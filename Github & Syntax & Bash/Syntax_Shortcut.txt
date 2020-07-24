@@ -101,3 +101,6 @@ Check cuda version:
 find files on ubuntu:
 - find . -iname $FILE_NAME 
 
+rosrun dynamic_reconfigure dynparam set /trajectory "{'speed':1.0,'trajectory': 2,'x_d':1.0,'y_d':1.0,'z_d':2.0}"
+rosrun dynamic_reconfigure dynparam set /trajectory "{'speed':1.0,'trajectory': 1}"
+
