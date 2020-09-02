@@ -21,7 +21,9 @@
 #    - Use mavros.setpoint module for topics
 
 from sensor_msgs.msg import PointCloud2, LaserScan
+from std_msgs.msg import Float64, Float32, Int32, String
 from laser_geometry import LaserProjection as lp
+from geometry_msgs.msg import PoseStamped, Quaternion, TwistStamped #geometry
 #import laser_geometry.laser_geometry as lg
 import math
 import rospy
@@ -30,6 +32,8 @@ import threading
 import time
 import numpy as np
 import mavros
+import scipy.signal as signal
+
 
 from math import *
 from mavros.utils import *
@@ -41,21 +45,49 @@ class sc2pcl:
     def __init__(self):
         self.rate = rospy.Rate(50) # 10hz is the original
         self.laserProj = lp()
+        self.x_demo = Float64()
+        self.filtered_x = 0.0
+        self.filtered_y = 0.0
+        self.filtered_z = 0.0
+        self.local_position = PoseStamped()
         self.scan_data = LaserScan()
+        rospy.Subscriber("mavros/local_position/pose", PoseStamped, self.position_callback)
         rospy.Subscriber("/scan",  LaserScan, self.scan_callback) # subscription to range values from rplidar
+        self.filtered_x_pos = rospy.Publisher('filtered_x', Float64, queue_size=10)
         self.pc = rospy.Publisher("converted_pc", PointCloud2, queue_size=1)
+        self.x_list = []
+        self.y_list = []
+        self.z_list = []
 
         while not rospy.is_shutdown():
             self.pcl_pub()
-            print "sc2pcl is running"
+            self.x_list.append(self.local_position.pose.position.x) 
+            self.y_list.append(self.local_position.pose.position.y)  
+            self.z_list.append(self.local_position.pose.position.z)    
+            self.apply_median_filter()
+
+            #print self.filtered_x
 
             self.rate.sleep()
 
     def scan_callback(self, data): # callback invoked with the message as the first arg
         self.scan_data =  data
+
+    def position_callback(self, data): # callback invoked with the message as the first arg
+        self.local_position = data 
         
     def pcl_pub(self):
         self.pc.publish(self.laserProj.projectLaser(self.scan_data))
+
+    def apply_median_filter(self, window_size=3):
+        self.filtered_x = signal.medfilt(self.x_list, window_size)
+        self.filtered_y = signal.medfilt(self.y_list, window_size)
+        self.filtered_z = signal.medfilt(self.z_list, window_size)
+
+        for i in range(len(self.filtered_x)):
+            self.x_demo.data = self.filtered_x[i]
+            self.filtered_x_pos.publish(self.x_demo)
+            print self.filtered_x[i], self.filtered_y[i], self.filtered_z[i]
                 
 if __name__ == '__main__':
     rospy.init_node('sc2pcl', anonymous=True)
