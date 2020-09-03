@@ -34,10 +34,11 @@ import numpy as np
 import mavros
 import scipy.signal as signal
 
-
+from std_msgs.msg import Header #type 
 from math import *
 from mavros.utils import *
 from mavros import setpoint as SP
+from tf2_msgs.msg import TFMessage
 #from tf.transformations import quaternion_from_euler
 
 class sc2pcl:
@@ -51,22 +52,44 @@ class sc2pcl:
         self.filtered_z = 0.0
         self.local_position = PoseStamped()
         self.scan_data = LaserScan()
+        self.y = 0.0
+        self.x = 0.0
+        self.z = 0.0
+        self.rx = 0.0
+        self.ry = 0.0
+        self.rz = 0.0
+
+        rospy.Subscriber('/tf', TFMessage, self.callback_tf)
         rospy.Subscriber("mavros/local_position/pose", PoseStamped, self.position_callback)
         rospy.Subscriber("/scan",  LaserScan, self.scan_callback) # subscription to range values from rplidar
+        self.pub_vis = rospy.Publisher('/filtered_vision', PoseStamped, queue_size=10)
         self.filtered_x_pos = rospy.Publisher('filtered_x', Float64, queue_size=10)
         self.pc = rospy.Publisher("converted_pc", PointCloud2, queue_size=1)
         self.x_list = []
         self.y_list = []
         self.z_list = []
+        i = 0.0
 
         while not rospy.is_shutdown():
-            self.pcl_pub()
-            self.x_list.append(self.local_position.pose.position.x) 
-            self.y_list.append(self.local_position.pose.position.y)  
-            self.z_list.append(self.local_position.pose.position.z)    
-            self.apply_median_filter()
-
-            #print self.filtered_x
+            #self.pcl_pub()
+            if i < 15:
+                #self.x_list.append(self.local_position.pose.position.x) 
+                self.y_list.append(self.y) 
+                self.x_list.append(self.x) 
+                self.z_list.append(self.z) 
+                i += 1
+            else:
+                self.filtered_y = np.median(self.y_list)
+                self.filtered_x = np.median(self.x_list)
+                self.filtered_z = np.median(self.z_list)
+                self.y_list.pop(0)
+                self.x_list.pop(0)
+                self.z_list.pop(0)
+                self.y_list.append(self.y) 
+                self.x_list.append(self.x) 
+                self.z_list.append(self.z) 
+                self.filtered_estimator()
+                print i, self.y, self.filtered_y
 
             self.rate.sleep()
 
@@ -75,6 +98,22 @@ class sc2pcl:
 
     def position_callback(self, data): # callback invoked with the message as the first arg
         self.local_position = data 
+
+    def callback_tf(self,data):
+        if data.transforms[0].header.frame_id == "camera_odom_frame":
+            self.y = data.transforms[0].transform.translation.y
+            self.x = data.transforms[0].transform.translation.x
+            self.z = data.transforms[0].transform.translation.z
+            self.rx = data.transforms[0].transform.rotation.x
+            self.ry = data.transforms[0].transform.rotation.y
+            self.rz = data.transforms[0].transform.rotation.z
+        else:
+            self.y = self.y
+            self.x = self.x
+            self.z = self.z
+            self.rx = self.rx
+            self.ry = self.ry
+            self.rz = self.rz
         
     def pcl_pub(self):
         self.pc.publish(self.laserProj.projectLaser(self.scan_data))
@@ -84,10 +123,37 @@ class sc2pcl:
         self.filtered_y = signal.medfilt(self.y_list, window_size)
         self.filtered_z = signal.medfilt(self.z_list, window_size)
 
-        for i in range(len(self.filtered_x)):
-            self.x_demo.data = self.filtered_x[i]
-            self.filtered_x_pos.publish(self.x_demo)
-            print self.filtered_x[i], self.filtered_y[i], self.filtered_z[i]
+        # for i in range(len(self.filtered_x)):
+        #     self.x_demo.data = self.filtered_x[i]
+        #     self.filtered_x_pos.publish(self.x_demo)
+        #     print self.filtered_x[i], self.filtered_y[i], self.filtered_z[i]
+
+    def filtered_estimator(self):
+
+        # Initialise necessary headers
+        pos = PoseStamped()
+        pos.header = Header()
+        pos.header.frame_id = "filtered_vision"
+
+        pos.pose.position.x = self.filtered_x
+        pos.pose.position.y = self.filtered_y
+        pos.pose.position.z = self.filtered_z
+
+        roll = self.rx 
+        pitch = self.ry
+        yaw = self.rz
+
+        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+        quaternion = [qx,qy,qz,qw]
+        pos.pose.orientation = Quaternion(*quaternion)
+            
+        pos.header.stamp = rospy.Time.now() # Update timestamp for each published SP
+        self.pub_vis.publish(pos)
+
                 
 if __name__ == '__main__':
     rospy.init_node('sc2pcl', anonymous=True)
