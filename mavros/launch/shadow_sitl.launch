@@ -1,9 +1,9 @@
 <launch>
     <arg name="headless" default="false"/>
     <arg name="gui" default="true"/> 
-    <arg name="ns" default="/"/>
-    <!-- <arg name="world_path" default="$(find mavros)/../sim/worlds/AIM_2020.world" /> -->
-    <arg name="world_path" default="$(find mavros)/../sim/worlds/borealis_demo.world" />
+    <arg name="ns" default="/"/> <!-- change to uav0 to give drone identity -->
+    <!--<arg name="world_path" default="$(find mavros)/../sim/worlds/AIM_2020.world" />--> 
+    <arg name="world_path" default="$(find mavros)/../sim/worlds/borealis_wall_ptsd.world" /> -->
     <arg name="build" default="px4_sitl_default"/>
     <!--arg name="fcu_url" default="udp://:14540@localhost:14557"/--> 
     <arg name="fcu_url" default="udp://:14540@192.168.1.36:14557"/>
@@ -22,7 +22,7 @@
     <node pkg = "tf" type = "static_transform_publisher" name="base_to_scan" args = "0 0 0.1 0 0 0 base_link iris/hokuyo_scan 100"/> 
     <!-- static_transform_publisher x y z yaw pitch roll frame_id child_frame_id period_in_ms -->
 
-    <!--<node pkg="rqt_reconfigure" type="rqt_reconfigure" output="screen" name="rqt_reconfigure" />-->
+    <node pkg="rqt_reconfigure" type="rqt_reconfigure" output="screen" name="rqt_reconfigure" />-->
 
     <!-- Launch PX4 SITL -->
     <include file="$(find px4)/launch/px4.launch">
