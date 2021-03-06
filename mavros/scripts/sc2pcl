@@ -39,6 +39,7 @@ from math import *
 from mavros.utils import *
 from mavros import setpoint as SP
 from tf2_msgs.msg import TFMessage
+from nav_msgs.msg import Odometry
 #from tf.transformations import quaternion_from_euler
 
 class sc2pcl:
@@ -51,6 +52,8 @@ class sc2pcl:
         self.filtered_y = 0.0
         self.filtered_z = 0.0
         self.local_position = PoseStamped()
+        self.odom = Odometry()
+        self.covariance = 0.0
         self.scan_data = LaserScan()
         self.y = 0.0
         self.x = 0.0
@@ -58,22 +61,35 @@ class sc2pcl:
         self.rx = 0.0
         self.ry = 0.0
         self.rz = 0.0
+        self.seq_2 = 0.0
+        self.X = 1.5
+        self.Y = 0.0
+        self.waypoints = Odometry()
+        self.init = 0.0
+        self.difference = 0.0
+        self.waypoint_position = Odometry()
+
 
         rospy.Subscriber('/tf', TFMessage, self.callback_tf)
+        rospy.Subscriber('/imu_odometry', Odometry, self.odom_callback)
         rospy.Subscriber("mavros/local_position/pose", PoseStamped, self.position_callback)
+        rospy.Subscriber("waypoints", Odometry, self.waypoints_callback)
         rospy.Subscriber("/scan",  LaserScan, self.scan_callback) # subscription to range values from rplidar
         self.pub_vis = rospy.Publisher('/filtered_vision', PoseStamped, queue_size=10)
         self.filtered_x_pos = rospy.Publisher('filtered_x', Float64, queue_size=10)
+        # self.covariance_pub = rospy.Publisher('covariance_sum', Float64, queue_size=10)
         self.pc = rospy.Publisher("converted_pc", PointCloud2, queue_size=1)
+        self.waypoints_pub = rospy.Publisher('waypoints', Odometry, queue_size=10)
         self.x_list = []
         self.y_list = []
         self.z_list = []
         i = 0.0
 
         while not rospy.is_shutdown():
-            #self.pcl_pub()
+            self.waypoints_assign()
+            self.pcl_pub()
             if i < 15:
-                #self.x_list.append(self.local_position.pose.position.x) 
+                # self.x_list.append(self.local_position.pose.position.x) 
                 self.y_list.append(self.y) 
                 self.x_list.append(self.x) 
                 self.z_list.append(self.z) 
@@ -89,7 +105,20 @@ class sc2pcl:
                 self.x_list.append(self.x) 
                 self.z_list.append(self.z) 
                 self.filtered_estimator()
-                print i, self.y, self.filtered_y
+                # print i, self.y, self.filtered_y
+            # print type(self.odom.pose.covariance), self.covariance
+            
+
+            # lalala = 0.0
+            # random_cov = np.random.uniform(0.00493, 0.02273)
+            # distance_from_drone = np.sqrt(((self.odom.pose.pose.position.x - self.local_position.pose.position.x)**2) + 
+            #     ((self.odom.pose.pose.position.y - self.local_position.pose.position.y)**2)) 
+            # data_pts = round((1.0/random_cov) / distance_from_drone)
+            # lalalal= data_pts
+            # lalala = int(lalala)
+            #print data_pts, random_cov, distance_from_drone, self.covariance
+            #print 1.0/random_cov
+            print self.X, self.Y, self.seq_2
 
             self.rate.sleep()
 
@@ -98,6 +127,90 @@ class sc2pcl:
 
     def position_callback(self, data): # callback invoked with the message as the first arg
         self.local_position = data 
+
+    def waypoints_callback(self, data): # callback invoked with the message as the first arg
+        self.waypoint_position = data 
+
+    def odom_callback(self, data): # callback invoked with the message as the first arg
+        self.odom = data
+        # x = 0.0 
+        # for i in self.odom.pose.covariance:
+        #     x += i 
+        # self.covariance = x     
+        # self.covariance_pub.publish(x)
+
+    def waypoints_assign(self):
+        if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 0.0):
+            self.seq_2 = self.seq_2 + 1  
+            self.X = 5.0
+            self.Y = 0.0
+            self.difference = self.waypoint_position.header.seq - self.init
+            self.init = self.waypoint_position.header.seq
+            
+
+        if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 1.0):
+            self.seq_2 = self.seq_2 + 1
+            self.X = 5.0
+            self.Y = -6.0
+            self.difference = self.waypoint_position.header.seq - self.init
+            self.init = self.waypoint_position.header.seq
+
+        if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 2.0):
+            self.seq_2 = self.seq_2 + 1  
+            self.X = 0.0
+            self.Y = -6.0
+            self.difference = self.waypoint_position.header.seq - self.init
+            self.init = self.waypoint_position.header.seq
+
+        if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 3.0):
+            self.seq_2 = self.seq_2 + 1  
+            self.X = 0.0
+            self.Y = 0.0
+            self.difference = self.waypoint_position.header.seq - self.init
+            self.init = self.waypoint_position.header.seq
+
+        if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 4.0):
+            self.seq_2 = self.seq_2 + 1  
+            self.X = 1.5
+            self.Y = 0.0
+            self.difference = self.waypoint_position.header.seq - self.init
+            self.init = self.waypoint_position.header.seq
+
+        if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 5.0):
+            self.seq_2 = self.seq_2 + 1  
+            self.X = 5.0
+            self.Y = 0.0
+            self.difference = self.waypoint_position.header.seq - self.init
+            self.init = self.waypoint_position.header.seq
+
+        if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 6.0):
+            self.seq_2 = self.seq_2 + 1
+            self.X = 5.0
+            self.Y = -6.0
+            self.difference = self.waypoint_position.header.seq - self.init
+            self.init = self.waypoint_position.header.seq
+
+        if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 7.0):
+            self.seq_2 = self.seq_2 + 1  
+            self.X = 0.0
+            self.Y = -6.0
+            self.difference = self.waypoint_position.header.seq - self.init
+            self.init = self.waypoint_position.header.seq
+
+        if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 8.0):
+            self.seq_2 = self.seq_2 + 1  
+            self.X = 0.0
+            self.Y = 0.0
+            self.difference = self.waypoint_position.header.seq - self.init
+            self.init = self.waypoint_position.header.seq
+
+
+        # self.waypoints.header.seq = self.odom.header.seq
+        self.waypoints.pose.pose.position.x = self.X
+        self.waypoints.pose.pose.position.y = self.Y
+        self.waypoints.pose.pose.position.z = self.difference
+
+        self.waypoints_pub.publish(self.waypoints)
 
     def callback_tf(self,data):
         if data.transforms[0].header.frame_id == "camera_odom_frame":

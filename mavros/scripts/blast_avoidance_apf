@@ -144,14 +144,7 @@ class blast_avoidance_apf:
                     self.quadrant = 4
 
                 self.x = self.target_x
-
-                if self.local_position.pose.position.x >= self.x:
-                    self.hold_target_y = self.target_y
-                    self.y = self.hold_target_y
-                else:
-                    self.hold_target_y = self.local_position.pose.position.y
-                    self.y = self.hold_target_y 
-
+                self.y = self.target_y
                 self.z = self.target_z 
 
                 print "active odometry", self.rmse_x, self.rmse_y,self.clearance, self.threshold, self.pitch_y, self.activation
@@ -159,7 +152,8 @@ class blast_avoidance_apf:
 
 
             self.tolerance = self.lowest * self.tolerance_gain
-            self.threshold = np.sqrt(((self.tolerance_percentage * self.data_pts * 2) * (self.tolerance ** 2)) / (self.tolerance_percentage * self.data_pts * 2)) 
+            ##self.threshold = np.sqrt(((self.tolerance_percentage * self.data_pts * 2) * (self.tolerance ** 2)) / (self.tolerance_percentage * self.data_pts * 2)) 
+            self.threshold = (self.tolerance_percentage * self.data_pts * 2) * (self.tolerance ** 2)
 
             if (self.drone_front + self.drone_right + self.drone_left + self.drone_back) > self.threshold:
                 self.x = self.local_position.pose.position.x - (self.kp * self.drone_front) + (self.kp * self.drone_back)
@@ -169,7 +163,7 @@ class blast_avoidance_apf:
 
             else:
                 self.x = self.target_x
-                self.y = self.hold_target_y
+                self.y = self.target_y
                 self.z = self.target_z 
 
             ##############################################

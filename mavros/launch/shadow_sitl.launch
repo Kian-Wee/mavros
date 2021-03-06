@@ -2,8 +2,8 @@
     <arg name="headless" default="false"/>
     <arg name="gui" default="true"/> 
     <arg name="ns" default="/"/> <!-- change to uav0 to give drone identity -->
-    <!--<arg name="world_path" default="$(find mavros)/../sim/worlds/AIM_2020.world" />--> 
-    <arg name="world_path" default="$(find mavros)/../sim/worlds/borealis_wall_ptsd.world" /> -->
+    <arg name="world_path" default="$(find mavros)/../sim/worlds/AIM_2021.world" />--> 
+    <!--<arg name="world_path" default="$(find mavros)/../sim/worlds/borealis_wall_ptsd.world" /> -->
     <arg name="build" default="px4_sitl_default"/>
     <!--arg name="fcu_url" default="udp://:14540@localhost:14557"/--> 
     <arg name="fcu_url" default="udp://:14540@192.168.1.36:14557"/>
@@ -54,6 +54,8 @@
     <!-- RViz -->
     <!--<node pkg="rviz" type="rviz" output="screen" name="rviz" respawn="true"
           args="-d $(find global_planner)/resource/global_planner.rviz" />-->
+
+    <node pkg="rqt_multiplot" type="rqt_multiplot" output="screen" name="rqt_multiplot" /> 
 
     <!-- can insert the launch file for the teraRanger pkg from the teraranger_array node -->
     
