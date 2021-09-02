@@ -20,10 +20,10 @@
 #    - Changed topic names after re-factoring : https://github.com/mavlink/mavros/issues/233
 #    - Use mavros.setpoint module for topics
 
-from sensor_msgs.msg import PointCloud2, LaserScan
+from sensor_msgs.msg import PointCloud2, LaserScan, PointField
 from std_msgs.msg import Float64, Float32, Int32, String
 from laser_geometry import LaserProjection as lp
-from geometry_msgs.msg import PoseStamped, Quaternion, TwistStamped #geometry
+from geometry_msgs.msg import PoseStamped, Quaternion, TwistStamped, TransformStamped #geometry
 #import laser_geometry.laser_geometry as lg
 import math
 import rospy
@@ -33,6 +33,9 @@ import time
 import numpy as np
 import mavros
 import scipy.signal as signal
+import sensor_msgs.point_cloud2 as pc2
+import pcl
+#import pcl.pcl_visualization
 
 from std_msgs.msg import Header #type 
 from math import *
@@ -40,6 +43,7 @@ from mavros.utils import *
 from mavros import setpoint as SP
 from tf2_msgs.msg import TFMessage
 from nav_msgs.msg import Odometry
+#from pcl_helper import *
 #from tf.transformations import quaternion_from_euler
 
 class sc2pcl:
@@ -68,6 +72,9 @@ class sc2pcl:
         self.init = 0.0
         self.difference = 0.0
         self.waypoint_position = Odometry()
+        self.waypoint_counter = 0.0
+        self.pcl_data = pcl.PointCloud_PointXYZRGB()
+        self.camera_depth = PointCloud2()
 
 
         rospy.Subscriber('/tf', TFMessage, self.callback_tf)
@@ -75,11 +82,14 @@ class sc2pcl:
         rospy.Subscriber("mavros/local_position/pose", PoseStamped, self.position_callback)
         rospy.Subscriber("waypoints", Odometry, self.waypoints_callback)
         rospy.Subscriber("/scan",  LaserScan, self.scan_callback) # subscription to range values from rplidar
+        rospy.Subscriber("/camera/depth/points",  PointCloud2, self.camera_depth_callback) # subscription to range values from rplidar
         self.pub_vis = rospy.Publisher('/filtered_vision', PoseStamped, queue_size=10)
         self.filtered_x_pos = rospy.Publisher('filtered_x', Float64, queue_size=10)
         # self.covariance_pub = rospy.Publisher('covariance_sum', Float64, queue_size=10)
-        self.pc = rospy.Publisher("converted_pc", PointCloud2, queue_size=1)
+        self.pc = rospy.Publisher("converted_pc", PointCloud2, queue_size=10)
+        # self.pc_rgb = rospy.Publisher("converted_pc_rgb", pcl.PointCloud_PointXYZRGB(), queue_size=1)
         self.waypoints_pub = rospy.Publisher('waypoints', Odometry, queue_size=10)
+        self.pub_spt = rospy.Publisher('drone_transform', TransformStamped, queue_size=10)
         self.x_list = []
         self.y_list = []
         self.z_list = []
@@ -118,9 +128,15 @@ class sc2pcl:
             # lalala = int(lalala)
             #print data_pts, random_cov, distance_from_drone, self.covariance
             #print 1.0/random_cov
-            print self.X, self.Y, self.seq_2
+
+            self.follow()
+            #print self.pcl_data.to_list
 
             self.rate.sleep()
+
+
+    def camera_depth_callback(self, data):
+        self.camera_depth = data
 
     def scan_callback(self, data): # callback invoked with the message as the first arg
         self.scan_data =  data
@@ -146,6 +162,7 @@ class sc2pcl:
             self.Y = 0.0
             self.difference = self.waypoint_position.header.seq - self.init
             self.init = self.waypoint_position.header.seq
+            self.waypoint_counter += 1
             
 
         if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 1.0):
@@ -154,6 +171,7 @@ class sc2pcl:
             self.Y = -6.0
             self.difference = self.waypoint_position.header.seq - self.init
             self.init = self.waypoint_position.header.seq
+            self.waypoint_counter += 1
 
         if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 2.0):
             self.seq_2 = self.seq_2 + 1  
@@ -161,6 +179,7 @@ class sc2pcl:
             self.Y = -6.0
             self.difference = self.waypoint_position.header.seq - self.init
             self.init = self.waypoint_position.header.seq
+            self.waypoint_counter += 1
 
         if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 3.0):
             self.seq_2 = self.seq_2 + 1  
@@ -168,6 +187,7 @@ class sc2pcl:
             self.Y = 0.0
             self.difference = self.waypoint_position.header.seq - self.init
             self.init = self.waypoint_position.header.seq
+            self.waypoint_counter += 1
 
         if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 4.0):
             self.seq_2 = self.seq_2 + 1  
@@ -175,6 +195,7 @@ class sc2pcl:
             self.Y = 0.0
             self.difference = self.waypoint_position.header.seq - self.init
             self.init = self.waypoint_position.header.seq
+            self.waypoint_counter += 1
 
         if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 5.0):
             self.seq_2 = self.seq_2 + 1  
@@ -182,6 +203,7 @@ class sc2pcl:
             self.Y = 0.0
             self.difference = self.waypoint_position.header.seq - self.init
             self.init = self.waypoint_position.header.seq
+            self.waypoint_counter += 1
 
         if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 6.0):
             self.seq_2 = self.seq_2 + 1
@@ -189,6 +211,7 @@ class sc2pcl:
             self.Y = -6.0
             self.difference = self.waypoint_position.header.seq - self.init
             self.init = self.waypoint_position.header.seq
+            self.waypoint_counter += 1
 
         if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 7.0):
             self.seq_2 = self.seq_2 + 1  
@@ -196,6 +219,7 @@ class sc2pcl:
             self.Y = -6.0
             self.difference = self.waypoint_position.header.seq - self.init
             self.init = self.waypoint_position.header.seq
+            self.waypoint_counter += 1
 
         if (np.abs(self.X - self.local_position.pose.position.x) < 0.2) and (np.abs(self.Y - self.local_position.pose.position.y) < 0.2) and (self.seq_2 == 8.0):
             self.seq_2 = self.seq_2 + 1  
@@ -203,12 +227,13 @@ class sc2pcl:
             self.Y = 0.0
             self.difference = self.waypoint_position.header.seq - self.init
             self.init = self.waypoint_position.header.seq
+            self.waypoint_counter += 1
 
 
         # self.waypoints.header.seq = self.odom.header.seq
         self.waypoints.pose.pose.position.x = self.X
         self.waypoints.pose.pose.position.y = self.Y
-        self.waypoints.pose.pose.position.z = self.difference
+        self.waypoints.pose.pose.position.z = self.waypoint_counter
 
         self.waypoints_pub.publish(self.waypoints)
 
@@ -230,6 +255,35 @@ class sc2pcl:
         
     def pcl_pub(self):
         self.pc.publish(self.laserProj.projectLaser(self.scan_data))
+        points_list = []
+
+        for data in pc2.read_points_list(self.laserProj.projectLaser(self.scan_data), skip_nans=True):
+             points_list.append([data[0], data[1], data[2], data[3]])
+             print data, data[0], type(data[0])
+
+        #self.pcl_data.from_list(points_list)
+       
+    #    visual = pcl.pcl_visualization.CloudViewing()
+    #    visual.ShowMonochromeCloud(self.pcl_data, b'cloud')
+
+
+    # def ros_to_pcl(self):
+    # """ Converts a ROS PointCloud2 message to a pcl PointXYZRGB
+    #     Args:
+    #         ros_cloud (PointCloud2): ROS PointCloud2 message
+    #     Returns:
+    #         pcl.PointCloud_PointXYZRGB: PCL XYZRGB point cloud
+    # """
+    #     points_list = []
+
+    #     for data in pc2.read_points(ros_cloud, skip_nans=True):
+    #         points_list.append([data[0], data[1], data[2], data[3]])
+
+    #     pcl_data = pcl.PointCloud_PointXYZRGB()
+    #     pcl_data.from_list(points_list)
+
+    #     return pcl_data
+
 
     def apply_median_filter(self, window_size=3):
         self.filtered_x = signal.medfilt(self.x_list, window_size)
@@ -266,6 +320,44 @@ class sc2pcl:
             
         pos.header.stamp = rospy.Time.now() # Update timestamp for each published SP
         self.pub_vis.publish(pos)
+
+
+    def follow(self): 
+        # Initialise necessary headers
+        pos = TransformStamped()
+        pos.header = Header() # initialising a new header for a new PoseStamped()
+        pos.header.frame_id = "convert pose to transform stamp"
+
+        # Establish desired setpoints
+        pos.transform.translation.x = self.local_position.pose.position.x 
+        pos.transform.translation.y = self.local_position.pose.position.y
+        pos.transform.translation.z = self.local_position.pose.position.z 
+
+        # Establish desired orientation at setpoint
+        roll_degrees = 0.0 
+        roll = radians(roll_degrees)
+        pitch_degrees = 0.0 
+        pitch = radians(pitch_degrees)
+        yaw_degrees = 0.0  
+        yaw = radians(yaw_degrees)
+
+        # Execute desired orientation
+        # quaternion = quaternion_from_euler(roll, pitch, yaw) #roll,pitch,yaw
+        # pos.pose.orientation = Quaternion(*quaternion)
+
+        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+        quaternion = [qx,qy,qz,qw]  # drone only takes in quarternion values, therefore have to do euler to quarternion conversion
+        pos.transform.rotation = Quaternion(*quaternion)
+        
+        pos.header.stamp = rospy.Time.now() # Update timestamp for each published SP
+
+        # Publishing to rostopic   
+        self.pub_spt.publish(pos) # updated pose from pos.pose.orientation
+
 
                 
 if __name__ == '__main__':

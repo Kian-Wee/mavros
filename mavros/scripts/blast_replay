@@ -38,8 +38,9 @@ from geometry_msgs.msg import PoseStamped, Quaternion, TwistStamped, Vector3 #ge
 from mavros_msgs.srv import CommandLong #service_class
 from mavros_msgs.msg import PositionTarget,ActuatorControl
 from sensor_msgs.msg import NavSatFix,Range,LaserScan #type
-from teraranger_array.msg import RangeArray
+#from teraranger_array.msg import RangeArray
 from nav_msgs.msg import Odometry
+from quadrotor_msgs.msg import PositionCommand
 
 
 class blast_replay:
@@ -55,7 +56,7 @@ class blast_replay:
         self.target_z = 1.8
 
         self.armed = False  
-        self.collective = RangeArray()
+        #self.collective = RangeArray()
         self.rate = rospy.Rate(50) # 10hz is the original 
         self.sensor_2 = 0.0
         self.sensor_6 = 0.0
@@ -76,6 +77,7 @@ class blast_replay:
         self.roll_x = 0.0
         self.pitch_y = 0.0
         self.yaw_z = 0.0
+        self.traj = PositionCommand()
 
         # rospy.wait_for_service('mavros/cmd/arming', 30) # wait for arming, queue for 30s
 
@@ -83,10 +85,11 @@ class blast_replay:
         rospy.Subscriber("/pose3dk", Vector3, self.blast_callback)
         rospy.Subscriber("/mavros/local_position/pose", PoseStamped, self.position_callback)
         rospy.Subscriber("/scan", LaserScan, self.scan_callback)
+        rospy.Subscriber("/drone_0_planning/pos_cmd", PositionCommand, self.traj_callback)
 
         self.pub_pos = rospy.Publisher('mavros/setpoint_raw/local', PositionTarget, queue_size=10)
-        self.pub_spt = rospy.Publisher('mavros/setpoint_position/local', PoseStamped, queue_size=10)
-        # self.pub_spt = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=10)
+        self.pub_traj_spt = rospy.Publisher('mavros/setpoint_position/local', PoseStamped, queue_size=10)
+        self.pub_spt = rospy.Publisher('/move_base_simple/goal', PoseStamped, queue_size=10)
         
         # rospy.wait_for_service('mavros/cmd/command', 30)
         self._srv_cmd_long = rospy.ServiceProxy('mavros/cmd/command', CommandLong, persistent=True)
@@ -98,7 +101,7 @@ class blast_replay:
                 self.y = self.target_y
                 self.z = self.target_z
 
-                print "non active odometry", self.x, self.y, self.z
+                # print "non active odometry", self.x, self.y, self.z
 
             if (self.blast_position.x or self.blast_position.y) != 0.0:
                 self.target_x = self.blast_position.x 
@@ -111,10 +114,11 @@ class blast_replay:
 
                 #print "active odometry", self.x, self.y, self.z  
             # print "blast_replay", self.blast_position.x, self.blast_position.y, self.z
-            # self.follow()
+            self.initialpt()
+            self.finalpt()
             # print self.sensor_0, self.sensor_90, self.sensor_180, self.sensor_270
-            print self.sensor_90, self.sensor_180
-            #print self.roll_x, self.pitch_y, self.yaw_z
+            print self.x, self.y, self.z, self.traj.position.x, self.traj.position.y, self.traj.position.z
+            # print self.roll_x, self.pitch_y, self.yaw_z
             self.rate.sleep() # The loop calls rate.sleep(), which sleeps just long enough to maintain the desired rate through the loop.
 
 
@@ -147,7 +151,10 @@ class blast_replay:
         # return roll_x, pitch_y, yaw_z # in radians
 
     def blast_callback(self, data): # callback invoked with the message as the first arg
-        self.blast_position = data  
+        self.blast_position = data
+
+    def traj_callback(self, data): # callback invoked with the message as the first arg
+        self.traj = data    
 
     def scan_callback(self, data):       
         self.scans = data
@@ -189,11 +196,11 @@ class blast_replay:
             self.rate.sleep() # The loop calls rate.sleep(), which sleeps just long enough to maintain the desired rate through the loop.
 
 
-    def follow(self): 
+    def initialpt(self): 
         # Initialise necessary headers
         pos = PoseStamped()
         pos.header = Header() # initialising a new header for a new PoseStamped()
-        pos.header.frame_id = "following_waypoints"
+        pos.header.frame_id = "initial_waypoints"
 
         # Establish desired setpoints
         pos.pose.position.x = self.x # North
@@ -224,6 +231,42 @@ class blast_replay:
 
         # Publishing to rostopic   
         self.pub_spt.publish(pos) # updated pose from pos.pose.orientation
+
+    def finalpt(self): 
+        # Initialise necessary headers
+        pos = PoseStamped()
+        pos.header = Header() # initialising a new header for a new PoseStamped()
+        pos.header.frame_id = "final_waypoints"
+
+        # Establish desired setpoints
+        pos.pose.position.x = self.traj.position.x
+        pos.pose.position.y = self.traj.position.y
+        pos.pose.position.z = 1.8
+
+        # Establish desired orientation at setpoint
+        roll_degrees = 0.0 
+        roll = radians(roll_degrees)
+        pitch_degrees = 0.0 
+        pitch = radians(pitch_degrees)
+        yaw_degrees = 0.0  
+        yaw = radians(yaw_degrees)
+
+        # Execute desired orientation
+        # quaternion = quaternion_from_euler(roll, pitch, yaw) #roll,pitch,yaw
+        # pos.pose.orientation = Quaternion(*quaternion)
+
+        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+        quaternion = [qx,qy,qz,qw]  # drone only takes in quarternion values, therefore have to do euler to quarternion conversion
+        pos.pose.orientation = Quaternion(*quaternion)
+        
+        pos.header.stamp = rospy.Time.now() # Update timestamp for each published SP
+
+        # Publishing to rostopic   
+        self.pub_traj_spt.publish(pos) # updated pose from pos.pose.orientation
 
 
     def deviance(self):
