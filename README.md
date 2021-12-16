@@ -3,11 +3,17 @@ BOREALIS SPECIFIC MAVROS SETUP
 Follow inital mavros installation and change branch to pull changes
 
 Initalise this fork from master branch
+
 	1. run through normal ros and mavros setup
+	
 	2. ```git remote set-url origin https://github.com/Kian-Wee/mavros.git```
+	
 	3. ```git branch borealis```
+	
 	4. ```git checkout borealis```
+	
 	5. ```git pull origin borealis```
+	
 
 Run the setup file to initalise aliases
 ``` . ~/catkin_ws/src/mavros/borealis_setup/setup.bash ```
