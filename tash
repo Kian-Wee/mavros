@@ -1,0 +1,2021 @@
+[33mcommit 7b489f3dc1e57326fa8a52e7f0630378caa8aef0[m[33m ([m[1;36mHEAD -> [m[1;32mborealis_kinetic[m[33m, [m[1;33mtag: 1.9.0[m[33m, [m[1;31morigin/borealis_D3[m[33m, [m[1;32mborealis_D3[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu Sep 9 11:41:04 2021 +0000
+
+    1.9.0
+
+[33mcommit 3c0898b89d194aef6079426b6aa99771e5adf963[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu Sep 9 14:40:06 2021 +0300
+
+    update changelog
+    
+    Signed-off-by: Vladimir Ermakov <vooon341@gmail.com>
+
+[33mcommit 85f01b5768050b5e19bc699bb7c16f4f37b9f01e[m
+Merge: 13ae6e53 a0668b5e
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Tue Sep 7 20:09:06 2021 +0300
+
+    Merge pull request #1621 from amilcarlucas/pr/mount-control-spelling
+    
+    Spelling corrections
+
+[33mcommit a0668b5e529f9350ca210f1c18858c3a7912eb68[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Tue Sep 7 16:47:46 2021 +0200
+
+    Spelling corrections
+
+[33mcommit 13ae6e53d67848ef63153ebe3036806e76308ee8[m
+Merge: c977812d 497d6657
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Tue Sep 7 13:34:13 2021 +0300
+
+    Merge pull request #1616 from amilcarlucas/pr/RC_CHANNELS-mavlink2-extensions
+    
+    Mavlink v2.0 specs for RC_CHANNELS_OVERRIDE accepts upto 18 channels.…
+
+[33mcommit 497d6657b2edadb28741449c17f4f6dc4fe5da6f[m
+Author: Karthik Desai <karthik.desai@iav.de>
+Date:   Fri Feb 14 15:09:00 2020 +0100
+
+    Changed OverrideRCIn to 18 channels
+
+[33mcommit c977812df2d63f9bc178d1acadd96d1c8a3991df[m
+Merge: 71b24cde dac2f260
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Sep 6 20:16:11 2021 +0300
+
+    Merge pull request #1615 from amilcarlucas/pr/erase-logs
+    
+    This adds functionality to erase all logs on the SD card via mavlink
+
+[33mcommit 71b24cde2a404d0a047e90f7ce9819d1be05d7f0[m
+Merge: 098c4673 27bb3626
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Sep 6 20:04:31 2021 +0300
+
+    Merge pull request #1617 from amilcarlucas/pr/NAV_CONTROLLER_OUTPUT-plugin
+    
+    Added NAV_CONTROLLER_OUTPUT Plugin
+
+[33mcommit 098c4673a55a1c7337316812758bf690021b84b4[m
+Merge: def8ccee df3d88c6
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Sep 6 20:02:34 2021 +0300
+
+    Merge pull request #1618 from amilcarlucas/pr/GPS_INPUT-plugin
+    
+    Added GPS_INPUT plugin
+
+[33mcommit def8cceefa104ee30b173335b51ed52297b62ba5[m
+Merge: ccda446a 9bb529dc
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Sep 6 20:00:41 2021 +0300
+
+    Merge pull request #1619 from amilcarlucas/pr/BATTERY2-topic
+    
+    publish BATTERY2 message as /mavros/battery2 topic
+
+[33mcommit dac2f26084f2754a407d08ca042f396c4792e134[m
+Author: Karthik Desai <karthik.desai@iav.de>
+Date:   Fri Apr 17 12:55:25 2020 +0200
+
+    This adds functionality to erase all logs on the SD card via mavlink
+
+[33mcommit 9bb529dc08c7c0a5d5d18a2d01a33f24fc117f48[m
+Author: Karthik Desai <karthik.desai@iav.de>
+Date:   Thu Sep 17 13:23:09 2020 +0200
+
+    publish BATTERY2 message as /mavros/battery2 topic
+
+[33mcommit cac757da1f1897c3fdab6a4b2759df91cd786beb[m
+Author: Karthik Desai <karthik.desai@iav.de>
+Date:   Thu Feb 13 13:19:03 2020 +0100
+
+    Mavlink v2.0 specs for RC_CHANNELS_OVERRIDE accepts upto 18 channels. The plugin publishes channels 9 to 18 if the FCU protocol version is 2.0
+
+[33mcommit 27bb3626360b8984643b7ff6430226ac7c21e3f0[m
+Author: Karthik Desai <karthik.desai@iav.de>
+Date:   Tue Jun 11 12:50:13 2019 +0200
+
+    Added NAV_CONTROLLER_OUTPUT Plugin
+
+[33mcommit df3d88c6d8068a0c1cedfed2e3477d9fab48b481[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Tue Feb 12 20:27:03 2019 +0100
+
+    Added GPS_INPUT plugin
+
+[33mcommit ccda446ae37954f96206583dbfe2045766183fb5[m
+Merge: c0069171 93c2d8d9
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Aug 30 18:18:25 2021 +0300
+
+    Merge pull request #1606 from BV-OpenSource/master
+    
+    Add Mount angles message for communications with ardupilotmega.
+
+[33mcommit 93c2d8d970fef4c1907def47771f7cd87872b30e[m
+Merge: ae2263bc c0069171
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Aug 30 18:17:44 2021 +0300
+
+    Merge branch 'master' into master
+
+[33mcommit c0069171d81e2247ec6ff861894c291cd9b58b52[m
+Author: Ricardo Marques <marques.ricardo17@gmail.com>
+Date:   Mon Aug 30 15:41:44 2021 +0200
+
+    Update esc_status plugin with datatype change on MAVLink.
+    
+    ESC_INFO MAVLink message was updated to have negative temperates and also at a different resolution. This commit updates those changes on this side.
+    
+    Signed-off-by: Ricardo Marques <marques.ricardo17@gmail.com>
+
+[33mcommit ae2263bc68887c587c45c87b5bde12c8af36a90b[m
+Author: André Filipe <andre.ferreira@beyond-vision.pt>
+Date:   Mon Aug 30 12:28:57 2021 +0100
+
+    Convert status data from cdeg to rad.
+
+[33mcommit 7e34675abaa46247fd1a6a7ff70bbec9248553ed[m
+Author: André Filipe <andre.ferreira@beyond-vision.pt>
+Date:   Mon Aug 30 11:40:27 2021 +0100
+
+    Publish quaternion information with Mount Status mavlink message.
+
+[33mcommit d817fe1e59d7b41d253a30c1a3f44e5959ef602e[m
+Author: André Filipe <andre.ferreira@beyond-vision.pt>
+Date:   Fri Aug 27 13:54:04 2021 +0100
+
+    Add missing subscription.
+
+[33mcommit 26f0acf0d6e2683d482e69ceef5470a57af2ab69[m
+Author: André Filipe <andre.ferreira@beyond-vision.pt>
+Date:   Thu Aug 26 09:39:37 2021 +0100
+
+    Remove Mount_Status plugin. Add Status data to Mount_Control plugin. Remove Mount_Status message.
+
+[33mcommit 677911dd412489ea6f72d7490bfb9ce1c44374e0[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Aug 25 20:58:47 2021 +0300
+
+    extras: esc_telemetry: fix build
+    
+    Signed-off-by: Vladimir Ermakov <vooon341@gmail.com>
+
+[33mcommit 50bc84ea45ebfaacf1b8c1050337899b2e24ad33[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Aug 25 20:55:18 2021 +0300
+
+    extras: fix esc_telemetry centi-volt/amp conversion
+    
+    Signed-off-by: Vladimir Ermakov <vooon341@gmail.com>
+
+[33mcommit 1d55c68a7fbd21113d3ba31ab193d2d525233db4[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Aug 25 20:54:16 2021 +0300
+
+    extras: uncrustify all plugins
+    
+    Signed-off-by: Vladimir Ermakov <vooon341@gmail.com>
+
+[33mcommit 3cf38324b4ec5290edb9cef148bc5aad6e5e6b1c[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Aug 25 20:51:30 2021 +0300
+
+    plugins: reformat xml
+
+[33mcommit 23c1db28d560760d0b10a3cfffa6e6aa098bccae[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Aug 25 20:47:25 2021 +0300
+
+    extras: reformat plugins xml
+    
+    Signed-off-by: Vladimir Ermakov <vooon341@gmail.com>
+
+[33mcommit 6eaad1ad03040d33fedab0afa17424fb482d89e4[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Aug 25 20:40:59 2021 +0300
+
+    extras: fix apm esc_telemetry
+
+[33mcommit d791519978b1142e515407e6f5a364326ea70ff8[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Aug 25 20:19:06 2021 +0300
+
+    msgs: fix types for apm's esc telemetry
+
+[33mcommit 7e0e33e0b92af0c197a685f3f015b9990288ef06[m
+Author: Abhijith Thottumadayil Jagadeesh <abhijith@rizse.io>
+Date:   Tue Jul 27 18:13:51 2021 +0000
+
+    actually allocate memory for the telemetry information
+
+[33mcommit d5a879d93ccb83343f53b514421824264a98562d[m
+Author: Abhijith Thottumadayil Jagadeesh <abhijith@rizse.io>
+Date:   Mon Jul 26 21:21:21 2021 +0000
+
+    fixed some compile errors
+
+[33mcommit a07965f675fd4697f4057321f47f73d7d28f372c[m
+Author: Russell <russell@rizse.io>
+Date:   Mon Jul 26 13:48:07 2021 -0500
+
+    added esc_telemetry plugin
+
+[33mcommit 04d624415a04d8280b3a7e6dc4fddfb4d6494201[m
+Author: André Filipe <andre.ferreira@beyond-vision.pt>
+Date:   Wed Aug 25 10:51:17 2021 +0100
+
+    Add Mount angles message for communications with ardupilotmega.
+
+[33mcommit 29db67693a3fecadfec973a6879930645c2ee9d1[m
+Author: André Filipe <andre.ferreira@beyond-vision.pt>
+Date:   Wed Aug 4 11:38:50 2021 +0100
+
+    Reset calibration flag when re-calibrating. Prevent wrong data output.
+
+[33mcommit 7df029f76d90c44cd400cc4e804748fefa194a3b[m
+Author: BV-OpenSource <opensource@beyond-vision.pt>
+Date:   Thu Jul 29 10:10:40 2021 +0100
+
+    Exclude changes to launch files.
+
+[33mcommit 028fb7a7989fb965ce56f9a0240da1c921733d86[m
+Author: André Filipe <andre.ferreira@beyond-vision.pt>
+Date:   Wed Jul 21 16:39:40 2021 +0100
+
+    Delete debug files.
+
+[33mcommit 358c3ca12a81d90d06fddee9f6828436e331c2a6[m
+Author: André Filipe <andre.ferreira@beyond-vision.pt>
+Date:   Wed Jul 21 16:29:29 2021 +0100
+
+    Apply uncrustify changes.
+
+[33mcommit 743239d90f3a8fee867fc6c59c82e516cecb84a0[m
+Author: André Filipe <andre.ferreira@beyond-vision.pt>
+Date:   Wed Jul 21 16:20:26 2021 +0100
+
+    Set progress array to global to prevent erasing data.
+
+[33mcommit 4a9ace864d231dd5c0a3958ac69476a1d48a04ad[m
+Author: André Filipe <andre.ferreira@beyond-vision.pt>
+Date:   Wed Jul 21 15:35:31 2021 +0100
+
+    Move Compass calibration report to extras. Rewrite code based on instructions.
+
+[33mcommit 3e9d119ac36d4c5fb1bab63741c2ad7aefbb537e[m
+Author: André Filipe <andre.ferreira@beyond-vision.pt>
+Date:   Tue Jul 20 15:49:09 2021 +0100
+
+    Remove extra message from CMakeLists.
+
+[33mcommit 928fdcd1a7c92e3344c197a77464a1713ea606e5[m
+Author: André Filipe <andre.ferreira@beyond-vision.pt>
+Date:   Tue Jul 20 15:47:29 2021 +0100
+
+    Add message and service definition.
+
+[33mcommit 5c480be751f024b68abb9707b6a7a605a2df8676[m
+Author: André Filipe <andre.ferreira@beyond-vision.pt>
+Date:   Tue Jul 20 15:26:26 2021 +0100
+
+    Add compass calibration feedback status. Add service to call the 'Next' button in calibrations.
+
+[33mcommit 5f706efd4102fa2ec0b0aa858c281e528441c67a[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sat May 29 11:31:44 2021 +0300
+
+    ci: update industrial-ci usage
+
+[33mcommit 379ef4de3efd5e07e78e2e352775604fc5ac3b3b[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sat May 29 11:27:50 2021 +0300
+
+    ci: remove travis
+
+[33mcommit b2f9d9cd6c727f5c0c80bad6d20eb8731b15b865[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sat May 29 10:27:10 2021 +0300
+
+    readme: update
+
+[33mcommit 8b9a32ac323e79cef826ee5f39aeb07a1162d240[m[33m ([m[1;33mtag: 1.8.0[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed May 5 07:35:25 2021 +0000
+
+    1.8.0
+
+[33mcommit 72485d4a76110e1b29542e494e45acb69ba132f8[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed May 5 10:34:51 2021 +0300
+
+    update changelog
+
+[33mcommit e5e482d76b3e99091ecf6811b7a2ee1e6a7dad2b[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Tue May 4 22:07:41 2021 +0300
+
+    Create semgrep-analysis.yml
+
+[33mcommit be6591a2bb23fbf6a9d96b0e08e0cccbdf458c9a[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Tue May 4 22:06:40 2021 +0300
+
+    Create codeql-analysis.yml
+
+[33mcommit 5ba8ec36ddf884505addb244310cedf0109f89de[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sun Apr 25 21:45:30 2021 +0300
+
+    ci: github uses yaml parser which do not support anchors. surprise, surprise!
+
+[33mcommit aca9d8107971101acbf3de7e5bcfa34f6e55c6f3[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sun Apr 25 21:43:51 2021 +0300
+
+    ci: install geographiclib datasets
+
+[33mcommit 6fc197ddfe7e805205896f44ed5d5303de37d691[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sun Apr 25 21:36:24 2021 +0300
+
+    extras: #1370: set obstacle aangle offset
+
+[33mcommit 4d0c04d7498125d1c45542039710273c1df81d0a[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sun Apr 25 21:30:13 2021 +0300
+
+    lib: ftf: allow both Quaterniond and Quaternionf for quaternion_to_mavlink()
+
+[33mcommit ce8b53adc5ab4b281b137f2e99ba75b8afd768b7[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sun Apr 25 20:37:30 2021 +0300
+
+    extras: distance_sensor: rename param for custom orientation, apply uncrustify
+    
+    Signed-off-by: Vladimir Ermakov <vooon341@gmail.com>
+
+[33mcommit 29dfb1cf48ed6262888fec46576f8130c8027e78[m
+Author: Alexey Rogachevskiy <sfalexrog@gmail.com>
+Date:   Sat Mar 21 21:33:30 2020 +0300
+
+    px4_config: Add distance_sensor parameters
+
+[33mcommit e49fc4120857da0245dd9fae64df003258a96239[m
+Author: Alexey Rogachevskiy <sfalexrog@gmail.com>
+Date:   Sat Mar 21 21:26:58 2020 +0300
+
+    distance_sensor: Add horizontal_fov_ratio, vertical_fov_ratio, sensor_orientation parameters
+
+[33mcommit 96ff79fe222b65507270ca4d5959ba47f1f691c5[m
+Author: Alexey Rogachevskiy <sfalexrog@gmail.com>
+Date:   Fri Mar 20 18:17:32 2020 +0300
+
+    distance_sensor: Fill horizontal_fov, vertical_fov, quaternion
+
+[33mcommit 7e26c548e66f38aac133bc544bdc59547ebba754[m
+Author: Thomas <thomas@rigi.tech>
+Date:   Thu Apr 15 09:56:26 2021 +0200
+
+    convert whole expression to mm
+
+[33mcommit 3de25ee29f25ea703e0f1cc399ba51b6d2c22628[m[33m ([m[1;33mtag: 1.7.1[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Apr 5 19:46:23 2021 +0000
+
+    1.7.1
+
+[33mcommit bb4786b6a84d0e13b903d63302319be8e5fa95fa[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Apr 5 22:45:58 2021 +0300
+
+    update changelog
+
+[33mcommit 9f996881a70f1105318aad9138ddc76456dfaacc[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Apr 5 22:43:02 2021 +0300
+
+    re-generate all pymavlink enums
+
+[33mcommit 7c967851780c9df3c956700c81fba196fe228bf6[m[33m ([m[1;33mtag: 1.7.0[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Apr 5 09:22:54 2021 +0000
+
+    1.7.0
+
+[33mcommit aae04e514bab024fb97d1fbb106eaad5209a707a[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Apr 5 12:22:18 2021 +0300
+
+    update changelog
+
+[33mcommit 5fdb8ce50c0bc387c51f89f2e7c79ba9c0f6c620[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu Apr 1 10:56:07 2021 +0300
+
+    msgs: re-generate the code
+
+[33mcommit acb7d23ab04228149b1f7018f1d7128c0ba92d35[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu Apr 1 10:54:14 2021 +0300
+
+    lib: re-generate the code
+
+[33mcommit ed355e6db92f22ef5323e9b86ad789425b318ab1[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu Apr 1 10:50:12 2021 +0300
+
+    plugins: mission: re-generate the code
+
+[33mcommit ea7d9f29f92b67658c88513b7dce15103041ccf5[m
+Author: Charlie-Burge <charlie.burge@manna.aero>
+Date:   Wed Mar 31 21:11:20 2021 +0100
+
+    MissionBase: correction to file information
+
+[33mcommit 34c0e5e131088af58bb065a70ae5f88f5c84b1de[m
+Author: Charlie-Burge <charlie.burge@manna.aero>
+Date:   Wed Mar 31 21:08:03 2021 +0100
+
+    MissionBase: add copyright from origional waypoint.cpp
+
+[33mcommit e2f5d4ea8dc1a46333cb8d2d1639408b489d5120[m
+Author: Charlie-Burge <charlie.burge@manna.aero>
+Date:   Wed Mar 31 16:42:37 2021 +0100
+
+    uncrustify
+
+[33mcommit e1944e40b5dc61091d9aaed721575fd071322a5a[m
+Author: Charlie-Burge <charlie.burge@manna.aero>
+Date:   Wed Mar 31 16:22:16 2021 +0100
+
+    whitespace
+
+[33mcommit 2551d5844ed800c7b41c49c5b88f13958eb652f4[m
+Author: Charlie-Burge <charlie.burge@manna.aero>
+Date:   Tue Mar 30 10:08:39 2021 +0100
+
+    add rallypoint and geofence plugins to mavros plugins xml
+
+[33mcommit 95bebb407b80d5d48e53676385283b62e143b205[m
+Author: Charlie-Burge <charlie.burge@manna.aero>
+Date:   Tue Mar 30 10:06:55 2021 +0100
+
+    add rallypoint and geofence plugins to CMakeList
+
+[33mcommit a3a64319925314be1b3edc4c074b8dbb3a090286[m
+Author: Charlie-Burge <charlie.burge@manna.aero>
+Date:   Tue Mar 30 10:04:04 2021 +0100
+
+    Geofence: add geofence plugin
+
+[33mcommit 7a32e0edeefaf78a1375add550dbca12dbf12ff9[m
+Author: Charlie-Burge <charlie.burge@manna.aero>
+Date:   Tue Mar 30 10:00:40 2021 +0100
+
+    Rallypoint: add rallypoint plugin
+
+[33mcommit a83b4f125e9b3f9815f94365623988767bc626ee[m
+Author: Charlie-Burge <charlie.burge@manna.aero>
+Date:   Tue Mar 30 09:57:56 2021 +0100
+
+    Waypoint: inherit MissionBase class for mission protocol
+
+[33mcommit 8acad0e8df5dc39d0758146fac5d623451851473[m
+Author: Charlie-Burge <charlie.burge@manna.aero>
+Date:   Tue Mar 30 09:12:19 2021 +0100
+
+    MissionBase: breakout mission protocol from waypoint.cpp
+
+[33mcommit ceb53a42102eb3f6f63b561a5c0e82cb38a5c5f6[m
+Author: Ramon Roche <mrpollo@gmail.com>
+Date:   Mon Mar 1 14:08:37 2021 -0800
+
+    README: Update PX4 Autopilot references
+    
+    Much needed fixes to clarify the project is named correctly throughout the README
+    for the PX4 Autopilot, QGroundControl, and MAVLink
+
+[33mcommit 48e545b5bcb508d28f3fe9a270636c37e3ccc541[m
+Author: Tobias Fischer <info@tobiasfischer.info>
+Date:   Wed Mar 3 10:04:43 2021 +1000
+
+    Fix https://github.com/mavlink/mavros/issues/849
+
+[33mcommit cceda52745b67d5313b2634109041ad37cfed64a[m[33m ([m[1;33mtag: 1.6.0[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Feb 15 07:11:56 2021 +0000
+
+    1.6.0
+
+[33mcommit a2a8a04a0e5e649178aa4a1655838cffc9904b91[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Feb 15 10:11:18 2021 +0300
+
+    update changelog
+    
+    Signed-off-by: Vladimir Ermakov <vooon341@gmail.com>
+
+[33mcommit e88158854cf19f099c61ca70e5457a995f74004b[m
+Author: zhouzhiwen2000 <zhouzhiwen2000@gmail.com>
+Date:   Sun Feb 14 05:54:47 2021 +0800
+
+    fix inconsistency in direction of yaw when using set_position in BODY frames and fix problems with yaw in setponit_raw
+
+[33mcommit 7ccca3eac1c8dda6c6972b0a971223bfea254d79[m
+Author: John Gifford <john.gifford@leonardo-itg.com>
+Date:   Wed Feb 10 10:35:32 2021 +0000
+
+    Fixed a bug in mavros_extras/src/plugins/odom.cpp by switching lines 175 and 180.
+    
+    Rationale: The pose covariance matrix published to the /mavros/odometry/in topic is exclusively zeros. This is because the transformation matrix r_pose is initialised as zeros (line 140), then applied to the covariance matrix cov_pose (line 176) and then populated (line 180). Clearly the latter two steps should be the other way around, and the comments in the code appear to suggest that this was the intention, but that lines 175 and 180 were accidentally written the wrong way around. Having switched them, the pose covariance is now published to /mavros/odometry/in as expected.
+    
+    JohnG897
+
+[33mcommit c8e166e0654242f5a0bb901aee2195ae0f21077e[m[33m ([m[1;33mtag: 1.5.2[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Tue Feb 2 06:30:17 2021 +0000
+
+    1.5.2
+
+[33mcommit 6cd6399ccdd9cd937f5372efcdc554e18f378ddd[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Tue Feb 2 09:29:57 2021 +0300
+
+    update changelog
+
+[33mcommit a05f5d9984714832ffa8c7e26038be2e6a069aa4[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Feb 1 15:18:14 2021 +0300
+
+    readme: add source install note for Noetic release
+    
+    Signed-off-by: Vladimir Ermakov <vooon341@gmail.com>
+
+[33mcommit 341bac3b4180f0e0f936f25342e14dd88b3f83b1[m
+Author: Ashwin Varghese Kuruttukulam <35679537+ashwinvk94@users.noreply.github.com>
+Date:   Tue Jan 19 09:32:29 2021 -0500
+
+    bugfix - add estimator type in odom message
+    
+    Add missing estimator_type field in  Odometry message.
+    Issue #1524
+
+[33mcommit efb533174e47aced9489526f2c8ae0be633e45e9[m[33m ([m[1;33mtag: 1.5.1[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Jan 4 13:06:37 2021 +0000
+
+    1.5.1
+
+[33mcommit d9d4ce85392f1d1422ccdbf2f9c4e9c0cfc3d849[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Jan 4 16:05:50 2021 +0300
+
+    update chengelog
+
+[33mcommit 48152f2d09e07de54423a7ec734d28cee2ca5cdd[m
+Author: Rob Clarke <robert.clarke@bristol.ac.uk>
+Date:   Fri Nov 13 17:49:03 2020 +0000
+
+    Fix tests for renaming of ECEF cases
+    Introduced in 6234af29
+
+[33mcommit 75f6bdb7baab7ca4571f124520a5d1ee625f3de5[m
+Author: Rob Clarke <robert.clarke@bristol.ac.uk>
+Date:   Fri Nov 13 17:47:45 2020 +0000
+
+    Fix test for renaming of HEARTBEAT
+
+[33mcommit 7f01ae942666a3855452fa1e53ddf6d66ab1f7d1[m
+Author: Rob Clarke <robert.clarke@bristol.ac.uk>
+Date:   Fri Nov 13 17:47:24 2020 +0000
+
+    Initialise message structures
+    Uninitialised Mavlink 2 extension fields were sent if the fields were
+    not later set. Initialising the fields to zero is the default value for
+    extension fields and appears to the receiver as though sender is unaware
+    of Mavlink 2.
+    
+    Instances were found with regex below, more may exist:
+    mavlink::[^:]+::msg::[^:={]+ ?[^:={]*;
+
+[33mcommit 0fb635f1848b898e4271005c42d78131f237ca8f[m[33m ([m[1;33mtag: 1.5.0[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Nov 11 14:32:48 2020 +0000
+
+    1.5.0
+
+[33mcommit be7e21251cb6623badda1c421326c42cdf85685a[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Nov 11 17:32:15 2020 +0300
+
+    prepare release
+
+[33mcommit 7e9ea3da91cb1b4c82ac23b1e64a8f4802c9dda2[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Mon Nov 9 15:10:44 2020 +0100
+
+    mavros/sys_status: Fill flight_custom_version field
+
+[33mcommit 71bc8424e5f47d492c85582597fdf8b9650bf7b9[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Mon Nov 9 15:10:27 2020 +0100
+
+    mavros_msgs/VehicleInfo: Add flight_custom_version field
+    
+    Mirroring the field in the corresponding MAVLink message.
+
+[33mcommit 040fda7482821184f286a940ed83cde59e5391e1[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Wed Oct 21 12:39:26 2020 +0200
+
+    mavros_msgs/State: Fix PX4 flight mode constants
+    
+    Turns out ROS message string literals don't need quotes,
+    so adding quotes creates strings including the quotes.
+
+[33mcommit c9adcfbe5ae76b0f1f05c6745c038c1cd79afed9[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Thu Oct 15 15:28:04 2020 +0200
+
+    mavros_msgs/State: Add flight mode constants
+
+[33mcommit 7a883b7ab6bcb6f2845c186998fa622d9ee1609c[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Wed Oct 7 16:53:18 2020 +0200
+
+    mavros_extras: Fix member initialization order
+
+[33mcommit 860dc981368a67da634e1150fa046742ea1e59c7[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Wed Oct 7 16:47:20 2020 +0200
+
+    mavros_msgs: Don't move temporary objects
+
+[33mcommit 463e3034f1b0a362d8b888e9295fbe60e398cb52[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Wed Oct 7 16:45:51 2020 +0200
+
+    mavros_extras: Add override specifiers
+
+[33mcommit b690270b125621d88c61e636be9e97d9df4dfe10[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Wed Oct 7 16:45:43 2020 +0200
+
+    mavros: Add override specifiers
+
+[33mcommit 6234af29c731e2367285eed1aef207d196375957[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Wed Oct 7 16:26:22 2020 +0200
+
+    mavros: Move ECEF tf enums to separate enum class
+    
+    This avoids a bunch of unhandled switch cases, and should
+    improve type safety a bit.
+
+[33mcommit 8529c61cf3fe0bb1b67e4fef156957fc118360ea[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Wed Oct 7 16:10:42 2020 +0200
+
+    libmavconn: Fix build warnings
+
+[33mcommit b718ae9dff60b9dd9bb677e035b9a26537d3fd7d[m
+Author: Kristian Klausen <kristian.klausen@scoutdi.com>
+Date:   Tue Sep 22 14:26:11 2020 +0200
+
+    mavros_extras: distance_sensor: Don't publish data when orientation configuration does not match incomming data.
+
+[33mcommit 13c90e26f729370403ed550544b06d85ceca7079[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Mon Sep 14 14:27:09 2020 +0200
+
+    fake_gps: Fix assignment typo
+    
+    This colon should probably be an equals sign.
+    With the colon, this assignment becomes a label instead,
+    and `_gps_rate` after the colon becomes an unused
+    expression result.
+
+[33mcommit c442f3e014601bf5f75144e44060d7652519b08d[m[33m ([m[1;33mtag: 1.4.0[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Fri Sep 11 14:27:54 2020 +0000
+
+    1.4.0
+
+[33mcommit a9e842e51d1815ef34645c8ca57615c42e1e54f3[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Fri Sep 11 17:27:14 2020 +0300
+
+    update changelog
+
+[33mcommit 2702c04d08863334b4158a57440365262b2a2486[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Fri Sep 11 17:23:45 2020 +0300
+
+    mavros: use mavlink::minimal:: after incompatible changes in mavlink package
+    
+    Incompatible change: https://github.com/mavlink/mavlink/pull/1463
+    
+    Fix: #1483, https://github.com/mavlink/mavlink/issues/1474
+
+[33mcommit 89026f96c144c22ded4d981bceae63b2b4e7c2cf[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Thu Sep 10 14:00:28 2020 +0200
+
+    play_tune: Assign tune format directly
+
+[33mcommit 1bfd862a40fd9dab36df306a8a17d52d6cd0a23e[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Thu Sep 10 13:53:02 2020 +0200
+
+    play_tune: Uncrustify
+
+[33mcommit d6091186749906c71d1639b19d760caac560e626[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Thu Sep 10 13:51:40 2020 +0200
+
+    play_tune: Use msg_set_target and set_string_z
+
+[33mcommit 65afb417781761aaa8b696caa4d0679c1ee9b8c8[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Wed Sep 9 16:00:28 2020 +0200
+
+    play_tune: Write new plugin
+
+[33mcommit e07682ccfd227ac595d668d94d57fe21961533fe[m
+Author: Marcelino <marcelino.malmeidan.pensa@gmail.com>
+Date:   Mon Aug 31 12:23:57 2020 -0500
+
+    fixes based on vooon's review
+
+[33mcommit ec13fc66e2630fae44f7530ae8a696da21689e0b[m
+Author: Marcelino <marcelino.malmeidan.pensa@gmail.com>
+Date:   Fri Aug 28 17:36:04 2020 -0500
+
+    fix issue what we couldn't set real parameters to 0.0 in mavros
+
+[33mcommit e0267c3725e2f9f14d853d7727ff70b0fd9e3662[m
+Author: Artem Batalov <a@batalov.me>
+Date:   Mon Aug 31 16:47:17 2020 +0300
+
+    Add error message
+
+[33mcommit 0d9e58f6584eb7b4e4e112395627dee22098e249[m
+Author: Øystein Skotheim <oystein.skotheim@scoutdi.com>
+Date:   Fri Feb 14 09:44:22 2020 +0100
+
+    Fixed compilation error: publish std_msgs::String, not std::string for gcs_ip
+
+[33mcommit bec0c8d6f157e2d95c4b37a3ce9d40a6dfe9306f[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Fri Dec 6 21:20:22 2019 +0100
+
+    Dispatch GCS IP address
+
+[33mcommit 07aa79fa4da8d7cc778649f5ba2f73174b573dfb[m[33m ([m[1;33mtag: 1.3.0[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sat Aug 8 19:15:33 2020 +0000
+
+    1.3.0
+
+[33mcommit 40b35b07e3081a635f48cd4ca39b6c5c313f71f0[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sat Aug 8 21:31:11 2020 +0300
+
+    update changelog
+
+[33mcommit 74883f0ddace7f218f07f23bb92cd89ff1d5ba4c[m
+Author: Ricardo Marques <marques.ricardo17@gmail.com>
+Date:   Wed Aug 5 16:18:32 2020 +0200
+
+    Take into account message count for message size
+    
+    Signed-off-by: Ricardo Marques <marques.ricardo17@gmail.com>
+
+[33mcommit 00485f94bc241097314214cd8ed2d85f2b929370[m
+Author: Ricardo Marques <marques.ricardo17@gmail.com>
+Date:   Mon Aug 3 10:27:32 2020 +0200
+
+    Add esc_status plugin.
+    
+    Signed-off-by: Ricardo Marques <marques.ricardo17@gmail.com>
+
+[33mcommit da3bca936c50f8b00dcffbb694201f7815cf17fb[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Mon Feb 18 11:47:28 2019 +0100
+
+    fake_gps.cpp: Implement GPS time data
+
+[33mcommit 26595bebd4596b6ce5bca64589d5a8e6122d8cc0[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Mon Feb 18 09:03:06 2019 +0100
+
+    fake_gps.cpp: implement speed accuracy
+
+[33mcommit addceb4a2fec943b22ca48a8f9aecf30eddef88e[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Mon Feb 18 09:01:55 2019 +0100
+
+    fake_gps.cpp: Added horiz_accuracy and vert_accuracy parameters
+
+[33mcommit 5af7135e3d5961ed14d2fc5b5fa85c2cd91024a8[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Fri Feb 15 17:53:06 2019 +0000
+
+    fake_gps.cpp: Add mocap_withcovariance configuration parameter
+
+[33mcommit a2ca04ca85c084e6c3b4010872032252f5a097e5[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Tue Feb 12 20:29:24 2019 +0100
+
+    fake_gps.cpp: add initial support for GPS_INPUT MAVLink message
+
+[33mcommit 63259eb8aa130a3b8f9f334b76f1906cf973e08c[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Tue Feb 12 20:28:30 2019 +0100
+
+    fake_gps.cpp: uncrustify
+
+[33mcommit 7d1258a8f83db0380523f4e02f01d0606607b32d[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Fri Aug 7 10:40:27 2020 +0000
+
+    apm.launch: Avoid warning:
+    Warning: You are using <arg> inside an <include> tag with the default=XY attribute - which is superfluous.
+             Use value=XY instead for less confusion.
+             Attribute name: respawn_mavros
+
+[33mcommit 7ad83de3ceae2ee2633e9eaf6801a49e9de99a0d[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Fri Feb 15 08:52:10 2019 +0000
+
+    Add gps_status plugin to publish GPS_RAW and GPS_RTK messages from FCU.
+    
+    The timestamps for the gps_status topics take into account the mavlink time and uses the convienence function
+
+[33mcommit 488ee38ea38687ea148728ada2cf8ca15bde0fad[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Tue Jul 7 13:07:24 2020 +0200
+
+    Added support for MavProxy parameter file format
+
+[33mcommit 8bed6495fb350860be35777b262b5e6d95e731ef[m
+Author: Dr.-Ing. Amilcar do Carmo Lucas <amilcar.lucas@iav.de>
+Date:   Thu Aug 6 19:54:32 2020 +0000
+
+    Ignore read-only parameters and statistics parameters in push operations
+
+[33mcommit 0f92d8853c3da4dce76910716e75725d76a486ff[m
+Author: CSCE439 <ajay@huskers.unl.edu>
+Date:   Fri Jul 31 20:44:03 2020 -0500
+
+    uncrustify gps_rtk plugin
+
+[33mcommit 973bad2ac29d433195bd685bafe6778cecac49bf[m
+Author: CSCE439 <ajay@huskers.unl.edu>
+Date:   Fri Jul 31 20:33:17 2020 -0500
+
+    adding support for publishing rtkbaseline msgs over ROS
+
+[33mcommit b9655bf4cb3a3839dc5e4d8faa72a58480016d2e[m
+Author: Yuan <xuyuan.cn@gmail.com>
+Date:   Thu Jun 25 10:12:19 2020 +0200
+
+    fix indentation
+
+[33mcommit 91e733475bdabd20da586d7c3fc126f5a070cd35[m
+Author: Yuan Xu <yuan.xu@dai-labor.de>
+Date:   Mon May 4 23:11:22 2020 +0200
+
+    transform based on coordinate_frame
+
+[33mcommit a9f1278ab4a9a03af0cedaa1f717cffde85e4519[m
+Author: Marcelino <marcelino.malmeidan.pensa@gmail.com>
+Date:   Thu Jun 18 15:12:00 2020 -0500
+
+    allow mavros to compile in CI environment
+
+[33mcommit a6a98ca0cfb25ab7c59747427f2a5c4cc8108b73[m
+Author: Ben Wolsieffer <benwolsieffer@gmail.com>
+Date:   Sat May 23 23:48:13 2020 -0400
+
+    wind plugin: fix ArduPilot wind transformation
+
+[33mcommit 277164425e002adae33d89854e4f9209757da78c[m[33m ([m[1;33mtag: 1.2.0[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Fri May 22 10:30:42 2020 +0000
+
+    1.2.0
+
+[33mcommit eece48a44c39c869123a28adb7b49afc1fd48955[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Fri May 22 13:30:05 2020 +0300
+
+    update changelog
+
+[33mcommit 7980df4c9ceff09c482c5dc8ff4fcd03fa25894f[m
+Author: Braedon <braedon@rizse.io>
+Date:   Thu May 21 08:54:43 2020 -0500
+
+    has_capability only works for enums
+
+[33mcommit b136243797e6be027e1f763b27ac7821b09c5f23[m
+Author: Braedon <braedon@rizse.io>
+Date:   Wed May 20 19:17:53 2020 -0500
+
+    Uncrustify
+
+[33mcommit 68d836d6e9428753824c7427770c060caa6f122c[m
+Author: Braedon <braedon@rizse.io>
+Date:   Wed May 20 19:07:42 2020 -0500
+
+    Reworked Waypoint plugin to use capabilities_cb
+    
+    Additionally added helper functions has_capability and has_capabilities
+    so that people can use either ints or enums to check if the UAS has a
+    capability. This might make accepting capabilities as a parameter moot
+    though.
+
+[33mcommit 60e552ef5d25ec86543fccf564648cecfb1838fe[m
+Author: Braedon <braedon@rizse.io>
+Date:   Wed May 20 14:53:20 2020 -0500
+
+    Added alias for capabilities enum to UAS
+
+[33mcommit cc05f0daaa310a8e4965d2450d2c0a0103719469[m
+Author: Braedon <braedon@rizse.io>
+Date:   Wed May 20 14:52:28 2020 -0500
+
+    Added alias for capabilities enum to UAS
+
+[33mcommit 84af17b4252fbe47cb5f296d825281cec73f7fa7[m
+Author: Braedon <braedon@rizse.io>
+Date:   Wed May 20 14:35:03 2020 -0500
+
+    Added a capabilities change cb queue
+    
+    Plugins can now write functions that they add to the
+    capabilities_cb_vec. These functions will be called only when there is a
+    change to the capabilities themselves not whenever the known status of
+    the fcu_capabilities change.
+    
+    These functions should have a parameter of type
+    mavlink::common::MAV_PROTOCOL_CAPABILITY which is essentially just a
+    uint64_t however being more opinionated is helpful when looking for what
+    the canonical enum names are in the mavlink project header files.
+
+[33mcommit ecc7999aca8895ef2b3960084e6ca2a37cfbc543[m
+Author: Braedon <braedon@rizse.io>
+Date:   Fri May 8 18:36:40 2020 -0500
+
+    Uncrustify
+
+[33mcommit 8792facedb9d5bc6f8d15974e90b182d43c43139[m
+Author: Braedon <braedon@rizse.io>
+Date:   Fri May 8 18:33:13 2020 -0500
+
+    Fixed Removed Uncrustify Option
+    
+    I'm not sure why this didn't break when I ran uncrustify previously but
+    it seems that the align_number_left option was removed a while ago with
+    this merge request but I may be mistaken
+    https://github.com/uncrustify/uncrustify/pull/1393
+    
+    I replaced it which align_number_right=true since it seems to be the
+    inverse of align_number_left=true.
+
+[33mcommit bb439908d96adc695aa7444fcb0dc40ad56711a1[m
+Author: Braedon <braedon@rizse.io>
+Date:   Fri May 8 18:23:25 2020 -0500
+
+    Removed deprecated MAV_FRAME values
+
+[33mcommit aaa920e1230ff64076d86e1d1c099a86aebc97e9[m
+Author: Braedon <braedon@rizse.io>
+Date:   Fri May 8 18:21:57 2020 -0500
+
+    Added .vscode to gitignore
+
+[33mcommit 9a42780ec1cf42759be2783e4edd59764e087ca9[m
+Author: Braedon <braedon@rizse.io>
+Date:   Fri May 8 11:39:05 2020 -0500
+
+    Removed use of variant in favor of templates
+    
+    Since ROS messages are now the storage type in the node, providing to
+    and from conversion functions is sufficient and can be better expressed
+    with function templates.
+
+[33mcommit e223fdde4090b1732ae6e9d2dce78bac1f946ef9[m
+Author: Braedon <braedon@rizse.io>
+Date:   Tue May 5 12:35:27 2020 -0500
+
+    Encode factor returns double
+
+[33mcommit 6c726fe7153789d6ec2ab20170ecaa4e04ee39c1[m
+Author: Braedon <braedon@rizse.io>
+Date:   Tue May 5 11:43:51 2020 -0500
+
+    Changed encoding factor cog code
+
+[33mcommit 23674e933b9b921820be70711509fe13c5fdb357[m
+Author: Braedon <braedon@rizse.io>
+Date:   Mon Apr 27 11:17:07 2020 -0500
+
+    Uncrustify changes
+
+[33mcommit 9ba4fd1776ef0e47fed877d1ab11819ffc07bdaa[m
+Author: Braedon <braedon@rizse.io>
+Date:   Mon Apr 27 11:12:34 2020 -0500
+
+    Added new parameter to config.yamls
+
+[33mcommit d55b0160cae3f09fc390ae64109103f9530cad1d[m
+Author: Braedon <braedon@rizse.io>
+Date:   Mon Apr 27 11:08:08 2020 -0500
+
+    Updated waypoint plugin to support MISSION_ITEM_INT
+    
+    These changes add a new parameter use_mission_item_int, which allows
+    users to prefer the old behavior. These changes also verify that the
+    flight controller supports _INT messages since APM only sends
+    REQUEST_ITEM messages even though it accepts _INT items back.
+    
+    This commit is functional and tested with the APM stack only.
+    PX4 sitl jmavsim threw:
+            WP: upload failed: Command is not supported.
+            FCU: IGN MISSION_ITEM: Busy
+
+[33mcommit acb90705e55bc1e338fc3bb109c5cdde38ccef25[m
+Author: Braedon <braedon@rizse.io>
+Date:   Fri Feb 21 11:51:34 2020 -0600
+
+    Removed x_lat, y_long, z_alt from WP
+    
+    These values seemed to be used due to the fact that double had
+    a greater resolution than float and doubles are used in the
+    ros msg. However they were only ever used for printing. Since
+    the int version of these messages has a greater resolution I
+    figure it is more useful to print the true value in the mavlink
+    message rather than the ros message value
+
+[33mcommit dbdc72bfa0a990bd398fec95778c584409333bce[m
+Author: Braedon <braedon@rizse.io>
+Date:   Thu Jan 23 06:46:31 2020 -0700
+
+    Replaced MISSION_ITEM
+
+[33mcommit 780e24889a9964929795c656725f56ff882f4b38[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu May 21 09:03:20 2020 +0000
+
+    Revert "extras: odom: Hardcode BODY_FRD enum_value to fix compilation"
+    
+    This reverts commit 1a898dea2202ee1af56d698bd40d40994346c5cb.
+
+[33mcommit 1a898dea2202ee1af56d698bd40d40994346c5cb[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu May 7 13:04:57 2020 +0300
+
+    extras: odom: Hardcode BODY_FRD enum_value to fix compilation
+    
+    That PR broke build: https://github.com/mavlink/mavlink/pull/1112
+    
+    TODO: find out what frame should be used
+
+[33mcommit 87bf485ed514f55c93892b3780ec2a46ad9c7b67[m
+Author: David Jablonski <dayjaby@gmail.com>
+Date:   Sat May 2 09:58:21 2020 +0200
+
+    add yaw to CMD_DO_SET_HOME
+
+[33mcommit cf4c6edd2e7dee15d39da9fe9cb0b9d43170adc0[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Apr 15 13:38:16 2020 +0300
+
+    ci: use github actions via industrial_ci
+
+[33mcommit 4696cf2bf17e90f6334ab060c27b1c53a905392d[m
+Author: Martina Rivizzigno <martina@rivizzigno.it>
+Date:   Thu Apr 9 18:03:28 2020 +0200
+
+    fix local angular velocity
+
+[33mcommit e0c733a0b3a84a3ac6420d5ef6b594a42196dd06[m[33m ([m[1;33mtag: 1.1.0[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sat Apr 4 09:04:14 2020 +0000
+
+    1.1.0
+
+[33mcommit 536ae071c3c3c8efa8c3ce9a722545a67a2468ba[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sat Apr 4 12:03:33 2020 +0300
+
+    update changelog
+
+[33mcommit 0b5e6eb0ce9a345d60063aaec21b369d60340b1f[m
+Author: Matt Koos <mattkoos@gmail.com>
+Date:   Tue Mar 31 12:40:19 2020 -0600
+
+    fixed styling
+
+[33mcommit 29925d78c696c2b213a8165c88d92b703f963246[m
+Author: Matt Koos <mattkoos@gmail.com>
+Date:   Tue Mar 31 12:32:16 2020 -0600
+
+    fixed indent from using spaces
+
+[33mcommit 166b347bde8b61a06af02188fe2dc2a881d54446[m
+Author: Matt Koos <mattkoos@gmail.com>
+Date:   Tue Mar 31 12:21:10 2020 -0600
+
+    updates apmrover2 modes and allows for arduboat mode changes
+
+[33mcommit ff934734ab5ebd10285e7bcd1de89338765c2b9b[m
+Author: Alamoris <gonzalez1139@gmail.com>
+Date:   Tue Feb 18 11:11:18 2020 +0300
+
+    Setting the same transparency for all elements
+
+[33mcommit 62ae4b5881d34def262167ddc69eab525cf9948b[m
+Author: Alamoris <gonzalez1139@gmail.com>
+Date:   Mon Feb 17 14:23:29 2020 +0300
+
+    Visualization of the direction of the device
+
+[33mcommit 52c7b2a8453081ded68dccae0fc7a264d36d9f24[m
+Author: aykutkabaoglu <aykutkabaoglu@gmail.com>
+Date:   Thu Mar 26 17:12:41 2020 +0300
+
+    mavsafety kill feature for emergency stop
+
+[33mcommit d296d0f3524eb6052996e9ecd73672f3166e5b41[m
+Author: Martina Rivizzigno <martina@rivizzigno.it>
+Date:   Wed Feb 26 11:07:11 2020 +0100
+
+    add support for bezier
+
+[33mcommit dcef73674718a80202d68336cb0aa6e88142a71d[m
+Author: Anthony Goeckner <agoeckner@users.noreply.github.com>
+Date:   Wed Feb 19 09:39:25 2020 -0500
+
+    Include trajectory_msgs in CMakeLists.txt
+    
+    This allows build to complete successfully.
+
+[33mcommit c3e01e7cc8ceb6550e7e3f1ed4ad4e87ac4e2902[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Tue Jan 14 14:11:39 2020 +0300
+
+    readme: add link to the issue 1369
+
+[33mcommit 29ba61106eb101ff462da1029a7ee18323bed56e[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Tue Jan 14 14:09:57 2020 +0300
+
+    readme: add notice about version 1.0.0
+
+[33mcommit a1dd03c6db26107f914b4526305abca9733f7486[m[33m ([m[1;33mtag: 1.0.0[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Jan 1 08:23:44 2020 +0000
+
+    1.0.0
+
+[33mcommit 38ec0a81dfe5714229263a9dfad9a64124d4ef21[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Jan 1 11:23:17 2020 +0300
+
+    update changelog
+
+[33mcommit 63183a6fee196b0620a7f7749c5ddeae5b50c669[m
+Author: James Goppert <james.goppert@gmail.com>
+Date:   Fri Dec 13 12:52:51 2019 -0500
+
+    Change odometry subscription queue to 1 to avoid buffering.
+
+[33mcommit e2cd26e774c2318127906c41f252ae1c38672831[m[33m ([m[1;33mtag: 0.33.4[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu Dec 12 08:33:46 2019 +0000
+
+    0.33.4
+
+[33mcommit 01d0a4e603e7b151d49d92b8c55701b9e3308821[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu Dec 12 11:33:28 2019 +0300
+
+    update changelog
+
+[33mcommit 563f7f5e12e886473019fa80521b9e735298a747[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Wed Dec 4 09:23:10 2019 +0100
+
+    obstacle_distance: Fill both increment and increment_f fields
+
+[33mcommit fc4152615befb0db8025f3a1041457fb546fc58f[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Tue Dec 3 15:12:19 2019 +0100
+
+    obstacle_distance: Fix wrong angle increment
+    
+    The computation `req->angle_increment * RAD_TO_DEG` correctly computes
+    angle increment in degrees as a float, but the `increment` field of the
+    OBSTACLE_DISTANCE MAVLink message is a uint8, so the float value gets
+    truncated. So if your real increment is 10 degrees, you may a floating
+    point value of something like 9.999999, which results in the integer value
+    9 getting written to the increment field.
+    
+    An improvement would be to round properly, with something like
+    
+    `static_cast<uint8_t>(increment_deg_float)`,
+    
+    but a better solution is to allow non-integer degree values for the
+    increment, which is supported by the `increment_f` field. According
+    to the MAVLink reference, increment_f is used instead of increment
+    whenever increment_f is nonzero.
+
+[33mcommit ea3b505e82567641c4a2fb2f7630ed07c591f45b[m
+Author: saifullah3396 <Saifullah3396@gmail.com>
+Date:   Wed Nov 20 09:33:17 2019 +0500
+
+    Splitted the message fields.
+
+[33mcommit 1546237d5c3061815d8cc50f2c8516f7fc64e0cf[m
+Author: saifullah3396 <Saifullah3396@gmail.com>
+Date:   Fri Nov 15 16:42:13 2019 +0500
+
+    Updated esimator status msg according to the new cog based definition of estimator status.
+
+[33mcommit 889240f2cdb57ed6d4391e4ea9e3dec3a6974df6[m
+Author: saifullah3396 <Saifullah3396@gmail.com>
+Date:   Fri Nov 15 16:41:47 2019 +0500
+
+    Replaced estimator status hardcoded definition with cog.
+
+[33mcommit fa6d9de618c4c0b4c8c3f477dff489b2d091b587[m
+Author: saifullah3396 <Saifullah3396@gmail.com>
+Date:   Fri Nov 15 15:05:01 2019 +0500
+
+    Added comments to msg.
+
+[33mcommit 7f4c4ad5eec63dc4316207ebdb65f3e8800e0454[m
+Author: saifullah3396 <Saifullah3396@gmail.com>
+Date:   Thu Nov 14 15:31:57 2019 +0500
+
+    Refactor.
+
+[33mcommit fb3cb479025d25a6ec1b70d47f22c1c78a1ee1e5[m
+Author: saifullah3396 <Saifullah3396@gmail.com>
+Date:   Thu Nov 14 15:26:51 2019 +0500
+
+    Replaced bool with git add -u as already done.
+
+[33mcommit 78383ab1cf485c5cdec598329c41c5a5d57d6a1c[m
+Author: saifullah3396 <Saifullah3396@gmail.com>
+Date:   Thu Nov 14 15:23:14 2019 +0500
+
+    Added new line char at end of message.
+
+[33mcommit 5e9c1fbcbb924f72cf7fba77daf504ee26827383[m
+Author: saifullah3396 <Saifullah3396@gmail.com>
+Date:   Thu Nov 14 15:17:01 2019 +0500
+
+    Added a publisher for estimator status message received from mavlink in sys_status.
+
+[33mcommit 3da41d770ca0e021f597bef30ffe6fcefe3e6959[m
+Author: acxz <17132214+acxz@users.noreply.github.com>
+Date:   Sat Nov 16 23:49:59 2019 -0500
+
+    add macro for get_io_service() to work with boost>1.70
+
+[33mcommit 6cf313aac4bc62980a440fbc3583fd65edb05192[m[33m ([m[1;33mtag: 0.33.3[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Nov 13 06:34:42 2019 +0000
+
+    0.33.3
+
+[33mcommit 1fb2b61649e597d340ef3cdcd203189c4c4704ca[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Nov 13 09:34:24 2019 +0300
+
+    update changelog
+
+[33mcommit 24ee9d6b3ef65ec66ef1d8b2db62478783d966d6[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Nov 13 09:33:42 2019 +0300
+
+    package: fix 6fa58e59 - main package depends on trajectory_msgs, not extras
+
+[33mcommit 7c3bcdef22bd01a3b37c98a89cd1614b6ce5795d[m[33m ([m[1;33mtag: 0.33.2[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Nov 13 06:26:54 2019 +0000
+
+    0.33.2
+
+[33mcommit ca45e63a728adc586815ad4e20cf49156b50b6a7[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Wed Nov 13 06:26:41 2019 +0000
+
+    update changelog
+
+[33mcommit 6fa58e59712acb4bb9f983526ac7039e74f06e1e[m
+Author: Jaeyoung-Lim <jaeyoung@auterion.com>
+Date:   Tue Nov 12 09:25:34 2019 +0100
+
+    Add trajectory_msg as dependency
+
+[33mcommit a71361f77d1c46f28ae3bd0ecf0f7c114647c485[m[33m ([m[1;33mtag: 0.33.1[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Nov 11 20:35:33 2019 +0000
+
+    0.33.1
+
+[33mcommit 0650a440a70211e3bdec5e2f02539a6939ad92ab[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Nov 11 20:35:16 2019 +0000
+
+    update changelog
+
+[33mcommit ce91e30be753acc0323316af834d2f41fd45c2d9[m
+Author: Jaeyoung-Lim <jaeyoung@auterion.com>
+Date:   Tue Nov 5 21:44:44 2019 +0100
+
+    Add mutex
+
+[33mcommit 36e1bd760e1b0a65c4678da2f4e082b3fa4e90b8[m
+Author: Jaeyoung-Lim <jaeyoung@auterion.com>
+Date:   Tue Nov 5 21:19:50 2019 +0100
+
+    Initialize type mask
+
+[33mcommit da7c6d4a79d2245e0f8750942a91aff2c0106fd9[m
+Author: Jaeyoung-Lim <jaeyoung@auterion.com>
+Date:   Mon Nov 4 23:13:25 2019 +0100
+
+    Handle frame with StaticTF
+
+[33mcommit 06f5c106e2c3a0efb160f8ec79a133efac4771bd[m
+Author: Jaeyoung-Lim <jaeyoung@auterion.com>
+Date:   Sun Nov 3 12:39:06 2019 +0100
+
+    Handle different frames
+
+[33mcommit 3636b4a4e124c4d6d2a424e4b6ca9015ce8c320d[m
+Author: Jaeyoung-Lim <jaeyoung@auterion.com>
+Date:   Tue Oct 8 23:19:01 2019 +0200
+
+    Set yaw rate from message inputs
+
+[33mcommit 1fa509f7a244fe47f0d9df5c649b2b7a9927d801[m
+Author: Jaeyoung-Lim <jaeyoung@auterion.com>
+Date:   Tue Oct 8 23:03:29 2019 +0200
+
+    Add setpoint trajectory reset interface
+
+[33mcommit 041739f8c5f2394833f19df1db51c983904b41a8[m
+Author: Jaeyoung-Lim <jaeyoung@auterion.com>
+Date:   Tue Oct 8 22:43:56 2019 +0200
+
+    Fix trajectory timestamp
+
+[33mcommit abf32165a25d8caf596f11c64676b6bdc2a9df16[m
+Author: Jaeyoung-Lim <jaeyoung@auterion.com>
+Date:   Tue Oct 8 22:34:15 2019 +0200
+
+    Address comments
+
+[33mcommit 938ae6a800a7f7e1033078bebe345b4d73d7e2a0[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Mon Sep 30 18:37:08 2019 +0200
+
+    Pass reference with oneshot timers
+
+[33mcommit d96a5fee586ca62ede7b4f7efa35c37d61b4cf81[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Tue Sep 10 08:07:17 2019 +0200
+
+    Set typemasks correctly
+
+[33mcommit c6b02bee02b36983899e8af75bc6058e27c588fc[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Mon Aug 26 12:07:33 2019 +0200
+
+    Address more style comments
+
+[33mcommit a094edbe365a45b267e7a18409732621906050b7[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Sun Aug 25 14:38:16 2019 +0200
+
+    Address style comments
+
+[33mcommit 1ef949c462b52253e9a5f8a3082d933d72780bc9[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Sat Aug 24 21:18:01 2019 +0200
+
+    Visualize desired trajectory
+
+[33mcommit 20e3bdd9b0e6c042e9e5b7a5a41b048e14fabc51[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Sat Aug 24 20:25:03 2019 +0200
+
+    Handle end of trajectory correctly
+
+[33mcommit 088af1a428d410fabc6caf82dc45b860eba7debe[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Sat Aug 24 15:03:48 2019 +0200
+
+    Remove message handlers
+
+[33mcommit 5e2d96b3bee898868b5d85111aff0f644227dd13[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Sat Jun 1 07:36:10 2019 +0200
+
+    Add setpoint_trajectory plugin template
+
+[33mcommit c0a8474cb12e6b25e72dd5d8860bfddd6cc671b5[m
+Merge: 6b0d0475 c741c214
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Fri Oct 25 21:18:32 2019 +0300
+
+    Merge pull request #1297 from dayjaby/feature/mount_orientation
+    
+    adding mount orientation to mount_control plugin
+
+[33mcommit 6b0d0475cb69951105498ca8f59df3aeb516a5fa[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Fri Oct 25 16:40:43 2019 +0200
+
+    landing_target: Fix cartesian to displacement bug
+    
+    I think these four conditionals are buggy:
+    
+    The first is    (x and y) > 0
+    and should be   (x > 0) and (y > 0)
+    (This one actually works the way it's written.)
+    
+    The second is   (x < 0 and y) > 0
+    and should be   (x < 0) and (y > 0)
+    
+    The third is    (x and y) < 0
+    and should be   (x < 0) and (y < 0)
+    
+    The fourth is   (x < 0 and y) < 0
+    and should be   (x > 0) and (y < 0)
+
+[33mcommit 92fcb8618ec607515b47b8b83a11d1a92bb9f6a0[m
+Author: Morten Fyhn Amundsen <morten.fyhn.amundsen@gmail.com>
+Date:   Mon Oct 14 09:13:55 2019 +0200
+
+    obstacle distance plugin: Add ROS param for mavlink frame
+    
+    Makes it possible to specify the 'frame' field in the MAVLink
+    OBSTACLE_DISTANCE message sent by this plugin. Previously the
+    frame was not defined, which means it defaulted to MAV_FRAME_GLOBAL.
+    (See https://mavlink.io/en/messages/common.html#OBSTACLE_DISTANCE)
+    The default frame is therefore still MAV_FRAME_GLOBAL.
+
+[33mcommit c741c2143d690cb19a6c344c07adfe662a76094e[m
+Merge: d9b1dfa2 247cde87
+Author: David Jablonski <dayjaby@gmail.com>
+Date:   Mon Oct 14 16:32:23 2019 +0200
+
+    resolved merge conflict
+
+[33mcommit 247cde879c5a9a3d1a88e38ca2b77b868cb1b4ab[m[33m ([m[1;33mtag: 0.33.0[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu Oct 10 11:54:26 2019 +0000
+
+    0.33.0
+
+[33mcommit c9f7ae0297df3f450603d1f67d6e44ba239622ff[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu Oct 10 14:53:53 2019 +0300
+
+    update changelog
+
+[33mcommit ba39df9f14b661d49218045c5d083aa32ba248a5[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Wed Sep 25 20:22:40 2019 +0200
+
+    Add vtol transition service
+
+[33mcommit 664aa9893de54964922541a029c848bd767f140f[m
+Author: kamilritz <kritz@ethz.ch>
+Date:   Mon Oct 7 09:40:06 2019 +0200
+
+    CleanUp
+
+[33mcommit 1789e810d59cdad70ac0ada134254c96b05a06ed[m
+Author: kamilritz <kritz@ethz.ch>
+Date:   Mon Oct 7 09:36:28 2019 +0200
+
+    Odom Plugin, enforcing ROS convetion, less options but clearer to use
+
+[33mcommit f30d4e17870239e5c4b98359a563886fdc4af096[m
+Author: kamilritz <kritz@ethz.ch>
+Date:   Mon Oct 7 09:31:52 2019 +0200
+
+    Update frame name in px4_config to match ROS standards
+
+[33mcommit 425bf490bbcf70fd8971cb8971ca9b90364243a7[m
+Author: kamilritz <kritz@ethz.ch>
+Date:   Mon Oct 7 09:29:40 2019 +0200
+
+    Enable publishing multiple static tfs at once, publish standard static tfs
+
+[33mcommit 56d782d4bc55209550cf3d2628bb1a6ae94a384c[m
+Author: Koby Aizer <koby.aizer@tg-17.com>
+Date:   Wed Jul 31 14:13:44 2019 +0300
+
+    libmavconn: simplify parse_buffer, and fix dropped_packets and parse_error counters
+    
+    Currently the dropped_packets & parse_error counters are always published as 0 in mavros_diag.cpp.
+    This seems to be caused by using the wrong status struct.
+    
+    Seems like mavros was editing m_status after mavlink_frame_char_buffer. This struct
+    seems to be the parsing state, and looks like it shouldn't be modified by the caller (for example
+    status->parse_error is zeroed out in the end of mavlink_frame_char_buffer).
+    Also, the crc & signature checks done in mavros seems redundant.
+    
+    r_mavlink_status seems to be the struct that holds the mavlink connection information, therefore I
+    changed get_status to return it instead.
+    
+    This fixes #1285.
+
+[33mcommit 95935e05d49cb61ee78e8fe9dc666f6b861da6a3[m
+Author: David Jablonski <dayjaby@gmail.com>
+Date:   Fri Sep 27 11:05:00 2019 +0200
+
+    moving ACK_TIMEOUT_DEFAULT out of class
+
+[33mcommit 1a2d5f0d72880c6f929aef23abd2e5a281623b64[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Sat Oct 5 22:01:52 2019 +0100
+
+    README: update discussion groups and forums
+
+[33mcommit 56687ac8c6f834db81550c7ed483878af55ce432[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Sat Oct 5 20:23:12 2019 +0100
+
+    README: add release token
+
+[33mcommit 4853fbf59784bb4ba9ebc9249f0130bc2b90c87c[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Sat Oct 5 20:15:54 2019 +0100
+
+    README: Add Travis build status token
+
+[33mcommit ff63bee2cf375109db833628de2625d29119c540[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Sat Oct 5 18:03:04 2019 +0100
+
+    Travis CI: remove Lunar since it's EOL
+
+[33mcommit f99c8b2abcea1b20b6513c5c39994cc7d074e35b[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Thu Sep 26 10:10:14 2019 +0200
+
+    Fix service namespace with new nodehandle
+
+[33mcommit 783219d0a20666c9b3c7b2ee47f03442c95bb9f6[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Thu Sep 26 09:22:17 2019 +0200
+
+    Apply comments
+
+[33mcommit 44fa5282e674c2ef6b836855841e71259f781e93[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Wed Sep 25 19:48:31 2019 +0200
+
+    Add mount configure service
+
+[33mcommit 41493d0372ddfa9a9bfa0987517339ceca431827[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Sun Jul 7 21:43:38 2019 +0200
+
+    Add mount configure service message
+
+[33mcommit b673d839c9de04e4555a13f1ec8415f57d8792e8[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu Sep 26 07:10:56 2019 +0000
+
+    cog: Update all generated code
+
+[33mcommit daba93745fb9e2e9b9cdd3ec0b0c8ca5659628c3[m
+Author: Sergei Zobov <sergey@szobov.ru>
+Date:   Wed Sep 25 13:58:20 2019 +0300
+
+    mavros/src/plugins/command.cpp: one more style fix
+
+[33mcommit cd02e8961596d38bdde1394b42f47604c4408888[m
+Author: Sergei Zobov <sergey@szobov.ru>
+Date:   Wed Sep 25 13:44:50 2019 +0300
+
+    mavros/src/plugins/command.cpp: style fixes
+
+[33mcommit ef90a7cbf33e7135f9f4dbdfc7cf4b8d2ecffe8a[m
+Author: Sergei Zobov <sergey@szobov.ru>
+Date:   Wed Sep 25 13:40:58 2019 +0300
+
+    mavros/src/plugins/command.cpp: command_ack_timeout ms -> s
+
+[33mcommit 17e1bfd81e1f1db8865b76dab095497a29b2b3b4[m
+Author: Sergei Zobov <sergey@szobov.ru>
+Date:   Tue Sep 24 08:06:50 2019 +0300
+
+    mavros/src/plugins/command.cpp: command_ack_timeout_ms int -> double
+
+[33mcommit 0b4550ea96c24bf86823275baca9631717920176[m
+Author: Sergei Zobov <sergey@szobov.ru>
+Date:   Fri Sep 20 15:31:53 2019 +0300
+
+    mavros/src/plugins/command.cpp: uncrustify
+
+[33mcommit 7de5f855bae5bfcb84dcfb3f0ba83623678a2af0[m
+Author: Sergei Zobov <sergey@szobov.ru>
+Date:   Fri Sep 20 15:07:51 2019 +0300
+
+    mavros/src/plugins/command.cpp: parameter for command's ack timeout
+    
+    Sometimes commands take more time than default 5 seconds. Due to a low bandwidth
+    of UART and a high rate of some mavlink streams. To eliminate this problem it's
+    better to provide the parameter to configure the command's ack timeout.
+
+[33mcommit 1a6b0106b4139bfa28fd1de83f8fd4c7648ea331[m
+Author: David Jablonski <dayjaby@gmail.com>
+Date:   Tue Sep 17 09:19:46 2019 +0200
+
+    added manual flag to mavros/state
+
+[33mcommit c36bdc12835dc2baf6cd1bb52b00a3b233a16745[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Wed Sep 4 22:28:36 2019 +0200
+
+    Use GeoPoseStamped messages
+
+[33mcommit 3a669cc57bc7aae73c5f5ed43c87b9cbb3ca0e7d[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Wed Sep 4 17:53:33 2019 +0200
+
+    Fix build
+
+[33mcommit 9409dd8792291453cc3374c83ac64f1a2577d23f[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Wed Sep 4 17:33:55 2019 +0200
+
+    Add callback for SET_POSITION_TARGET_GLBOAL_INT
+
+[33mcommit c373472c75310d1b76f40d2e4ea8b0b72f894e36[m
+Author: baumanta <tanja@auterion.com>
+Date:   Wed Aug 21 09:52:02 2019 +0200
+
+    use header.stamp to fill mavlink msg field time_usec
+
+[33mcommit ba1b404ecc5b90313884ae0c116f741c2fbf0fee[m
+Author: baumanta <tanja@auterion.com>
+Date:   Tue Aug 20 09:34:05 2019 +0200
+
+    use cog for copy
+
+[33mcommit b449e250ee1ab37a95dbbc021b6b38ea85c8dac9[m
+Author: baumanta <tanja@auterion.com>
+Date:   Thu Aug 15 17:31:58 2019 +0200
+
+    adapt message and plugin after mavlink message merge
+
+[33mcommit d90b984983b18fbe857fb28872354d14684e5477[m
+Author: baumanta <tanja@auterion.com>
+Date:   Tue Aug 6 09:36:57 2019 +0200
+
+    rename message and adjust fields
+
+[33mcommit ce53b693e200201ae97496b7b3db93c8f9ec29b6[m
+Author: baumanta <tanja@auterion.com>
+Date:   Wed Jul 31 15:20:26 2019 +0200
+
+    add component id to mavros message to distinguish ROS msgs from different systems
+
+[33mcommit 304e50a1e4d40fe79c9bd233c6aae8d52886568d[m
+Author: baumanta <tanja@auterion.com>
+Date:   Wed Jul 31 09:07:32 2019 +0200
+
+    component_status message and plugin draft
+
+[33mcommit d9b1dfa2ed36da335a656288c491f16a14b01d04[m
+Author: David Jablonski <dayjaby@gmail.com>
+Date:   Wed Aug 14 14:51:44 2019 +0200
+
+    adding mount orientation to mount_control plugin
+
+[33mcommit 53ef22f98a2a9ebf3f9b0cb600f9d8975dffbfbf[m[33m ([m[1;33mtag: 0.32.2[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Sep 9 09:01:53 2019 +0000
+
+    0.32.2
+
+[33mcommit f09c1e13412f1be77838a03b5d3371eb6795218b[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Mon Sep 9 12:01:33 2019 +0300
+
+    update changelog
+
+[33mcommit 4a36b0e8e776cb9699b74430aeedd66c5a3480b6[m
+Author: Rob Clarke <robert.clarke@bristol.ac.uk>
+Date:   Fri Aug 30 13:37:08 2019 +0100
+
+    uncrustify
+
+[33mcommit a39bf315c4235664630907faa26ccb3b80b87411[m
+Author: Robert Clarke <robert.clarke@bristol.ac.uk>
+Date:   Fri Aug 30 13:34:18 2019 +0100
+
+    Add boolean to check if IMU data has been received
+    
+    Follow sensor_msgs/Imu convention when data not present
+
+[33mcommit 7503c22dc27858b6ebd3a5a36dcdd7ad8622f2d7[m
+Author: baumanta <tanja@auterion.com>
+Date:   Tue Aug 20 16:43:42 2019 +0200
+
+    clean up
+
+[33mcommit 1aeb4cd6a580fbe8a54be7db00a00ed2fd755707[m
+Author: baumanta <tanja@auterion.com>
+Date:   Mon Aug 19 16:05:33 2019 +0200
+
+    fix obstacle distance plugin
+
+[33mcommit 3cd4033553edc6cfab3799fc40263402eb4b380a[m
+Author: Nick Steele <nicholas.steele@nearearth.aero>
+Date:   Fri Aug 16 14:48:36 2019 -0400
+
+    Uncrustify the GPS_GLOBAL_ORIGIN handler in global_position
+
+[33mcommit e50aae1217d442e2fef8ef6147c9d756e2a7ab10[m
+Author: Nick Steele <nicholas.steele@nearearth.aero>
+Date:   Fri Aug 16 14:32:47 2019 -0400
+
+    Fix global origin conversion to ecef (was using amsl where hae was required)
+    
+    Summary: Fix global origin conversion to ecef (was using amsl where hae was required)
+
+[33mcommit d79edd0824b16bbe572accbc3538d8db03ae4b42[m
+Author: David Jablonski <dayjaby@gmail.com>
+Date:   Thu Aug 15 10:42:42 2019 +0200
+
+    moved code to end of function
+
+[33mcommit c05d19340b90807d5b81c49866fe4c1ab09e4570[m
+Author: David Jablonski <dayjaby@gmail.com>
+Date:   Wed Aug 14 13:48:00 2019 +0200
+
+    added amount of satellites to global_position/raw/
+
+[33mcommit dcb048bfcc9b8bd42617772eeaab47a9d6689106[m[33m ([m[1;33mtag: 0.32.1[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu Aug 8 08:07:32 2019 +0000
+
+    0.32.1
+
+[33mcommit 9ad280c538f92df4b770344a7445ca7d12110c72[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Thu Aug 8 08:05:51 2019 +0000
+
+    update changelog
+
+[33mcommit 8aabb0bf1b7ba05ddd5da487bbb729655a37a2e9[m
+Author: Lucas Hill <lucas.hill@nearearth.aero>
+Date:   Mon Jun 17 17:47:30 2019 -0400
+
+    uncrustify
+
+[33mcommit 1dada7e2e91aad5178ff0030ea3d99c1d1e8ac14[m
+Author: Lucas Hill <lucas.hill@nearearth.aero>
+Date:   Mon Jun 17 17:35:22 2019 -0400
+
+    Removed tf loop
+
+[33mcommit bdc5c7386f9451ac244b5a85c087ad620fd3a989[m
+Author: Eric <eric.emj.johnson@gmail.com>
+Date:   Mon Jul 15 19:47:20 2019 -0500
+
+    made small edit to handle augmented gps fix
+
+[33mcommit 0b79098b049be88a2b0533080bbce12cdf199ab1[m
+Author: Eric <eric.emj.johnson@gmail.com>
+Date:   Mon Jul 8 19:03:52 2019 -0500
+
+    added a check for gps fix before setting origin for global_position/local odometry topic
+
+[33mcommit 30bd87e17d369a3c3b1b01e18a8478eeaa14ec8d[m[33m ([m[1;33mtag: 0.32.0[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sat Jul 6 19:25:54 2019 +0000
+
+    0.32.0
+
+[33mcommit d5fdfebc6f599dd55307d9d64bca32955a570c8c[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Sat Jul 6 22:25:16 2019 +0300
+
+    update changelog
+
+[33mcommit 881cda6ab8c3f655cefbbe20a592d4d76a66f2dd[m
+Author: Martina Rivizzigno <martina@rivizzigno.it>
+Date:   Wed Jun 26 14:40:26 2019 +0200
+
+    use direclty radians in yaml files
+
+[33mcommit 19c2c3e0a7092da0f9ed4265fa9d4cb07b230590[m
+Author: Martina Rivizzigno <martina@rivizzigno.it>
+Date:   Mon Jun 24 21:51:53 2019 +0200
+
+    add mav_cmd associated with each point in trajectory plugin
+
+[33mcommit 10dd8153c5b8ded35968c116f231355d60fd7b49[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Wed Jun 26 17:40:12 2019 +0200
+
+    Fix typo
+
+[33mcommit 07932cd2d752db3ba47a447ea1415f9c4ccc824d[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Tue Jun 25 10:19:20 2019 +0200
+
+    Address comments
+
+[33mcommit 71ffd03a9711935603e46e040d2abf0a2c5dae63[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Sat Jun 22 18:13:40 2019 +0200
+
+    Send messages from callback
+
+[33mcommit a7d48616338fc08f2df01c31cd08a0af8f15a96f[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Sun Jun 16 07:42:20 2019 +0200
+
+    Use MountControl Msg
+
+[33mcommit 2e462fe6083e553d8fda04af32bca9eda42275c9[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Sun Jun 16 07:39:16 2019 +0200
+
+    Define new MountControl.msg
+
+[33mcommit 8656a66efcb65c6aec78da315a320f6b7363ed8a[m
+Author: Jaeyoung-Lim <jalim@student.ethz.ch>
+Date:   Sun Jun 16 07:28:03 2019 +0200
+
+    Add mount control class template
+
+[33mcommit e0d46f37ee7dec53ce3f98cb449f99da0d4f933d[m
+Author: 강정석 <piono623@naver.com>
+Date:   Tue Jun 25 22:25:42 2019 +0900
+
+    A simple typo error has fixed. (#1260)
+    
+    * fix: a typing error "alredy" to "already"
+    
+    * Fix: typo error (helth -> health)
+
+[33mcommit 44f0dbfd6e7d597f8ccc2b3b4e408a98c05b6641[m[33m ([m[1;33mtag: 0.31.0[m[33m)[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Fri Jun 7 09:49:12 2019 +0000
+
+    0.31.0
+
+[33mcommit 265ca80fd96ef8101a839f2a7eb9248d1dec124b[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Fri Jun 7 09:48:44 2019 +0000
+
+    update changelog
+
+[33mcommit f6d1e3e30e6f5a73332c20d29a90f96c8d12ba9c[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Fri Jun 7 12:40:41 2019 +0300
+
+    readme: fix udp-pb formatting
+
+[33mcommit f87d0e8e8c77a17e7d97543f3ba97e268dcf4fb5[m
+Author: Vladimir Ermakov <vooon341@gmail.com>
+Date:   Fri Jun 7 12:39:59 2019 +0300
+
+    readme: fix udp-pb formatting
+
+[33mcommit 68d6fcc4d124e5c48cf00c540837346485a6f5ff[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Thu Jun 6 23:15:43 2019 +0100
+
+    landing_target: fix landing target pose input topic naming
+
+[33mcommit a68a131170f8a3930c80971dc608cdaf94e08e1a[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Thu Jun 6 16:43:55 2019 +0100
+
+    fix naming for file
+
+[33mcommit f3a5f3f17e7f543a65df8806c6a6b827f335569c[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Thu Jun 6 16:42:37 2019 +0100
+
+    mavros_msgs: LandingTarget: update msg description link
+
+[33mcommit 987b0c54ccdc6f46fc5c16fc9bdef153eebab2d0[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Fri Feb 8 13:52:01 2019 +0000
+
+    mavros_plugins: fix landing_target plugin init
+
+[33mcommit bfb483a0f87a5c1ec523c6f2bcecc3350f85a84c[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Fri Feb 8 11:42:09 2019 +0000
+
+    launch config: landing_target: fix and improve parameter list
+
+[33mcommit 3cd01b9891f09d2cfb79a9405f337f9ab3f4ff35[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Fri Feb 8 11:28:40 2019 +0000
+
+    landing_target: change topic subscription naming
+
+[33mcommit d7038dedb975afd6d36161ae0526f54c9117b834[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Wed Feb 6 16:37:13 2019 +0000
+
+    extras: mavros_plugins.xml: fix malform on XML file
+
+[33mcommit 83453ce077a09e452b603691ea43215062246c68[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Fri Feb 1 05:34:20 2019 +0000
+
+    landing_target: use m_uas
+
+[33mcommit 189f8225a6557b12e5fbaac5b00f3aa17147705f[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Fri Feb 1 05:26:20 2019 +0000
+
+    visualization: set the frame and child frame id back to map and base_link
+
+[33mcommit b9aaf2123f40e2a1e194b03fca26d9c81fef873a[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Fri Feb 1 05:10:07 2019 +0000
+
+    remove duplicated landing_target parameters
+
+[33mcommit 830abc74da968c9012c89d1c8aff817b8bc1b7bc[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Fri Feb 1 05:05:02 2019 +0000
+
+    general fixup to update the landing_target codebase
+
+[33mcommit 0a0982dd70d3ae068635e2e809fae1d262591655[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Fri Feb 1 04:40:09 2019 +0000
+
+    enum_to_string: simplify landing_target_type_from_str
+
+[33mcommit f1e50e17f5fac8c8051f10380a0a54a2de8159a9[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Wed Aug 23 12:10:48 2017 +0100
+
+    enum_to_string: update enumerations and checksum
+
+[33mcommit 2125d9d69433e43cba2f399735991348245ef8b7[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Thu Aug 17 16:04:20 2017 +0100
+
+    extras: landing target: improve usability and flexibility
+
+[33mcommit 601654f86882766fa96c08a1b0b547dc0cf45b91[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Mon Jul 3 16:09:30 2017 +0100
+
+    remove landing_target from blacklist
+
+[33mcommit 46c76230f6ba8a03cfb1210192b7a9a3fd729bb4[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Sun Apr 16 16:56:20 2017 +0300
+
+    ident correction
+
+[33mcommit 8e89d54192179b731e2cb14353d82cb3d02bb04a[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Sun Apr 16 16:27:55 2017 +0300
+
+    update to use pymavlink generator
+
+[33mcommit c9c4020ec91ab229100883d2b206e3ed077f2c4c[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Wed Aug 12 12:38:40 2015 +0100
+
+    landing_target: use Eigen::Quaterniond::Identity()
+
+[33mcommit 473dc08cdc03566db2f927d43e5ca1abeff1edb9[m
+Author: TSC21 <n.marques21@hotmail.com>
+Date:   Tue Aug 4 11:26:08 2015 +0100
+
+    visualization: small correction on cb

@@ -1,0 +1,161 @@
+#!/usr/bin/env python
+
+# Sauce
+# https://docs.px4.io/master/en/ros/mavros_offboard.html
+# https://gist.github.com/annesteenbeek/5370f62cf85bb9d6825327bff1b85293
+
+import rospy
+import mavros
+from geometry_msgs.msg import PoseStamped
+from mavros_msgs.msg import State 
+from mavros_msgs.srv import CommandBool, SetMode
+
+mavros.set_namespace()
+
+# callback method for state sub
+current_state = State() 
+#offb_set_mode = SetMode
+def state_cb(state):
+    global current_state
+    current_state = state
+
+# local_pos_pub = rospy.Publisher(mavros.get_topic('setpoint_position', 'local'), PoseStamped, queue_size=10) #UAV0
+# state_sub = rospy.Subscriber(mavros.get_topic('state'), State, state_cb)
+# arming_client = rospy.ServiceProxy(mavros.get_topic('cmd', 'arming'), CommandBool)
+#set_mode_client = rospy.ServiceProxy(mavros.get_topic('set_mode'), SetMode) 
+local_pos_pub = rospy.Publisher('uav0/mavros/setpoint_position/local', PoseStamped, queue_size=10) #UAV0
+state_sub = rospy.Subscriber('uav0/mavros/state', State, state_cb)
+arming_client = rospy.ServiceProxy('uav0/mavros/cmd/arming', CommandBool)
+
+altitude = 0.75
+length = 1
+
+pose = PoseStamped()
+pose.pose.position.x = 0
+pose.pose.position.y = 0
+pose.pose.position.z = altitude
+
+# For demo purposes we will lock yaw/heading to north.
+roll_degrees = 0.0 
+roll = radians(roll_degrees)
+pitch_degrees = 0.0 
+pitch = radians(pitch_degrees)
+yaw_degrees = 0.0  # North
+yaw = radians(yaw_degrees)
+
+qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+#quaternion = quaternion_from_euler(0, 0, yaw)
+quaternion = [qx,qy,qz,qw]
+msg.pose.orientation = SP.Quaternion(*quaternion)
+
+pose2 = PoseStamped()
+pose2.pose.position.x = length
+pose2.pose.position.y = 0
+pose2.pose.position.z = altitude
+
+pose3 = PoseStamped()
+pose3.pose.position.x = length
+pose3.pose.position.y = length
+pose3.pose.position.z = altitude
+
+pose0 = PoseStamped()
+pose0.pose.position.x = 0
+pose0.pose.position.y = length
+pose0.pose.position.z = altitude
+
+local_position = PoseStamped()
+
+def position_callback(data): # callback invoked with the message as the first arg
+    local_position = data 
+
+def position_control():
+
+    print "position control"
+    
+    rospy.init_node('offb_node', anonymous=True)
+    prev_state = current_state
+    rosrate = 20
+    rate = rospy.Rate(rosrate) # MUST be more then 2Hz
+
+    # send a few setpoints before starting
+    for i in range(100):
+        local_pos_pub.publish(pose)
+        rate.sleep()
+    
+    # wait for FCU connection
+    while not current_state.connected:
+        rate.sleep()
+
+    last_request = rospy.get_rostime()
+    while not rospy.is_shutdown():
+        # now = rospy.get_rostime()
+        # if current_state.mode != "OFFBOARD" and (now - last_request > rospy.Duration(5.)):
+        #     set_mode_client(base_mode=0, custom_mode="OFFBOARD")
+        #     last_request = now
+        # else:
+        #     if not current_state.armed and (now - last_request > rospy.Duration(5.)):
+        #        arming_client(True)
+        #        last_request = now 
+
+        # # older versions of PX4 always return success==True, so better to check Status instead
+        # if prev_state.armed != current_state.armed:
+        #     rospy.loginfo("Vehicle armed: %r" % current_state.armed)
+        # if prev_state.mode != current_state.mode: 
+        #     rospy.loginfo("Current mode: %s" % current_state.mode)
+        # prev_state = current_state
+
+        # Update timestamp and publish pose 
+        pose.header.stamp = rospy.Time.now()
+        # print current_state
+        if current_state.armed == True:
+            print "sending position"
+            posetemp = PoseStamped()
+            posetemp.pose.position.x = local_position.pose.position.x
+            posetemp.pose.position.y = local_position.pose.position.y
+            posetemp.pose.position.z = local_position.pose.position.z
+            local_pos_pub.publish(posetemp)
+            rate.sleep()
+        if current_state.armed == True and current_state.mode == "OFFBOARD":
+            rate = rospy.Rate(rosrate)
+            for i in range(5 * rosrate):
+                print "sending first waypoint"
+                local_pos_pub.publish(pose)
+                rate.sleep()
+            for i in range(5 * rosrate):
+                print "sending second waypoint"
+                local_pos_pub.publish(pose2)
+                rate.sleep()
+            for i in range(5 * rosrate):
+                print "sending third waypoint"
+                local_pos_pub.publish(pose3)
+                rate.sleep()
+            for i in range(5 * rosrate):
+                print "sending last waypoint"
+                local_pos_pub.publish(pose0)
+                rate.sleep()
+            for i in range(60 * rosrate):
+                print "back to first waypoint"
+                local_pos_pub.publish(pose)
+                rate.sleep()
+            # for i in range(5 * rosrate):
+            #     print "landing"
+            #     set_mode_client(base_mode=0, custom_mode="AUTO.LAND")
+            #     rate.sleep()'arming'
+            print "disarming and ending"
+            # arming_client(False)
+            break
+        else:
+            print "not currently armed"
+            local_pos_pub.publish(pose)
+            rate.sleep()
+
+if __name__ == '__main__':
+    local_pos_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, position_callback)
+    try:
+        position_control()
+    except rospy.ROSInterruptException:
+        pass

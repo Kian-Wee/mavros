@@ -1,3 +1,18 @@
+BOREALIS SPECIFIC MAVROS SETUP
+======
+Follow inital mavros installation and change branch to pull changes
+
+Initalise this fork from master branch
+	1. run through normal ros and mavros setup
+	2. ```git remote set-url origin https://github.com/Kian-Wee/mavros.git```
+	3. ```git branch borealis```
+	4. ```git checkout borealis```
+	5. ```git pull origin borealis```
+
+Run the setup file to initalise aliases
+``` . ~/catkin_ws/src/mavros/borealis_setup/setup.bash ```
+
+
 MAVROS
 ======
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/mavlink/mavros)](https://github.com/mavlink/mavros/releases)  [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mavlink/mavros?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  [![CI](https://github.com/mavlink/mavros/actions/workflows/main.yml/badge.svg)](https://github.com/mavlink/mavros/actions/workflows/main.yml)
@@ -18,6 +33,27 @@ MAVLink extendable communication node for ROS.
 - 2020-01-01 version 1.0.0 released, please see [#1369][iss1369] for reasons and its purpose.
 - 2021-05-28 version 2.0.0 released, it's the first alpha release for ROS2.
 
+
+Instructions on launching the files for navigation for the Shadow Drone:
+----------------------
+
+ - cd into workspace
+
+ - RUN source devel/setup.bash
+
+ - RUN sudo chmod 666 /dev/ttyPixhawk to enable serial read from Pixhawk 2.1 FCU
+
+ - RUN roslaunch mavros shadow.launch to establish connection with Pixhawk 2.1 FCU
+
+ - RUN rosrun mavros shadow.final (trajectory within the room) for navigation, takeoff in stabilise mode and switch to Offboard 
+
+OR 
+
+ - RUN rosrun mavros shadow.corner (fly forward along the corner of the room and then back but with greater altitude) for navigation, takeoff in stabilise mode and switch to Offboard
+
+Scripts can be found under src/mavros/mavros/scripts
+
+ADVISED TO RUN ON PYTHON 2.7.12
 
 mavros package
 --------------

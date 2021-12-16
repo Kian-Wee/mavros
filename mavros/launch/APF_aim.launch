@@ -1,0 +1,16 @@
+<launch>
+  
+  <node name="potential_fields" pkg="artificial_potential_fields" type="apf_aim" output="screen" args=""> -->
+	<param name="UAV_radius" value="1.0" /> --> <!-- used to be 1.0 m in old simulation -->
+	<!-- <remap from="/uav/attractive_velocity" to="/$(arg vehicle)/attractive_velocity"/> -->
+	<!-- <remap from="/potential_fields/velocity" to="/$(arg vehicle)/command_velocity"/> -->
+  </node> -->  
+
+  <!-- Launch rqt_reconfigure -->
+  <node pkg="rqt_reconfigure" type="rqt_reconfigure" output="screen" name="rqt_reconfigure" /> -->
+
+  <!--<node name="rviz" pkg="rviz" type="rviz" output="screen" args="d $(find artificial_potential_fields)/rviz/rviz.rviz"/>-->
+  
+  <!--  <node pkg="rqt_multiplot" type="rqt_multiplot" output="screen" name="rqt_multiplot" /> -->
+
+</launch>

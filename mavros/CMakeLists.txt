@@ -23,6 +23,8 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_eigen
   tf2_ros
   trajectory_msgs
+  dynamic_reconfigure
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -60,6 +62,28 @@ endif()
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
 catkin_python_setup()
+
+
+################################################
+## Declare ROS dynamic reconfigure parameters ##
+################################################
+
+## To declare and build dynamic reconfigure parameters within this
+## package, follow these steps:
+## * In the file package.xml:
+##   * add a build_depend and a run_depend tag for "dynamic_reconfigure"
+## * In this file (CMakeLists.txt):
+##   * add "dynamic_reconfigure" to
+##     find_package(catkin REQUIRED COMPONENTS ...)
+##   * uncomment the "generate_dynamic_reconfigure_options" section below
+##     and list every .cfg file to be processed
+
+## Generate dynamic reconfigure parameters in the 'cfg' folder
+# generate_dynamic_reconfigure_options(
+#   cfg/DynReconf1.cfg
+#   cfg/DynReconf2.cfg
+# )
+generate_dynamic_reconfigure_options(cfg/setpids.cfg)
 
 
 ###################################
@@ -176,6 +200,15 @@ target_link_libraries(gcs_bridge
   mavros
   ${catkin_LIBRARIES}
 )
+
+#
+#add_executable(offb_test
+#  scripts/offb_node.cpp
+#)
+#target_link_libraries(offb_test
+#  mavros
+#  ${catkin_LIBRARIES}
+#)
 
 #############
 ## Install ##
