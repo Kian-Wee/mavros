@@ -6,14 +6,15 @@ Initalise this fork from master branch
 
 	1. run through normal ros and mavros setup
 	
-	2. ```git remote set-url origin https://github.com/Kian-Wee/mavros.git```
+	2. git remote set-url origin https://github.com/Kian-Wee/mavros.git
 	
-	3. ```git branch borealis```
+	3. git branch borealis
 	
-	4. ```git checkout borealis```
+	4. git checkout borealis
 	
-	5. ```git pull origin borealis```
+	5. git pull origin borealis
 	
+If any prior changes were made, drop the changes first with, ```git stash```, ```git stash drop stash@{0}```. Enter name and email if prompted.
 
 Run the setup file to initalise aliases
 ``` . ~/catkin_ws/src/mavros/borealis_setup/setup.bash ```
