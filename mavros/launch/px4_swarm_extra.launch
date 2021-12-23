@@ -5,8 +5,8 @@
 	<!-- vim: set ft=xml noet : -->
 	<!-- example launch script for PX4 based FCU's -->
 	
-	<!-- <arg name="fcu_url" default="udp://:14540@localhost:14557" /> -->
-	<arg name="fcu_url" default="/dev/ttyPixhawk:921600" />
+	<arg name="fcu_url" default="udp://:14540@localhost:14557" />
+	<!-- <arg name="fcu_url" default="/dev/ttyPixhawk:921600" /> -->
 	<arg name="gcs_url" default="udp://@"  />
 	<arg name="tgt_system" default="1" />
 	<arg name="tgt_component" default="1" />
@@ -28,10 +28,6 @@
 
     <!-- Launch mavros_extras visualization.cpp to show in rviz, CHECK WHY NOT DISPLAYING-->
     <node name="drone_rviz" pkg="mavros_extras" type="visualization" />
-
-    <!-- <node name="mocap" pkg="mavros_extras" type="mocap_pose_estimation" /> -->
-
-<!-- <remap from="/vrpn_client_node/BetaVroom/pose" to="uav0/mavros/vision_pose/pose" /> -->
 
     </group>
 </launch>

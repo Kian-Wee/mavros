@@ -1,0 +1,122 @@
+#!/usr/bin/env python
+# vim:set ts=4 sw=4 et:
+#
+# Adapted from follow_me script
+#
+# Follows a marker(drone/human/robot) at a fixed time interval if the drone is moving
+# Uses position control only, no velocity is involved
+# Currently assumes that the marker will not walk/fly/move back into the drone and that the rate of marker publish is constant
+
+import rospy
+import thread
+import threading
+import time
+import mavros
+
+from math import *
+from mavros.utils import *
+from mavros import setpoint as SP
+from std_msgs.msg import Header #type 
+from std_msgs.msg import Float64, Float32 #type from msg generation
+from geometry_msgs.msg import PoseStamped, Quaternion, TwistStamped #geometry
+#from tf.transformations import quaternion_from_euler #transformation
+from mavros_msgs.srv import CommandLong #service_class
+from sensor_msgs.msg import NavSatFix,Range,LaserScan #type
+
+follow_pos= "/vrpn_client_node/BetaVroom/pose" #object being followed
+follower_set="/uav0/mavros/setpoint_position/local" #object following
+follower_pos="/uav0/mavros/local_position/pose"
+followlag=4 #seconds behind followed object
+barrier=1 #meters, if drone is this distance from followed object, it stops
+
+class follow:
+    """
+    This class sends position targets to FCU's position controller
+    """
+    def __init__(self):
+
+        self.follow_position = PoseStamped() #callback data is saved here
+        rospy.Subscriber(follow_pos, PoseStamped , self.followcallback)
+
+        self.follower_position = PoseStamped() #callback data is saved here
+        rospy.Subscriber(follower_pos, PoseStamped , self.followercallback)
+        
+        self.follower_pub = rospy.Publisher(follower_set, PoseStamped, queue_size=10)
+        
+        self.rate = rospy.Rate(50) # 10hz is the original 
+
+        # Previous acceptable position of drone
+        self.prevx=self.follower_position.pose.position.x
+        self.prevy=self.follower_position.pose.position.y
+        self.prevz=self.follower_position.pose.position.z
+
+        # Historical position of followed drone in array
+        # The most recent value is added at the back while the most dated value is at the front
+        self.xarr=[]
+        self.yarr=[]
+        self.zarr=[]
+
+        # Interrupt timer whenever drone gets within [barrier] threshold, waits until drone is [followlag] seconds away before reactivating
+        inttimer=0
+      
+        while not rospy.is_shutdown(): #subsequent functions below are automatically run using this while loop (inert functions)  
+
+            # Swapped due to coordinate axis of optirack and mavros
+            eu_dist=sqrt((self.follow_position.pose.position.y-self.follower_position.pose.position.x)**2 + (self.follow_position.pose.position.x-self.follow_position.pose.position.y)**2)
+
+            # followed is within [barrier] distance of follower, publish previously acceptable distance
+            if eu_dist < barrier:
+                rospy.loginfo("marker below safe threshold, stopping")
+                posetemp = PoseStamped()
+                posetemp.pose.position.x = self.prevx
+                posetemp.pose.position.y = self.prevy
+                posetemp.pose.position.z = self.prevz
+                self.follower_pub.publish(posetemp)
+                inttimer=time.time()
+            
+            # Time is less than [followlag] threshhold, start logging drone position but dont follow yet
+            elif time.time() < inttimer + followlag:
+                rospy.loginfo("waiting for marker to move away")
+                posetemp = PoseStamped()
+                posetemp.pose.position.x = self.prevx
+                posetemp.pose.position.y = self.prevy
+                posetemp.pose.position.z = self.prevz
+                # Ensure X and Y are swapped and -Z for optitrack transforms(Z up)
+                self.xarr.append(self.follow_position.pose.position.y) #Append the current position to the end of the list
+                self.yarr.append(self.follow_position.pose.position.x)
+                self.zarr.append(-self.follow_position.pose.position.z)
+                self.follower_pub.publish(posetemp)
+
+            # Time is more than [followlag] threshhold, publishing delayed setpoints in normal operation
+            else:
+                #rospy.loginfo("following normally")
+                posetemp = PoseStamped()
+                self.xarr.append(self.follow_position.pose.position.y) #Append the current position to the end of the list
+                self.yarr.append(self.follow_position.pose.position.x)
+                self.zarr.append(-self.follow_position.pose.position.z)
+                posetemp.pose.position.x = self.xarr[0]
+                posetemp.pose.position.y = self.yarr[0]
+                posetemp.pose.position.z = self.zarr[0]
+                print(self.xarr[0], self.yarr[0], self.zarr[0]) # For debug
+                self.xarr.pop(0) #delete the most dated position at [followlag]s after sending to the follower
+                self.yarr.pop(0)
+                self.zarr.pop(0)
+                self.follower_pub.publish(posetemp)
+
+            self.rate.sleep() #The loop calls rate.sleep(), which sleeps just long enough to maintain the desired rate through the loop.
+
+    def followcallback(self,data): # callback invoked with the message as the first arg
+        self.follow_position = data
+
+    def followercallback(self,data): # callback invoked with the message as the first arg
+        self.follower_position = data
+         
+if __name__ == '__main__':
+
+    rospy.init_node('follow', anonymous=True)
+
+    node = follow()
+
+    rospy.spin()
+     
+
