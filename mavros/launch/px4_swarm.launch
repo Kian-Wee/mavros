@@ -7,7 +7,7 @@
 	
 	<!-- <arg name="fcu_url" default="udp://:14540@localhost:14557" /> same as the bottom --> 
 	<arg name="fcu_url" default="/dev/ttyPixhawk:921600" /> 
-	<arg name="gcs_url" default="udp://@"  />
+	<arg name="gcs_url" default="udp://:14555@"  />
 	<arg name="tgt_system" default="1" />
 	<arg name="tgt_component" default="1" />
 	<arg name="log_output" default="screen" />

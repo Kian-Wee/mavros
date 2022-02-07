@@ -20,6 +20,10 @@
 #    - Changed topic names after re-factoring : https://github.com/mavlink/mavros/issues/233
 #    - Use mavros.setpoint module for topics
 
+# Ensure that EKF2_AID_MASK has vision set to on if the local_position is not publishing
+
+# TODO, check for case whereby t265 or mavros disconnects
+
 import rospy
 import thread
 import threading
@@ -41,6 +45,8 @@ from mavros_msgs.msg import PositionTarget,Thrust,AttitudeTarget
 from sensor_msgs.msg import NavSatFix,Range #type
 from tf2_msgs.msg import TFMessage
 
+drone_name="uav2"
+odom_frame_id=drone_name+"/t265_odom_frame"
 
 class vision:
     """
@@ -61,9 +67,9 @@ class vision:
         # rospy.Subscriber("subscribed topic",topic type,callback invoked with the message as the first arg)  
 
         rospy.Subscriber('/tf', TFMessage, self.callback_tf)
-        rospy.Subscriber("uav0/mavros/local_position/pose", PoseStamped, self.position_callback)
-        rospy.Subscriber("uav0/mavros/vision_pose/pose", PoseStamped, self.vision_callback)
-        self.pub_vis = rospy.Publisher('uav0/mavros/vision_pose/pose', PoseStamped, queue_size=10)
+        rospy.Subscriber(drone_name + "/mavros/local_position/pose", PoseStamped, self.position_callback)
+        rospy.Subscriber(drone_name + "/mavros/vision_pose/pose", PoseStamped, self.vision_callback)
+        self.pub_vis = rospy.Publisher(drone_name + '/mavros/vision_pose/pose', PoseStamped, queue_size=10)
         self.x_list = []
         self.y_list = []
         self.z_list = []
@@ -89,14 +95,14 @@ class vision:
                 self.x_list.append(self.x) 
                 self.z_list.append(self.z) 
                 self.filtered_estimator()
-                #print i, self.vision_position.pose.orientation.z, self.local_position.pose.position.z
-                if self.vision_position.pose.orientation.z == None and self.local_position.pose.position.z == None:
-                    print "T265 and Mavros are offline"
+                print i, self.vision_position.pose.orientation.z, self.local_position.pose.position.z
+                if (self.vision_position.pose.orientation.z == None and self.local_position.pose.position.z == None) or (self.vision_position.pose.orientation.z == 0 and self.local_position.pose.position.z == 0):
+                    print("%s T265 and Mavros are offline" % (drone_name))
                     time.sleep(1)
-                elif self.vision_position.pose.orientation.z == None:
-                    print "T265 is offline"
-                elif self.local_position.pose.position.z == None:
-                    print "Mavros is offline"
+                elif self.vision_position.pose.orientation.z == None or self.vision_position.pose.orientation.z == 0:
+                    print("%s T265 is offline" % (drone_name))
+                elif self.local_position.pose.position.z == None or self.local_position.pose.position.z == 0:
+                    print("%s Mavros is offline" % (drone_name))
 
             self.rate.sleep()
 
@@ -108,7 +114,7 @@ class vision:
 
         
     def callback_tf(self,data):
-        if data.transforms[0].header.frame_id == "t265_odom_frame":
+        if data.transforms[0].header.frame_id == odom_frame_id:
             self.y = data.transforms[0].transform.translation.y
             self.x = data.transforms[0].transform.translation.x
             self.z = data.transforms[0].transform.translation.z
@@ -152,7 +158,7 @@ class vision:
 
 
 if __name__ == '__main__':
-    rospy.init_node('vision', anonymous=True)
+    rospy.init_node(drone_name + '_vision', anonymous=True)
 
     node = vision()
 

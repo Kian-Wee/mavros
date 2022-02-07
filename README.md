@@ -13,14 +13,21 @@ Initalise this fork from master branch
 	4. git checkout borealis
 	
 	5. git pull origin borealis
-	
+
 If any prior changes were made, drop the changes first with, ```git stash```, ```git stash drop stash@{0}```. Enter name and email if prompted.
 
+
+
+
+
+**Vehicle and position setup** 
 Run the setup file to initalise aliases
 ``` . ~/catkin_ws/src/mavros/borealis_setup/setup.bash ```
+Enable vision fusion on EKF_2_AID_MASK
+Do remember to change the MAV_SYS_ID on different vehicles
 
 
-MAVROS
+SMAVROS
 ======
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/mavlink/mavros)](https://github.com/mavlink/mavros/releases)  [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mavlink/mavros?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  [![CI](https://github.com/mavlink/mavros/actions/workflows/main.yml/badge.svg)](https://github.com/mavlink/mavros/actions/workflows/main.yml)
 
