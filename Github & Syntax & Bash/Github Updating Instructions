@@ -9,7 +9,7 @@ Updating files(to branch)
 	1. git remote set-url origin https://github.com/[Username]/[REPO].git
 	2. git add -A (add all untracked commits)
 	3. git commit -m "initial commit" (for the first commit, afterwhich git commit)
-	4. git push -u origin master (where master is branch name), ensure you generate authentication token first
+	4. git push -u origin borealis (where borealis is branch name), ensure you generate authentication token first
 
 Updating local repository to newest version after discarded local changes
 	1. git add -A (add all untracked commits)
