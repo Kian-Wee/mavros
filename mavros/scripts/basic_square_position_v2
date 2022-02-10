@@ -1,12 +1,10 @@
 #!/usr/bin/env python
 
+#added local position callback for testing
+
 # Sauce
 # https://docs.px4.io/master/en/ros/mavros_offboard.html
 # https://gist.github.com/annesteenbeek/5370f62cf85bb9d6825327bff1b85293
-
-# !!! Ensure the px4 param COM_RCL_EXCEPT is set to 5 in QGC
-# NAV_RCL_ACT is disabled
-# COM_RC_IN_MODE no checks
 
 import rospy
 import mavros
@@ -28,11 +26,12 @@ def state_cb(state):
 # arming_client = rospy.ServiceProxy(mavros.get_topic('cmd', 'arming'), CommandBool)
 #set_mode_client = rospy.ServiceProxy(mavros.get_topic('set_mode'), SetMode) 
 local_pos_pub = rospy.Publisher('uav0/mavros/setpoint_position/local', PoseStamped, queue_size=10) #UAV0
+local_pos_sub = rospy.Subscriber('uav0/mavros/local_position/pose', PoseStamped,  pose_cb)
 state_sub = rospy.Subscriber('uav0/mavros/state', State, state_cb)
 arming_client = rospy.ServiceProxy('uav0/mavros/cmd/arming', CommandBool)
 
 altitude = 0.75
-length = 5
+length = 1
 
 pose = PoseStamped()
 pose.pose.position.x = 0
@@ -97,7 +96,16 @@ def position_control():
 
         # Update timestamp and publish pose 
         pose.header.stamp = rospy.Time.now()
-        if current_state.armed == True and current_state.mode == "OFFBOARD":
+        # print current_state
+        if current_state.armed == True:
+            print "Currently armed but not in offboard mode, hovering"
+            posetemp = PoseStamped()
+            posetemp.pose.position.x = local_position.pose.position.x # offboard mode requires existing position setpoints to boot into
+            posetemp.pose.position.y = local_position.pose.position.y
+            posetemp.pose.position.z = local_position.pose.position.z
+            local_pos_pub.publish(posetemp)
+            rate.sleep()
+        elif current_state.armed == True and current_state.mode == "OFFBOARD":
             rate = rospy.Rate(rosrate)
             for i in range(5 * rosrate):
                 print "sending first waypoint"
@@ -126,14 +134,6 @@ def position_control():
             print "disarming and ending"
             # arming_client(False)
             break
-        elif current_state.armed == True:
-            print "Currently armed but not in offboard mode, hovering"
-            posetemp = PoseStamped()
-            posetemp.pose.position.x = local_position.pose.position.x # offboard mode requires existing position setpoints to boot into
-            posetemp.pose.position.y = local_position.pose.position.y
-            posetemp.pose.position.z = local_position.pose.position.z
-            local_pos_pub.publish(posetemp)
-            rate.sleep()
         else:
             print "Not armed"
             local_pos_pub.publish(pose)

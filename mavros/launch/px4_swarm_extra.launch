@@ -1,3 +1,5 @@
+<!-- CURRENTLY NOT IN USE-->
+
 <launch>
 
     <!-- Launch script for multidrone/swarm with prefix-->
@@ -5,8 +7,8 @@
 	<!-- vim: set ft=xml noet : -->
 	<!-- example launch script for PX4 based FCU's -->
 	
-	<arg name="fcu_url" default="udp://:14540@localhost:14557" />
-	<!-- <arg name="fcu_url" default="/dev/ttyPixhawk:921600" /> -->
+	<!-- <arg name="fcu_url" default="udp://:14540@localhost:14557" /> -->
+	<arg name="fcu_url" default="/dev/ttyPixhawk:921600" />
 	<arg name="ID" value="1"/>
 	<!-- <arg name="gcs_url" default="udp://:14557@"/> -->
 	<arg name="gcs_url" default="udp://@"  />
@@ -28,7 +30,7 @@
 		<arg name="respawn_mavros" default="$(arg respawn_mavros)" />
 	</include>
 
-    <!-- Launch mavros_extras visualization.cpp to show in rviz, CHECK WHY NOT DISPLAYING-->
+    <!-- Launch mavros_extras visualization.cpp to show in rviz, DOESNT SEEM TO PUBLISH-->
     <node name="drone_rviz" pkg="mavros_extras" type="visualization" />
 
     </group>

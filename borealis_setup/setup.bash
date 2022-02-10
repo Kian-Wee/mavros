@@ -13,7 +13,8 @@ alias launch_t265='roslaunch realsense2_camera rs_t265.launch serial_no:=9484221
 alias launch_drone_data_feeder='roslaunch drone_data_feeder_node drone_data_feeder.launch'
 alias drone_data_feeder='rosrun drone_data_feeder_node drone_data_feeder.py'
 
-alias launch_borealis='. ~/parallel_comments.bash "roslaunch mavros px4_swarm_extra.launch" "roslaunch realsense2_camera rs_t265.launch camera:=uav0/t265 serial_no:=948422110423" "rosrun mavros pos_265" "roslaunch realsense2_camera rs_camera.launch camera:=uav0/d435i serial_no:=134222075005 color_width:=848 color_height:=480 color_fps:=30 depth_width:=848 depth_height:=480 depth_fps:=30 align_depth:=true"'
+# Syncronise time and launch mavros, 2 realsenses, the positioning node and the LEDs
+alias launch_borealis='. ~/parallel_comments.bash "sudo ntpdate -s time.nist.gov" "roslaunch mavros px4_swarm.launch" "roslaunch realsense2_camera rs_t265.launch camera:=uav0/t265 serial_no:=948422110423" "rosrun mavros pos_265" "roslaunch realsense2_camera rs_camera.launch camera:=uav0/d435i serial_no:=134222075005 color_width:=848 color_height:=480 color_fps:=30 depth_width:=848 depth_height:=480 depth_fps:=30 align_depth:=true" "python ~/catkin_ws/src/PX4-Lights/buzzer_ros.py'
 EOF
 
 # Add in udev rules
@@ -21,6 +22,7 @@ EOF
 sudo touch "/etc/udev/rules.d/99-pixhawk.rules"
 sudo su -
 cat <<EOF > /etc/udev/rules.d/99-pixhawk.rules
+SUBSYSTEM=="tty", ATTRS{idVendor}=="26ac", ATTRS{idProduct}=="0011", SYMLINK+="ttyPixhawk"
 SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="ttyPixhawk"
 EOF
 

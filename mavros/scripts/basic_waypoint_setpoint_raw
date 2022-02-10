@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+# Position and velocity setpoints
+
 # Sauce
 # https://docs.px4.io/master/en/ros/mavros_offboard.html
 # https://gist.github.com/annesteenbeek/5370f62cf85bb9d6825327bff1b85293
@@ -119,9 +121,9 @@ def position_control():
         msgtemp.position.x = local_position.position.x
         msgtemp.position.y = local_position.position.y
         msgtemp.position.z = local_position.position.z
-        msgtemp.velocity.x = 0#local_position.velocity.x
-        msgtemp.velocity.y = 0#local_position.velocity.y
-        msgtemp.velocity.z = 0#local_position.velocity.z
+        msgtemp.velocity.x = 0.5#local_position.velocity.x
+        msgtemp.velocity.y = 0.5#local_position.velocity.y
+        msgtemp.velocity.z = 0.5#local_position.velocity.z
         msgtemp.coordinate_frame = coordframe
 
         # print current_state
