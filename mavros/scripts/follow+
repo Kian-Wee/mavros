@@ -10,6 +10,7 @@
 import rospy
 import time
 import csv
+import numpy as np
 
 from math import *
 from mavros.utils import *
@@ -20,8 +21,8 @@ follow_pos= "/uav0/mavros/setpoint_position/local" #object being followed
 #/vrpn_client_node/BetaVroom/pose
 follower_set="/uav1/mavros/setpoint_position/local" #object following
 follower_pos="/uav1/mavros/local_position/pose"
-followlag=3 #seconds behind followed object
-barrier=1 #meters, if drone is this distance from followed object, it stops
+followlag=1 #seconds behind followed object
+barrier=1.5 #meters, if drone is this distance from followed object, it stops
 rate=10
 
 class follow:
@@ -65,8 +66,8 @@ class follow:
 
         # Historical positions("Breadcrumbs"), velocities and errors of all sent setpoints, saves all positions
         # Breadcrumbs, timestamp, velocity, error accumulated
-        self.totalarr=[["X-Setpoint", "Y-Setpoint", "Z-Setpoint", "X-Position", "Y-Position", "Z-Position", "Timestamp", "X-Velocity", "Y-Velocity", "Z-Velocity", "X-Error", "Y-Error", "Z-Error", "Eucalediam-Error"]] 
-        self.totalarr=[self.totalarr, [0, 0, 0, 0, 0, 0, self.timestamp, self.xvel, self.yvel, self.zvel, self.xerror, self.yerror, self.zerror, self.error]]
+        self.totalarr=["X-Setpoint", "Y-Setpoint", "Z-Setpoint", "X-Position", "Y-Position", "Z-Position", "Timestamp", "X-Velocity", "Y-Velocity", "Z-Velocity", "X-Error", "Y-Error", "Z-Error", "Eucaledian-Error"] 
+        self.totalarr.append([0, 0, 0, 0, 0, 0, self.timestamp, self.xvel, self.yvel, self.zvel, self.xerror, self.yerror, self.zerror, self.error])
 
         # Interrupt timer whenever drone gets within [barrier] threshold, waits until drone is [followlag] seconds away before reactivating
         inttimer=0
@@ -130,8 +131,8 @@ class follow:
                 self.zerror = self.follower_position.pose.position.z-self.follow_position.pose.position.z
                 self.error=sqrt(self.xerror**2 + self.yerror**2 + self.zerror**2)
 
-                self.totalarr=[self.totalarr, [self.follow_position.pose.position.x, self.follow_position.pose.position.y, self.follow_position.pose.position.z, posetemp.pose.position.x, posetemp.pose.position.y, posetemp.pose.position.z, 
-                                self.timestamp, self.xvel, self.yvel, self.zvel, self.xerror, self.yerror, self.zerror, self.error]]
+                self.totalarr.append([self.follow_position.pose.position.x, self.follow_position.pose.position.y, self.follow_position.pose.position.z, posetemp.pose.position.x, posetemp.pose.position.y, posetemp.pose.position.z, 
+                                self.timestamp, self.xvel, self.yvel, self.zvel, self.xerror, self.yerror, self.zerror, self.error])
             
             # Publish setpoints
             self.follower_pub.publish(posetemp)
@@ -153,11 +154,20 @@ class follow:
         self.follower_position = data
          
     def save(self):
-        wtr = csv.writer(open ('~/Desktop/out.csv', 'w'), delimiter=',', lineterminator='\n')
-        for x in self.totalarr:
-            wtr.writerow ([x])
-            print("saving %s",x)
+        # wtr = csv.writer(open ('out.csv', 'w'), delimiter=',', lineterminator='\n') #~/Desktop/
+        rmse=0
+        for x in range(1,len(self.totalarr)): #omit first column of headers
+            rmse+=self.totalarr[x][-1]
+            # wtr.writerow (self.totalarr[x])
+            # print("saving %s",x)
+        rmse=sqrt(rmse/ (len(self.totalarr)-1))
+        self.totalarr.append(rmse)
+        newarr = np.matrix(self.totalarr)
+        # print(newarr)
+        # saves to home(~)
+        np.savetxt("data.csv", newarr, delimiter=",", fmt='%s')
         rospy.loginfo("Data Saved")
+        print("RMSE is {}".format(rmse))
 
 if __name__ == '__main__':
 

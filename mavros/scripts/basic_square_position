@@ -33,6 +33,7 @@ arming_client = rospy.ServiceProxy('uav0/mavros/cmd/arming', CommandBool)
 
 altitude = 0.75
 length = 5
+duration = 10 #duration to reach setpoint
 
 pose = PoseStamped()
 pose.pose.position.x = 0
@@ -99,33 +100,35 @@ def position_control():
         pose.header.stamp = rospy.Time.now()
         if current_state.armed == True and current_state.mode == "OFFBOARD":
             rate = rospy.Rate(rosrate)
-            for i in range(5 * rosrate):
+            for i in range(duration * rosrate):
                 print "sending first waypoint"
                 local_pos_pub.publish(pose)
                 rate.sleep()
-            for i in range(5 * rosrate):
+            for i in range(duration * rosrate):
                 print "sending second waypoint"
                 local_pos_pub.publish(pose2)
                 rate.sleep()
-            for i in range(5 * rosrate):
+            for i in range(duration * rosrate):
                 print "sending third waypoint"
                 local_pos_pub.publish(pose3)
                 rate.sleep()
-            for i in range(5 * rosrate):
+            for i in range(duration * rosrate):
                 print "sending last waypoint"
                 local_pos_pub.publish(pose0)
                 rate.sleep()
-            for i in range(60 * rosrate):
-                print "back to first waypoint"
-                local_pos_pub.publish(pose)
-                rate.sleep()
-            # for i in range(5 * rosrate):
-            #     print "landing"
-            #     set_mode_client(base_mode=0, custom_mode="AUTO.LAND")
-            #     rate.sleep()'arming'
-            print "disarming and ending"
-            # arming_client(False)
-            break
+
+            # Uncomment to land after runing once
+            # for i in range(60 * rosrate):
+            #     print "back to first waypoint"
+            #     local_pos_pub.publish(pose)
+            #     rate.sleep()
+            # # for i in range(5 * rosrate):
+            # #     print "landing"
+            # #     set_mode_client(base_mode=0, custom_mode="AUTO.LAND")
+            # #     rate.sleep()'arming'
+            # print "disarming and ending"
+            # # arming_client(False)
+            # break
         elif current_state.armed == True:
             print "Currently armed but not in offboard mode, hovering"
             posetemp = PoseStamped()
