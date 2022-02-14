@@ -1,0 +1,124 @@
+#!/usr/bin/env python
+
+# Basic position control, rewritten from past scripts to properly use classes
+
+import rospy
+import mavros
+import math
+from geometry_msgs.msg import PoseStamped
+from mavros_msgs.msg import State , PositionTarget
+from mavros_msgs.srv import CommandBool, SetMode
+from nav_msgs.msg import Odometry
+from std_msgs.msg import Int32 # Lap counter
+import numpy as np
+
+local_pos_topic='/uav0/mavros/setpoint_position/local'
+local_vel_topic='/uav0/mavros/setpoint_raw/local'
+drone_pos_topic= "/uav1/mavros/local_position/odom"
+
+lap_topic="/uav0/lap"
+
+z_vel=0.2 # m/s
+coordframe=1
+
+rate=10 #hz
+
+mavros.set_namespace()
+
+class drone:
+
+    def __init__(self):
+
+        self.rate = rospy.Rate(rate) # 10hz
+
+        self.drone_position = Odometry() #callback data is saved here
+        rospy.Subscriber(drone_pos_topic, Odometry , self.positioncallback)
+
+        self.local_pos_pub = rospy.Publisher(local_pos_topic, PoseStamped, queue_size=10) # Position Publisher
+        self.local_vel_pub = rospy.Publisher(local_vel_topic, PositionTarget, queue_size=10) # Position and Velocity Publisher
+
+        self.lap = rospy.Publisher(lap_topic, Int32, queue_size=10)
+        self.lapcounter = 0
+
+        self.traj_arr = self.generatetrajectory("Circle",5)
+
+        while not rospy.is_shutdown():
+
+            # Send trajectory and sleep
+            for pos in self.traj_arr:
+                print(pos, self.lapcounter)
+                self.gotopos(pos[0],pos[1],pos[2])
+                self.rate.sleep()
+
+            # After the trajectory has finished sending, increment lap count by 1
+            self.lapcounter+=1
+            self.lap.publish(self.lapcounter)
+
+    # Generate trajectory for circle and square
+    def generatetrajectory(self, shape, radius, x_offset=0, y_offset=0, altitude=1, resolution=0.1):
+
+        # Assume current position is the center, plan trajectory around center
+        x=self.drone_position.pose.pose.position.x
+        y=self.drone_position.pose.pose.position.y
+        z=self.drone_position.pose.pose.position.z
+
+        if shape=="Circle":
+            n=100
+            return [(math.cos(2*math.pi/n*x)*radius,math.sin(2*math.pi/n*x)*radius,altitude) for x in range(0,n+1)]
+
+        # Draw a square of radius,radius assuming it is currently at 0,0
+        elif shape=="Square":
+            temparr=[]
+            for i in np.arange(0, radius, resolution):
+                temparr.append([i+x+x_offset, 0+y+y_offset, altitude])
+            for i in np.arange(0, radius, resolution):
+                temparr.append([radius+x+x_offset, i+y+y_offset, altitude])
+            for i in np.arange(0, radius, resolution):
+                temparr.append([-i+x+x_offset, radius+y+y_offset, altitude])
+            for i in np.arange(0, radius, resolution):
+                temparr.append([x+x_offset, -i+y+y_offset, altitude])
+            return temparr
+        else:
+            print("Invalid Shape")
+            rospy.signal_shutdown("Invalid Shape")
+
+    # Go to position, supports velocity setpoints too
+    def gotopos(self, x, y, z, velocity=0):
+
+        # No velocity defined, defaulting to position control
+        if(velocity==0):
+            posetemp = PoseStamped()
+            posetemp.pose.position.x = x # offboard mode requires existing position setpoints to boot into
+            posetemp.pose.position.y = y
+            posetemp.pose.position.z = z
+            self.local_pos_pub.publish(posetemp)
+
+        # Send velocity and position
+        else:
+            msg0 = PositionTarget()
+            msg0.position.x = x
+            msg0.position.y = y
+            msg0.position.z = z
+            msg0.velocity.x= velocity
+            msg0.velocity.y= velocity
+            msg0.velocity.z= z_vel
+            msg0.coordinate_frame = coordframe
+            self.local_vel_pub.publish(msg0)
+
+    # Check if drone is at position before sending new position
+
+    def positioncallback(self,data): # callback invoked with the message as the first arg
+        self.drone_position = data
+
+        
+
+
+
+
+if __name__ == '__main__':
+
+    rospy.init_node('drone', anonymous=True)
+
+    node = drone()
+
+    rospy.spin()
