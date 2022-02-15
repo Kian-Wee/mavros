@@ -29,6 +29,13 @@ Do remember to change the MAV_SYS_ID on different vehicles
 [Other reference](https://github.com/PX4/PX4-Devguide/blob/master/en/companion_computer/pixhawk_companion.md)
 
 
+**Scripts**
+pos_265 - node for Intel Realsense 265, visual positioning is given to mavros (pos_265_old shows all output)
+follow - basic follow script to follow a topic
+follow+ - saves additional datapoints
+follow+odom - uses odometry instead of posestamped and implements a lapcounter(for use with basic_position)
+basic_position - send positions and generate trajectories
+
 MAVROS
 ======
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/mavlink/mavros)](https://github.com/mavlink/mavros/releases)  [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mavlink/mavros?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  [![CI](https://github.com/mavlink/mavros/actions/workflows/main.yml/badge.svg)](https://github.com/mavlink/mavros/actions/workflows/main.yml)
