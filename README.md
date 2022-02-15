@@ -1,4 +1,4 @@
-BOREALIS SPECIFIC MAVROS SETUP
+# BOREALIS SPECIFIC MAVROS SETUP
 ======
 Follow inital mavros installation and change branch to pull changes
 
@@ -20,7 +20,7 @@ More instructions avaliable at [Github & Syntax & Bash](https://github.com/Kian-
 
 
 
-**Vehicle and position setup** 
+### **Vehicle and position setup** 
 Run the setup file to initalise aliases and udev rules
 ``` . ~/catkin_ws/src/mavros/borealis_setup/setup.bash ```
 Enable vision fusion on EKF_2_AID_MASK
@@ -29,12 +29,17 @@ Do remember to change the MAV_SYS_ID on different vehicles
 [Other reference](https://github.com/PX4/PX4-Devguide/blob/master/en/companion_computer/pixhawk_companion.md)
 
 
-**Scripts**
-pos_265 - node for Intel Realsense 265, visual positioning is given to mavros (pos_265_old shows all output)
-follow - basic follow script to follow a topic
-follow+ - saves additional datapoints
-follow+odom - uses odometry instead of posestamped and implements a lapcounter(for use with basic_position)
-basic_position - send positions and generate trajectories
+### **Scripts**
+
+**pos_265** - node for Intel Realsense 265, visual positioning is given to mavros (pos_265_old shows all output)
+
+**follow** - basic follow script to follow a topic
+
+**follow+** - saves additional datapoints
+
+**follow+odom** - uses odometry instead of posestamped and implements a lapcounter(for use with basic_position)
+
+**basic_position** - send positions and generate trajectories
 
 MAVROS
 ======
