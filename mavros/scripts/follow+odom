@@ -17,20 +17,23 @@ from mavros.utils import *
 # from mavros import setpoint as SP
 from geometry_msgs.msg import PoseStamped #geometry
 from nav_msgs.msg import Odometry
+from mavros_msgs.msg import PositionTarget
 from std_msgs.msg import Int32 # Lap counter
 
 follow_pos= "/uav0/mavros/setpoint_position/local" #object being followed
 #/vrpn_client_node/BetaVroom/pose
 follower_set="/uav1/mavros/setpoint_position/local" #object following
+follower_set_raw='uav1/mavros/setpoint_raw/local' #object following with velocity
+local_pos_pub = rospy.Publisher(follower_set_raw, PositionTarget, queue_size=10) #UAV0
 # Take note that odom topic has an additional pose for self.follower_pose.pose.pose
 follower_pos="/uav1/mavros/local_position/odom" #/uav1/mavros/local_position/odom
 followlag=1 #seconds behind followed object
-barrier=1.5 #meters, if drone is this distance from followed object, it stops
+barrier=1 #meters, if drone is this distance from followed object, it stops
 rate=10
 
 lap_topic="/uav0/lap"
 
-#TEST LAP FILTERING AND FIGURE OUT WHY SAVING EXTRA BRACKET
+
 
 class follow:
     """
@@ -227,11 +230,9 @@ class follow:
             # print("saving %s",x)
         rmse=sqrt(rmse/ (len(self.totalarr)-1))
         
-        # saves to home(~)
         print("RMSE is {}".format(rmse))
 
-        # data = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0]
-        # print(data)
+        # saves to home(~)
         wtr.writerow(["Total RMSE", rmse])
 
         # # Numpy code(depreciated)
