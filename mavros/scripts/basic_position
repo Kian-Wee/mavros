@@ -20,8 +20,8 @@ drone_pos_topic= '/uav0/mavros/local_position/odom'
 lap_topic="/uav0/lap"
 velocity_topic="uav0/velocity"
 
-velocity = 3 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
-shape = "Circle"
+velocity = 2 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
+shape = "Square"
 radius = 5
 
 z_vel=0.2 # m/s
@@ -56,11 +56,14 @@ class drone:
             for pos in self.traj_arr:
                 print(pos, self.lapcounter)
                 self.gotopos(pos[0],pos[1],pos[2]) #,velocity
+                self.velocity_pub.publish(velocity)
                 self.rate.sleep()
 
             # After the trajectory has finished sending, increment lap count by 1
             self.lapcounter+=1
             self.lap.publish(self.lapcounter)
+
+            
 
     # Generate trajectory for circle and square
     def generatetrajectory(self, shape, radius, velocity=0, x_offset=0, y_offset=0, altitude=1, resolution=0.1):
@@ -90,6 +93,29 @@ class drone:
                 #Generate Trajectory
                 return [(math.cos(2*math.pi/no_of_waypoints*x)*radius,math.sin(2*math.pi/no_of_waypoints*x)*radius,altitude) for x in range(0,no_of_waypoints+1)]
             
+            # This method creates a square with radius rounded to the nearest multiple of rate to ensure corners are sharp
+            # Still gives alot of resolution, ie 10hz allows up to 0.1m accuracy
+            elif shape=="Square":
+                print("Velocity Square")
+                time_taken=float(radius)/float(velocity) # dont caculate for total perimeter(all 4 sides), caculate each side independently to ensure corner waypoints are sharp
+                no_of_waypoints=round(time_taken*rate) # no of waypoints per side
+
+                time_taken=no_of_waypoints/float(rate)
+                radius=time_taken*velocity
+                rospy.loginfo("New radius is. %s", radius)
+            
+                temparr=[]
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([i+x_offset, y_offset, altitude])
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([radius+x_offset, i+y_offset, altitude])
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([radius-i+x_offset, radius+y_offset, altitude])
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([x_offset, radius-i+y_offset, altitude])
+                return temparr
+
+
             # WIP This method 
             elif shape=="Circle-hz":
                 pass
