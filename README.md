@@ -16,7 +16,7 @@ Initalise this fork from master branch
 
 If any prior changes were made, drop the changes first with, ```git stash```, ```git stash drop stash@{0}```. Enter name and email if prompted.
 
-More instructions avaliable at [Github & Syntax & Bash](https://github.com/Kian-Wee/mavros/tree/borealis/Github %26 Syntax %26 Bash)/**Github Updating Instructions**
+More instructions avaliable at [Github & Syntax & Bash](Github & Syntax & Bash/Github Updating Instructions)
 
 
 
@@ -26,7 +26,7 @@ Run the setup file to initalise aliases and udev rules
 Enable vision fusion on EKF_2_AID_MASK
 Do remember to change the MAV_SYS_ID on different vehicles
 
-[Other reference](https://github.com/PX4/PX4-Devguide/blob/master/en/companion_computer/pixhawk_companion.md)
+[Other reference](https://github.com/PX4/PX4-Devguide/blob/master/en/companion_computer/pixhawk_companion)
 
 
 ### **Scripts**
