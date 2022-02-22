@@ -143,8 +143,8 @@ class follow:
             if self.velocity_setpoint == 0:
                 self.positioncontrol() 
             elif self.velocity_setpoint != 0:
-                # self.positioncontrol()
-                self.velocitycontrol() 
+                self.positioncontrol()
+                # self.velocitycontrol() 
             else:
                 rospy.signal_shutdown("Invalid Control Mode, use Position or Velocity")
 
