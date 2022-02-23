@@ -19,7 +19,7 @@
 		<param name="target_component_id" value="$(arg tgt_component)" />
 		<param name="fcu_protocol" value="$(arg fcu_protocol)" />
 
-		<!-- load blacklist, config -->
+		<!-- load blacklist, config # GIVEN IN MAIN LAUNCH FILE-->
 		<rosparam command="load" file="$(arg pluginlists_yaml)" />
 		<rosparam command="load" file="$(arg config_yaml)" />
 	</node>

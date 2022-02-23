@@ -1,0 +1,131 @@
+#!/usr/bin/env python
+# vim:set ts=4 sw=4 et:
+#
+# Copyright 2015 UAVenture AG.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+# Updated: Tarek Taha : tarek.taha@kustar.ac.ae, Vladimir Ermakov
+#    - Changed topic names after re-factoring : https://github.com/mavlink/mavros/issues/233
+#    - Use mavros.setpoint module for topics
+
+import rospy
+import thread
+import threading
+import time
+import mavros
+
+import numpy as np
+
+from math import *
+from mavros.utils import *
+from mavros import setpoint as SP
+from std_msgs.msg import Header #type 
+from std_msgs.msg import Float64, Float32 #type from msg generation
+from geometry_msgs.msg import PoseStamped, Quaternion, TwistStamped #geometry
+#from tf.transformations import quaternion_from_euler #transformation
+from mavros_msgs.srv import CommandLong #service_class
+from mavros_msgs.msg import PositionTarget,ActuatorControl
+from sensor_msgs.msg import NavSatFix,Range,LaserScan #type
+from teraranger_array.msg import RangeArray
+from uwb_msgs.msg import UWBReading
+from uwb_msgs.msg import UUBmsg
+from nav_msgs.msg import Odometry
+from dynamic_reconfigure.server import Server
+from local_planner.cfg import LocalPlannerNodeConfig
+
+
+class uwb_follow_me:
+    """
+    This class sends position targets to FCU's position controller
+    """
+    def __init__(self):
+
+        self.rate = rospy.Rate(150) # 10hz is the original 
+        self.anchor = 0 # anchor~responder
+        self.uwb_position = UUBmsg()
+        self.a = 0.0
+        self.b = 0.0
+        self.c = 0.0
+        self.d = 0.0
+
+        self.z = 0.0
+        self.server = Server(LocalPlannerNodeConfig, self.reconfigure_cb)
+
+        # rospy.Subscriber("subscribed topic",topic type,callback invoked with the message as the first arg)  
+
+        # rospy.Subscriber("/UAV1", UUBmsg, self.uwb_callback)
+        # self.uwb_results = rospy.Publisher('uwb_results_0', TwistStamped, queue_size=10)
+        
+        while not rospy.is_shutdown(): #subsequent functions below are automatically run using this while loop (inert functions)  
+            
+
+            # if self.uwb_position.header.seq % 2 == 0.0: # initiator ~ 2
+            #     #self.a = self.uwb_position.header.seq
+            #     if len(self.uwb_position.readings) != 0:
+            #         self.a = self.uwb_position.readings[self.anchor].timestamp
+            #         self.b = self.uwb_position.readings[self.anchor].distance
+
+            # if self.uwb_position.header.seq % 2 != 0.0: # initiator ~ 3
+            #     #self.c = self.uwb_position.header.seq
+            #     if len(self.uwb_position.readings) != 0:
+            #         self.c = self.uwb_position.readings[self.anchor].timestamp
+            #         self.d = self.uwb_position.readings[self.anchor].distance
+
+            # self.server = Server(LocalPlannerNodeConfig, self.reconfigure_cb)
+            # self.server = Server(LocalPlannerNodeConfig, self.reconfigure_cb)
+            print self.z
+
+
+
+            # self.access_data()
+            self.rate.sleep() # The loop calls rate.sleep(), which sleeps just long enough to maintain the desired rate through the loop.
+
+
+    def uwb_callback(self, data): # callback invoked with the message as the first arg
+        self.uwb_position = data 
+
+    def reconfigure_cb(self, config, level):
+        self.z = config["max_sensor_range_"]
+
+        return config
+
+
+    def access_data(self): 
+
+        pos = TwistStamped()
+        pos.header = Header()
+        pos.header.frame_id = "uwb_data_2_3"
+
+        pos.twist.linear.x = self.a #seq from 2
+        pos.twist.linear.y = 2 # beacon~initiator from 2
+        pos.twist.linear.z = self.b #distance from 2
+            
+        pos.twist.angular.x = self.c #seq from 3
+        pos.twist.angular.y = 3 # beacon~initiator from 3
+        pos.twist.angular.z = self.d #distance from 3
+        
+        pos.header.stamp = rospy.Time.now() # Update timestamp for each published SP
+        # self.uwb_results.publish(pos) 
+
+    
+
+if __name__ == '__main__':
+    rospy.init_node('uwb_follow_me', anonymous=True)
+
+    node = uwb_follow_me()
+
+    rospy.spin()  # spin() simply keeps python from exiting until this node is stopped
+     
+

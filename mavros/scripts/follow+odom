@@ -1,0 +1,259 @@
+#!/usr/bin/env python
+# vim:set ts=4 sw=4 et:
+#
+# Adapted from follow+ script which saves additional odom information and lap counter
+#
+# Follows a marker(drone/human/robot) at a fixed time interval if the drone is moving
+# Uses position control only, no velocity is involved
+# Currently assumes that the marker will not walk/fly/move back into the drone and that the rate of marker publish is constant
+
+import rospy
+import time
+import csv
+# import numpy as np
+
+from math import *
+from mavros.utils import *
+# from mavros import setpoint as SP
+from geometry_msgs.msg import PoseStamped #geometry
+from nav_msgs.msg import Odometry
+from mavros_msgs.msg import PositionTarget
+from std_msgs.msg import Int32 # Lap counter
+
+follow_pos= "/uav0/mavros/setpoint_position/local" #object being followed
+#/vrpn_client_node/BetaVroom/pose
+follower_set="/uav1/mavros/setpoint_position/local" #object following
+follower_set_raw='uav1/mavros/setpoint_raw/local' #object following with velocity
+local_pos_pub = rospy.Publisher(follower_set_raw, PositionTarget, queue_size=10) #UAV0
+# Take note that odom topic has an additional pose for self.follower_pose.pose.pose
+follower_pos="/uav1/mavros/local_position/odom" #/uav1/mavros/local_position/odom
+followlag=1 #seconds behind followed object
+barrier=1 #meters, if drone is this distance from followed object, it stops
+rate=10
+
+lap_topic="/uav0/lap"
+
+
+
+class follow:
+    """
+    This class sends position targets to FCU's position controller
+    """
+    def __init__(self):
+
+        self.follow_position = PoseStamped() #callback data is saved here
+        rospy.Subscriber(follow_pos, PoseStamped , self.followcallback)
+
+        self.follower_position = Odometry() #callback data is saved here
+        rospy.Subscriber(follower_pos, Odometry , self.followercallback)
+        
+        self.follower_pub = rospy.Publisher(follower_set, PoseStamped, queue_size=10)
+
+        self.lap_count = Int32() #callback data is saved here
+        rospy.Subscriber(lap_topic, Int32 , self.lapcallback)
+        
+        self.rate = rospy.Rate(rate) # 10hz
+
+        # Velocity
+        self.xvel=0
+        self.yvel=0
+        self.zvel=0
+        self.timestamp=time.time()
+
+        # Previous position of drone(initalised at start point)
+        self.prevx=self.follower_position.pose.pose.position.x
+        self.prevy=self.follower_position.pose.pose.position.y
+        self.prevz=self.follower_position.pose.pose.position.z
+
+        # Historical position of followed drone in array, total size is fixed based on rate*followlag
+        # The most recent value is added at the back while the most dated value is at the front
+        self.xarr=[self.prevx] * rate * followlag
+        self.yarr=[self.prevy] * rate * followlag
+        self.zarr=[self.prevz] * rate * followlag
+
+        # Error Accumulated
+        self.xerror=0
+        self.yerror=0
+        self.zerror=0
+        self.error=sqrt(self.xerror**2 + self.yerror**2 + self.zerror**2)
+
+        # Historical positions("Breadcrumbs"), velocities and errors of all sent setpoints, saves all positions
+        # Breadcrumbs, timestamp, velocity, error accumulated
+        self.totalarr=[["Timestamp", "X-Setpoint", "Y-Setpoint", "Z-Setpoint", "X-Position", "Y-Position", "Z-Position",
+                        "X-Orientation", "Y-Orientation", "Z-Orientation", "W-Orientation",
+                        "X-Twist-Linear", "Y-Twist-Linear", "Z-Twist-Linear",
+                        "X-Twist-Angular", "Y-Twist-Angular", "Z-Twist-Angular",
+                        "X-Velocity", "Y-Velocity", "Z-Velocity", "X-Error", "Y-Error", "Z-Error", "Eucaledian-Error"]]
+        self.totalarr.append([self.timestamp, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  self.xvel, self.yvel, self.zvel, self.xerror, self.yerror, self.zerror, self.error])
+
+        # Interrupt timer whenever drone gets within [barrier] threshold, waits until drone is [followlag] seconds away before reactivating
+        inttimer=0
+
+        # Keep track of laps
+        self.prevlap =0
+        # Keep track of the position of the pointer for the starting of the next lap to avoid scanning through the entire breadcrumb(self.totalarr) again
+        # Start from 1 to avoid header line
+        self.prevlaparr =1
+
+        # Save file on shutdown    # local_pos_sub = rospy.Subscriber("/mavros/local_position/pose", PoseStamped, position_callback)
+    # try:
+    #     position_control()
+    # except rospy.ROSInterruptException:
+    #     pass
+        rospy.on_shutdown(self.save)
+      
+        while not rospy.is_shutdown(): #subsequent functions below are automatically run using this while loop (inert functions)  
+
+            # eu_dist=(((self.follow_position.pose.position.x-self.follower_position.pose.position.x)**2) + ((self.follow_position.pose.position.y-self.follow_position.pose.position.y)**2))**0.5
+            x=(self.follow_position.pose.position.x-self.follower_position.pose.pose.position.x)**2
+            y=(self.follow_position.pose.position.y-self.follower_position.pose.pose.position.y)**2
+            eu_dist=sqrt(x+y)
+
+            # The position that will be sent to the following drone
+            posetemp = PoseStamped()
+
+            # Followed is within [barrier] distance of follower, publish previously acceptable distance
+            # In this case, the drone is sent to the current position it is at and the setpoint array is untouched
+            if eu_dist < barrier:
+                rospy.loginfo("marker below safe threshold, stopping. %s", eu_dist)
+                posetemp.pose.position.x = self.follower_position.pose.pose.position.x #Hover on the spot
+                posetemp.pose.position.y = self.follower_position.pose.pose.position.y
+                posetemp.pose.position.z = self.follower_position.pose.pose.position.z
+                inttimer=time.time()
+            
+            # Time is less than [followlag] threshhold, start logging drone position but dont follow yet
+            # Build up the setpoint array and wait for the drone to move [followlag]seconds away
+            elif time.time() < inttimer + followlag:
+                rospy.loginfo("waiting for marker to move away. %s", eu_dist)
+                posetemp.pose.position.x = self.follower_position.pose.pose.position.x #Hover on the spot
+                posetemp.pose.position.y = self.follower_position.pose.pose.position.y
+                posetemp.pose.position.z = self.follower_position.pose.pose.position.z
+
+                self.xarr.append(self.follow_position.pose.position.x) #Append the current position of the followed device to the end of the setpoint array
+                self.yarr.append(self.follow_position.pose.position.y)
+                self.zarr.append(self.follow_position.pose.position.z)
+                self.xarr.pop(0) #delete the most dated position at [followlag]s after sending to the follower
+                self.yarr.pop(0)
+                self.zarr.pop(0)
+
+            # Time is more than [followlag] threshhold, publishing delayed setpoints in normal operation
+            else:
+                self.xarr.append(self.follow_position.pose.position.x) #Append the current position to the end of the list
+                self.yarr.append(self.follow_position.pose.position.y)
+                self.zarr.append(self.follow_position.pose.position.z)
+                posetemp.pose.position.x = self.xarr[0]
+                posetemp.pose.position.y = self.yarr[0]
+                posetemp.pose.position.z = self.zarr[0]
+                rospy.loginfo("following normally at: %s %s %s", self.xarr[0], self.yarr[0], self.zarr[0]) # For debug
+                self.xarr.pop(0) #delete the most dated position at [followlag]s after sending to the follower
+                self.yarr.pop(0)
+                self.zarr.pop(0)
+
+                # Compute parameters for storage
+                self.xvel= (posetemp.pose.position.x-self.follower_position.pose.pose.position.x)/(time.time()-self.timestamp)
+                self.yvel= (posetemp.pose.position.y-self.follower_position.pose.pose.position.y)/(time.time()-self.timestamp)
+                self.zvel= (posetemp.pose.position.z-self.follower_position.pose.pose.position.z)/(time.time()-self.timestamp)
+                self.xerror = self.follower_position.pose.pose.position.x-self.follow_position.pose.position.x
+                self.yerror = self.follower_position.pose.pose.position.y-self.follow_position.pose.position.y
+                self.zerror = self.follower_position.pose.pose.position.z-self.follow_position.pose.position.z
+                self.error=sqrt(self.xerror**2 + self.yerror**2 + self.zerror**2)
+
+                self.totalarr.append([self.timestamp, posetemp.pose.position.x, posetemp.pose.position.y, posetemp.pose.position.z, self.follower_position.pose.pose.position.x, self.follower_position.pose.pose.position.y, self.follower_position.pose.pose.position.z, 
+                                        self.follower_position.pose.pose.orientation.x, self.follower_position.pose.pose.orientation.y, self.follower_position.pose.pose.orientation.z, self.follower_position.pose.pose.orientation.w,
+                                        self.follower_position.twist.twist.linear.x, self.follower_position.twist.twist.linear.y, self.follower_position.twist.twist.linear.z,
+                                        self.follower_position.twist.twist.angular.x, self.follower_position.twist.twist.angular.y, self.follower_position.twist.twist.angular.z,
+                                        self.xvel, self.yvel, self.zvel, self.xerror, self.yerror, self.zerror, self.error])
+
+            # Publish setpoints
+            self.follower_pub.publish(posetemp)
+
+            # Update timestamp
+            self.timestamp=time.time()
+
+            # Update previous location(independent of setpoint)
+            self.prevx=self.follower_position.pose.pose.position.x
+            self.prevy=self.follower_position.pose.pose.position.y
+            self.prevz=self.follower_position.pose.pose.position.z
+
+            # Check if lap has completed and append spacer and errors
+            if self.prevlap != self.lap_count.data:
+
+                self.xerror=0
+                self.yerror=0
+                self.zerror=0
+                self.error=0
+                self.lapdatacount = 1 # temp counter to keep track of number of data points/entries per lap
+
+                # Calculate current lap errors
+                for x in range(self.prevlaparr,len(self.totalarr)): #omit first column of headers
+                    self.xerror += self.totalarr[x][-4]
+                    self.yerror += self.totalarr[x][-3]
+                    self.zerror += self.totalarr[x][-2]
+                    # self.error += self.totalarr[x][-1] # caculate based on x,y,z error
+                    self.lapdatacount+=1
+
+                self.xerror=self.xerror/self.lapdatacount
+                self.yerror=self.yerror/self.lapdatacount
+                self.zerror=self.zerror/self.lapdatacount
+                # self.error=self.error/self.lapdatacount
+                self.error=sqrt(self.xerror**2 + self.yerror**2 + self.zerror**2)
+
+                # Append Spacer
+                self.totalarr.append(["Lap: "+ str(self.lap_count.data), 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,  0, 0, 0, self.xerror, self.yerror, self.zerror, self.error])
+                self.prevlap=self.lap_count.data # Update lap number
+                self.prevlaparr=len(self.totalarr)+1 # Update pointer to count the errors from next lap at the row after this
+
+                # Print to terminal
+                rospy.loginfo("LAP COUNT: %s",self.lap_count.data)
+                rospy.loginfo("No of setpoints: %s", self.lapdatacount)
+                rospy.loginfo("Average Lap Error: %s, X-Error: %s, Y-Error: %s, Z-Error: %s",self.error,self.xerror,self.yerror,self.zerror)
+
+            self.rate.sleep() #The loop calls rate.sleep(), which sleeps just long enough to maintain the desired rate through the loop.
+
+    def followcallback(self,data): # callback invoked with the message as the first arg
+        self.follow_position = data
+
+    def followercallback(self,data): # callback invoked with the message as the first arg
+        self.follower_position = data
+
+    def lapcallback(self,data): # callback invoked with the message as the first arg
+        self.lap_count = data
+         
+    def save(self):
+        wtr = csv.writer(open ('out.csv', 'w'), delimiter=',', lineterminator='\n') #~/Home
+        rmse=0
+
+        for x in range(0,len(self.totalarr)): #omit first column of headers
+            if isinstance(self.totalarr[x][0], float) == True or isinstance(self.totalarr[x][0], int) == True: # do not append to rmse if lap counter row
+                rmse+=self.totalarr[x][-1]
+            wtr.writerow (self.totalarr[x])
+            # print("saving %s",x)
+        rmse=sqrt(rmse/ (len(self.totalarr)-1))
+        
+        print("RMSE is {}".format(rmse))
+
+        # saves to home(~)
+        wtr.writerow(["Total RMSE", rmse])
+
+        # # Numpy code(depreciated)
+        # self.totalarr.append(rmse)
+        # newarr = np.array(self.totalarr)
+        # np.savetxt("data.csv", newarr, delimiter=",", newline='\n', fmt='%s')
+
+        # wtr.close()
+
+        rospy.loginfo("Data Saved")
+
+        
+
+
+if __name__ == '__main__':
+
+    rospy.init_node('follow', anonymous=True)
+
+    node = follow()
+
+    rospy.spin()
+     
+
+
