@@ -2,6 +2,11 @@
 
 # Setup script for borealis, adds aliases and copies parallel commands script for simultaneous launching
 
+# Prompt user for drone name
+echo Enter Drone Name[eg, uav0]
+read DRONE_NAME_TEMP
+echo The Drone Name is $DRONE_NAME_TEMP , edit DRONE_NAME in bashrc to change
+
 # Install dependancies
 sudo apt-get install ros-$ROS_DISTRO-realsense2-camera -y
 sudo apt-get install ntpdate -y
@@ -14,7 +19,8 @@ cat >> ~/.bashrc << EOF
 source ~/catkin_ws/devel/setup.bash
 
 # Configure these
-export DRONE_NAME="uav0"
+#export DRONE_NAME="uav0"
+export DRONE_NAME=$DRONE_NAME_TEMP
 export T265_ID="948422110423"
 export D435_ID="134222075005"
 
