@@ -24,6 +24,7 @@ from geometry_msgs.msg import PoseStamped #geometry
 from nav_msgs.msg import Odometry
 from mavros_msgs.msg import PositionTarget
 from std_msgs.msg import Int32, Float32 # Lap counter
+from borealis_msgs.msg import Breadcrumb
 
 follow_namespace="/uav0"
 # The following topic is for the position of object being followed, either Odometry or PoseStamped messages
@@ -31,6 +32,7 @@ follow_pos= follow_namespace + "/mavros/local_position/pose" #PoseStamped
 follow_pos_odom= follow_namespace + "/mavros/local_position/odom" #Odometry
 follow_type= "Odometry"
 #/vrpn_client_node/BetaVroom/pose /uav0/mavros/setpoint_position/local
+follow_pub=follow_namespace + "/breadcrumb"
 
 follower_namespace="/uav1"
 follower_set= follower_namespace + "/mavros/setpoint_position/local" #object following
@@ -39,7 +41,7 @@ follower_set_raw= follower_namespace + '/mavros/setpoint_raw/local' #object foll
 follower_pos= follower_namespace + "/mavros/local_position/odom" #/uav1/mavros/local_position/odom
 followlag=1 #seconds behind followed object
 barrier=1 #meters, if drone is this distance from followed object, it stops
-rate=10
+rate=15
 
 lap_topic="/uav0/lap"
 velocity_topic="uav0/velocity" #checks for velocity or position control where 0 is position and any other value is the set
@@ -95,6 +97,12 @@ class follow:
         self.yarr=[self.prevy] * rate * followlag
         self.zarr=[self.prevz] * rate * followlag
 
+        # Historical velocity of followed drone in array, total size is fixed based on rate*followlag
+        # The most recent value is added at the back while the most dated value is at the front
+        self.xvelarr=[self.prevx] * rate * followlag
+        self.yvelarr=[self.prevy] * rate * followlag
+        self.zvelarr=[self.prevz] * rate * followlag
+
         # Error Accumulated
         self.xerror=0
         self.yerror=0
@@ -136,6 +144,9 @@ class follow:
         # Past position used for caculating error
         self.targetpast = PositionTarget()
 
+        # Republish topics
+        self.follow_repub = rospy.Publisher(follow_pub, Breadcrumb, queue_size=10)
+
         rospy.on_shutdown(self.save)
       
         while not rospy.is_shutdown(): #subsequent functions below are automatically run using this while loop (inert functions)  
@@ -143,14 +154,17 @@ class follow:
             if self.velocity_setpoint == 0:
                 self.positioncontrol() 
             elif self.velocity_setpoint != 0:
-                self.positioncontrol()
-                # self.velocitycontrol() 
+                # self.positioncontrol()
+                self.velocitycontrol() 
             else:
                 rospy.signal_shutdown("Invalid Control Mode, use Position or Velocity")
 
             # Check if lap has completed and append spacer and errors
             if self.prevlap != self.lap_count.data:
                 self.tracklap() 
+
+            # To republish the setpoints
+            self.topicbroadcaster()
 
             self.followprevx=self.follow_object.velx
             self.followprevy=self.follow_object.vely
@@ -183,16 +197,27 @@ class follow:
             # self.error += self.totalarr[x][-1] # caculate based on x,y,z error
             self.lapdatacount+=1
 
-        self.xerror=self.xerror/self.lapdatacount
-        self.yerror=self.yerror/self.lapdatacount
-        self.zerror=self.zerror/self.lapdatacount
-        # self.error=self.error/self.lapdatacount
-        self.error=sqrt(self.xerror**2 + self.yerror**2 + self.zerror**2)
+        # If the follow drone has not been initalised yet or is not moving, prevent modulo by zero error
+        if (self.lapdatacount==0):
+            self.xerror =0
+            self.yerror =0
+            self.zerror =0
+            self.error =0
+            self.xvelerror =0
+            self.yvelerror =0
+            self.zvelerror =0
+            self.velerror =0
+        else:
+            self.xerror=self.xerror/self.lapdatacount
+            self.yerror=self.yerror/self.lapdatacount
+            self.zerror=self.zerror/self.lapdatacount
+            # self.error=self.error/self.lapdatacount
+            self.error=sqrt(self.xerror**2 + self.yerror**2 + self.zerror**2)
 
-        self.xvelerror= self.xvelerror/self.lapdatacount
-        self.yvelerror= self.yvelerror/self.lapdatacount
-        self.zvelerror= self.zvelerror/self.lapdatacount
-        self.velerror=sqrt(self.xvelerror**2 + self.yvelerror**2 + self.zvelerror**2)
+            self.xvelerror= self.xvelerror/self.lapdatacount
+            self.yvelerror= self.yvelerror/self.lapdatacount
+            self.zvelerror= self.zvelerror/self.lapdatacount
+            self.velerror=sqrt(self.xvelerror**2 + self.yvelerror**2 + self.zvelerror**2)
 
         # Append Spacer
         self.totalarr.append(["Lap: "+ str(self.lap_count.data), 0, 0, 0, 0, 0, 0,self.xerror, self.yerror, self.zerror, self.error, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, self.xvelerror,self.yvelerror,self.zvelerror,self.velerror, 0 ])
@@ -323,6 +348,14 @@ class follow:
             self.yarr.pop(0)
             self.zarr.pop(0)
 
+            self.xvelarr.append(self.follow_object.velx) #Append the current position of the followed device to the end of the setpoint array
+            self.yvelarr.append(self.follow_object.vely)
+            self.zvelarr.append(self.follow_object.velz)
+            self.xvelarr.pop(0) #delete the most dated position at [followlag]s after sending to the follower
+            self.yvelarr.pop(0)
+            self.zvelarr.pop(0)
+
+
         # Time is more than [followlag] threshhold, publishing delayed setpoints in normal operation
         else:
             self.xarr.append(self.follow_object.posx) #Append the current position to the end of the list
@@ -338,6 +371,13 @@ class follow:
             self.xarr.pop(0) #delete the most dated position at [followlag]s after sending to the follower
             self.yarr.pop(0)
             self.zarr.pop(0)
+
+            self.xvelarr.append(self.follow_object.velx) #Append the current position of the followed device to the end of the setpoint array
+            self.yvelarr.append(self.follow_object.vely)
+            self.zvelarr.append(self.follow_object.velz)
+            self.xvelarr.pop(0) #delete the most dated position at [followlag]s after sending to the follower
+            self.yvelarr.pop(0)
+            self.zvelarr.pop(0)
 
             # Compute parameters for storage
             self.xvelerror= self.followprevx-self.follower_position.twist.twist.linear.x
@@ -397,7 +437,16 @@ class follow:
 
     # Republishes topics with time delay for visualisation
     def topicbroadcaster(self):
-        pass
+        self.temp=Breadcrumb()
+        self.temp.velocity_setpoint=self.velocity_setpoint
+        # self.temp.position=[self.xarr,self.yarr,self.zarr]
+        self.temp.position_x=self.xarr
+        self.temp.position_y=self.yarr
+        self.temp.position_z=self.zarr
+        self.temp.velocity_x=self.xarr
+        self.temp.velocity_y=self.yarr
+        self.temp.velocity_z=self.zarr
+        self.follow_repub.publish(self.temp)
 
     def save(self):
         wtr = csv.writer(open ('out.csv', 'w'), delimiter=',', lineterminator='\n') #~/Home
