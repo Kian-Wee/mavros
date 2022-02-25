@@ -29,7 +29,7 @@ altitude2 = 2 # secondary altitude for inclined square
 
 z_vel=0.2 # m/s
 
-rate=10 #hz
+rate=15 #hz
 
 mavros.set_namespace()
 
