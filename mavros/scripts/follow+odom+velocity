@@ -34,12 +34,13 @@ follow_type= "Odometry"
 
 follower_namespace="/uav1"
 follower_set= follower_namespace + "/mavros/setpoint_position/local" #object following
+follower_setpts= follower_namespace + "/setpoints" #object following
 follower_set_raw= follower_namespace + '/mavros/setpoint_raw/local' #object following with velocity
 # Take note that odom topic has an additional pose for self.follower_pose.pose.pose
 follower_pos= follower_namespace + "/mavros/local_position/odom" #/uav1/mavros/local_position/odom
 followlag=1 #seconds behind followed object
 barrier=1 #meters, if drone is this distance from followed object, it stops
-rate=10
+rate=15
 
 lap_topic="/uav0/lap"
 velocity_topic="uav0/velocity" #checks for velocity or position control where 0 is position and any other value is the set
@@ -61,6 +62,7 @@ class follow:
         
         #For position setpoints
         self.follower_pub = rospy.Publisher(follower_set, PoseStamped, queue_size=10)
+        self.follower_setpts = rospy.Publisher(follower_setpts, PoseStamped, queue_size=10)
 
         #For velocity setpoints
         self.follower_vel_pub = rospy.Publisher(follower_set_raw, PositionTarget, queue_size=10)
@@ -274,6 +276,7 @@ class follow:
 
         # Publish setpoints
         self.follower_pub.publish(self.posetemp)
+        self.follower_setpts.publish(self.posetemp)
 
         # # Update timestamp
         # self.timestamp=time.time()

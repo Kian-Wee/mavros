@@ -21,15 +21,15 @@ drone_pos_topic= '/uav0/mavros/local_position/odom'
 lap_topic="/uav0/lap"
 velocity_topic="uav0/velocity"
 
-velocity = 2 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
-shape = "Inclined Square" # Square, Circle, Inclined Square
+velocity = 3 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
+shape = "Circle" # Square, Circle, Inclined Square
 radius = 5
 altitude = 1.5 # default altitude to hover at
 altitude2 = 2 # secondary altitude for inclined square
 
 z_vel=0.2 # m/s
 
-rate=10 #hz
+rate=15 #hz
 
 mavros.set_namespace()
 
@@ -54,7 +54,7 @@ class drone:
         self.traj_arr = self.generatetrajectory(shape,radius,velocity,altitude=altitude,altitude2=altitude2)
 
         while not rospy.is_shutdown():
-
+            #print ("traj_arr..", self.traj_arr)
             # Send trajectory and sleep
             for pos in self.traj_arr:
                 print(pos, self.lapcounter)
@@ -204,6 +204,7 @@ class drone:
         # Send velocity and position
         else:
             msg0 = PositionTarget()
+            msg0.type_mask = 64;
             msg0.position.x = x
             msg0.position.y = y
             msg0.position.z = z
