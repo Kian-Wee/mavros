@@ -1,7 +1,7 @@
 <launch>
 
     <!-- Launch script for multidrone/swarm with prefix-->
-    <group ns="uav0">
+    <group ns="$(env DRONE_NAME)">
 	<!-- vim: set ft=xml noet : -->
 	<!-- example launch script for PX4 based FCU's -->
 	

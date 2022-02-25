@@ -24,6 +24,8 @@
 
 # TODO, check for case whereby t265 or mavros disconnects
 
+import os
+
 import rospy
 import thread
 import threading
@@ -45,7 +47,8 @@ from mavros_msgs.msg import PositionTarget,Thrust,AttitudeTarget
 from sensor_msgs.msg import NavSatFix,Range #type
 from tf2_msgs.msg import TFMessage
 
-drone_name="uav0"
+# drone_name="uav0"
+drone_name = os.getenv('DRONE_NAME') #environment variable set in bashrc(or exported in terminal)
 odom_frame_id=drone_name+"/t265_odom_frame"
 
 class vision:

@@ -31,7 +31,13 @@ Do remember to change the MAV_SYS_ID on different vehicles
 
 ### **Scripts**
 
+**basic_position** - send positions and generate trajectories
+
 **pos_265** - node for Intel Realsense 265, visual positioning is given to mavros (pos_265_old shows all output)
+
+**follow+odom+velocity** - follows and republishes odom and velocity, counts error per lap
+
+### **Old Scripts**
 
 **follow** - basic follow script to follow a topic
 
@@ -39,7 +45,7 @@ Do remember to change the MAV_SYS_ID on different vehicles
 
 **follow+odom** - uses odometry instead of posestamped and implements a lapcounter(for use with basic_position)
 
-**basic_position** - send positions and generate trajectories
+
 
 MAVROS
 ======
