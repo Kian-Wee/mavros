@@ -44,7 +44,7 @@ followlag=1 #seconds behind followed object
 barrier=1 #meters, if drone is this distance from followed object, it stops
 rate=15
 
-lap_topic="/uav0/lap"
+lap_topic="/uav0/lap" #lap counter, everytime it increments by 1 the lap error is computed
 velocity_topic="uav0/velocity" #checks for velocity or position control where 0 is position and any other value is the set
 
 class follow:
@@ -383,12 +383,12 @@ class follow:
             self.yvelerror= self.followprevy-self.follower_position.twist.twist.linear.y
             self.zvelerror= self.followprevz-self.follower_position.twist.twist.linear.z
             self.velerror=sqrt(self.xvelerror**2 + self.yvelerror**2 + self.zvelerror**2)
-            self.xerror = self.posepast.pose.position.x-self.follower_position.pose.pose.position.x
-            self.yerror = self.posepast.pose.position.y-self.follower_position.pose.pose.position.y
-            self.zerror = self.posepast.pose.position.z-self.follower_position.pose.pose.position.z
+            self.xerror = self.targetpast.position.x-self.follower_position.pose.pose.position.x
+            self.yerror = self.targetpast.position.y-self.follower_position.pose.pose.position.y
+            self.zerror = self.targetpast.position.z-self.follower_position.pose.pose.position.z
             self.error=sqrt(self.xerror**2 + self.yerror**2 + self.zerror**2)
 
-            self.totalarr.append([time.time(), self.posepast.pose.position.x, self.posepast.pose.position.y, self.posepast.pose.position.z,
+            self.totalarr.append([time.time(), self.targetpast.position.x, self.targetpast.position.y, self.targetpast.position.z,
                                     self.follower_position.pose.pose.position.x, self.follower_position.pose.pose.position.y, self.follower_position.pose.pose.position.z, 
                                     self.xerror, self.yerror, self.zerror, self.error,
                                     self.follower_position.pose.pose.orientation.x, self.follower_position.pose.pose.orientation.y, self.follower_position.pose.pose.orientation.z, self.follower_position.pose.pose.orientation.w,
@@ -408,7 +408,7 @@ class follow:
         self.prevz=self.follower_position.pose.pose.position.z
 
         # Update previous pose
-        self.posepast=self.posetemp
+        self.targetpast=self.targettemp
         
     def followinit():
         pass
@@ -452,7 +452,6 @@ class follow:
 
         self.temp=Breadcrumb()
         self.temp.velocity_setpoint=self.velocity_setpoint
-        print(self.column(self.totalarr,1))
         self.temp.position_x=self.column(self.totalarr,1)
         self.temp.position_y=self.column(self.totalarr,2)
         self.temp.position_z=self.column(self.totalarr,3)
