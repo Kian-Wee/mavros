@@ -154,12 +154,12 @@ class follow:
         while not rospy.is_shutdown(): #subsequent functions below are automatically run using this while loop (inert functions)  
             # print(self.velocity_setpoint)
             if self.velocity_setpoint == 0:
-                self.positioncontrol() 
+                 self.positioncontrol() 
             elif self.velocity_setpoint != 0:
-                # self.positioncontrol()
-                self.velocitycontrol() 
+                 self.positioncontrol()
+            #     # self.velocitycontrol() 
             else:
-                rospy.signal_shutdown("Invalid Control Mode, use Position or Velocity")
+                 rospy.signal_shutdown("Invalid Control Mode, use Position or Velocity")
 
             # Check if lap has completed and append spacer and errors
             if self.prevlap != self.lap_count.data:
@@ -300,8 +300,8 @@ class follow:
                                     self.xvelerror, self.yvelerror, self.zvelerror, self.velerror, self.velocity_setpoint])
 
         # Publish setpoints
-        self.follower_pub.publish(self.posetemp)
-        self.follower_setpts.publish(self.posetemp)
+        #self.follower_pub.publish(self.posetemp)
+        #self.follower_setpts.publish(self.posetemp)
 
         # # Update timestamp
         # self.timestamp=time.time()

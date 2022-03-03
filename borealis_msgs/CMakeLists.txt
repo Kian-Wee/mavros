@@ -12,10 +12,6 @@ add_message_files(
   xyz.msg
 )
 
-add_service_files(
-  DIRECTORY srv
-  FILES
-)
 
 # add_action_files(
 #   DIRECTORY action
