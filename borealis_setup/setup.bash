@@ -58,10 +58,12 @@ echo "Please reboot if permissions were not set before"
 # Acados setup, ignore/delete if not needed https://docs.acados.org/installation/index.html
 cd ~
 git clone https://github.com/acados/acados.git
+cd ~/acados
 git submodule update --recursive --init
 # source https://discourse.acados.org/t/acados-installation-in-pycharm/103/11
 cd ~/acados
 rm build/* -rf
+mkdir build
 cd build
 cmake .. -DACADOS_WITH_QPOASES=ON -DACADOS_EXAMPLES=ON -DHPIPM_TARGET=GENERIC -DBLASFEO_TARGET=GENERIC
 make -j4
@@ -69,20 +71,24 @@ make install -j4
 
 # Copy aliases
 cat >> ~/.bashrc << EOF
-export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"/home/kw/acados/lib"
-export ACADOS_SOURCE_DIR="/home/kw/acados"
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"/home/$USER/acados/lib"
+export ACADOS_SOURCE_DIR="/home/$USER/acados"
 EOF
 
 source ~/.bashrc
 
-# run a C example, e.g.:
-./examples/c/sim_wt_model_nx6
+echo "Since some of the C examples use qpOASES, also set ACADOS_WITH_QPOASES = 1 in <acados_root_folder>/Makefile.rule"
 
 cd ~/acados
+make shared_library
 make examples_c
 make run_examples_c
-make shared_library
 
+# run a C example, e.g.:
+cd build
+./examples/c/sim_wt_model_nx6
 
-
-
+# Python installation and example
+sudo apt-get install virtualenv
+pip3 install -e /home/$USER/acados/interfaces/acados_template
+python3 ~/acados/examples/acados_python/getting_started/minimal_example_closed_loop.py
