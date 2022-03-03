@@ -33,6 +33,7 @@ follow_pos_odom= follow_namespace + "/mavros/local_position/odom" #Odometry
 follow_type= "Odometry"
 #/vrpn_client_node/BetaVroom/pose /uav0/mavros/setpoint_position/local
 follow_pub=follow_namespace + "/breadcrumb"
+follow_pub_all=follow_namespace + "/breadcrumb_all"
 
 follower_namespace="/uav1"
 follower_set= follower_namespace + "/mavros/setpoint_position/local" #object following
@@ -44,7 +45,7 @@ followlag=1 #seconds behind followed object
 barrier=1 #meters, if drone is this distance from followed object, it stops
 rate=15
 
-lap_topic="/uav0/lap"
+lap_topic="/uav0/lap" #lap counter, everytime it increments by 1 the lap error is computed
 velocity_topic="uav0/velocity" #checks for velocity or position control where 0 is position and any other value is the set
 
 class follow:
@@ -148,6 +149,7 @@ class follow:
 
         # Republish topics
         self.follow_repub = rospy.Publisher(follow_pub, Breadcrumb, queue_size=10)
+        self.follow_repub_all = rospy.Publisher(follow_pub_all, Breadcrumb, queue_size=10)
 
         rospy.on_shutdown(self.save)
       
@@ -303,9 +305,6 @@ class follow:
         #self.follower_pub.publish(self.posetemp)
         #self.follower_setpts.publish(self.posetemp)
 
-        # # Update timestamp
-        # self.timestamp=time.time()
-
         # Update previous location(independent of setpoint)
         self.prevx=self.follower_position.pose.pose.position.x
         self.prevy=self.follower_position.pose.pose.position.y
@@ -387,12 +386,12 @@ class follow:
             self.yvelerror= self.followprevy-self.follower_position.twist.twist.linear.y
             self.zvelerror= self.followprevz-self.follower_position.twist.twist.linear.z
             self.velerror=sqrt(self.xvelerror**2 + self.yvelerror**2 + self.zvelerror**2)
-            self.xerror = self.posepast.pose.position.x-self.follower_position.pose.pose.position.x
-            self.yerror = self.posepast.pose.position.y-self.follower_position.pose.pose.position.y
-            self.zerror = self.posepast.pose.position.z-self.follower_position.pose.pose.position.z
+            self.xerror = self.targetpast.position.x-self.follower_position.pose.pose.position.x
+            self.yerror = self.targetpast.position.y-self.follower_position.pose.pose.position.y
+            self.zerror = self.targetpast.position.z-self.follower_position.pose.pose.position.z
             self.error=sqrt(self.xerror**2 + self.yerror**2 + self.zerror**2)
 
-            self.totalarr.append([time.time(), self.posetemp.pose.position.x, self.posetemp.pose.position.y, self.posetemp.pose.position.z,
+            self.totalarr.append([time.time(), self.targetpast.position.x, self.targetpast.position.y, self.targetpast.position.z,
                                     self.follower_position.pose.pose.position.x, self.follower_position.pose.pose.position.y, self.follower_position.pose.pose.position.z, 
                                     self.xerror, self.yerror, self.zerror, self.error,
                                     self.follower_position.pose.pose.orientation.x, self.follower_position.pose.pose.orientation.y, self.follower_position.pose.pose.orientation.z, self.follower_position.pose.pose.orientation.w,
@@ -406,16 +405,13 @@ class follow:
         self.targettemp.coordinate_frame = 1
         self.follower_vel_pub.publish(self.targettemp)
 
-        # # Update timestamp
-        # self.timestamp=time.time()
-
         # Update previous location(independent of setpoint)
         self.prevx=self.follower_position.pose.pose.position.x
         self.prevy=self.follower_position.pose.pose.position.y
         self.prevz=self.follower_position.pose.pose.position.z
 
         # Update previous pose
-        self.posepast=self.posetemp
+        self.targetpast=self.targettemp
         
     def followinit():
         pass
@@ -438,11 +434,15 @@ class follow:
     def takeoff(self):
         pass
 
+    def column(self, matrix, i):
+        tempcol=[]
+        # return [row[i] for row in matrix]
+        return [matrix[row][i] for row in range(1, len(matrix))]
+
     # Republishes topics with time delay for visualisation
     def topicbroadcaster(self):
         self.temp=Breadcrumb()
         self.temp.velocity_setpoint=self.velocity_setpoint
-        # self.temp.position=[self.xarr,self.yarr,self.zarr]
         self.temp.position_x=self.xarr
         self.temp.position_y=self.yarr
         self.temp.position_z=self.zarr
@@ -450,6 +450,19 @@ class follow:
         self.temp.velocity_y=self.yarr
         self.temp.velocity_z=self.zarr
         self.follow_repub.publish(self.temp)
+
+
+
+        self.temp=Breadcrumb()
+        self.temp.velocity_setpoint=self.velocity_setpoint
+        self.temp.position_x=self.column(self.totalarr,1)
+        self.temp.position_y=self.column(self.totalarr,2)
+        self.temp.position_z=self.column(self.totalarr,3)
+        self.temp.velocity_x=self.column(self.totalarr,21)
+        self.temp.velocity_y=self.column(self.totalarr,22)
+        self.temp.velocity_z=self.column(self.totalarr,23)
+        self.follow_repub_all.publish(self.temp)
+        
 
     def save(self):
         wtr = csv.writer(open ('out.csv', 'w'), delimiter=',', lineterminator='\n') #~/Home
