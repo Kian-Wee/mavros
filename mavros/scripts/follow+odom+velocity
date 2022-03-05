@@ -303,7 +303,7 @@ class follow:
 
         # Publish setpoints
         #self.follower_pub.publish(self.posetemp)
-        #self.follower_setpts.publish(self.posetemp)
+        self.follower_setpts.publish(self.posetemp)
 
         # Update previous location(independent of setpoint)
         self.prevx=self.follower_position.pose.pose.position.x
@@ -446,9 +446,9 @@ class follow:
         self.temp.position_x=self.xarr
         self.temp.position_y=self.yarr
         self.temp.position_z=self.zarr
-        self.temp.velocity_x=self.xarr
-        self.temp.velocity_y=self.yarr
-        self.temp.velocity_z=self.zarr
+        self.temp.velocity_x=self.xvelarr
+        self.temp.velocity_y=self.yvelarr
+        self.temp.velocity_z=self.zvelarr
         self.follow_repub.publish(self.temp)
 
 
