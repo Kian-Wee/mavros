@@ -69,7 +69,7 @@ class drone:
             
 
     # Generate trajectory for circle and square
-    def generatetrajectory(self, shape, radius, velocity=0, x_offset=0, y_offset=0, altitude=1,altitude2=1, resolution=0.1):
+    def generatetrajectory(self, shape, radius, velocity=0, x_offset=-radius/2, y_offset=-radius/2, altitude=1,altitude2=1, resolution=0.1):
 
         # Assume current position is the center, plan trajectory around center
         x=self.drone_position.pose.pose.position.x
