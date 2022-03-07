@@ -156,10 +156,11 @@ class follow:
         while not rospy.is_shutdown(): #subsequent functions below are automatically run using this while loop (inert functions)  
             # print(self.velocity_setpoint)
             if self.velocity_setpoint == 0:
-                 self.positioncontrol() 
+                # self.positioncontrol() 
+                self.velocitycontrol()
             elif self.velocity_setpoint != 0:
-                 self.positioncontrol()
-            #     # self.velocitycontrol() 
+                #self.positioncontrol()
+                self.velocitycontrol() 
             else:
                  rospy.signal_shutdown("Invalid Control Mode, use Position or Velocity")
 
@@ -266,6 +267,7 @@ class follow:
             self.yarr.pop(0)
             self.zarr.pop(0)
 
+
         # Time is more than [followlag] threshhold, publishing delayed setpoints in normal operation
         else:
             self.xarr.append(self.follow_object.posx) #Append the current position to the end of the list
@@ -330,6 +332,10 @@ class follow:
             self.targettemp.velocity.x = 0
             self.targettemp.velocity.y = 0
             self.targettemp.velocity.z = 0
+
+            self.posetemp.pose.position.x = self.follower_position.pose.pose.position.x #Hover on the spot
+            self.posetemp.pose.position.y = self.follower_position.pose.pose.position.y
+            self.posetemp.pose.position.z = self.follower_position.pose.pose.position.z
             self.inttimer=time.time()
         
         # Time is less than [followlag] threshhold, start logging drone position but dont follow yet
@@ -342,6 +348,10 @@ class follow:
             self.targettemp.velocity.x = 0
             self.targettemp.velocity.y = 0
             self.targettemp.velocity.z = 0
+
+            self.posetemp.pose.position.x = self.follower_position.pose.pose.position.x #Hover on the spot
+            self.posetemp.pose.position.y = self.follower_position.pose.pose.position.y 
+            self.posetemp.pose.position.z = self.follower_position.pose.pose.position.z
 
             self.xarr.append(self.follow_object.posx) #Append the current position of the followed device to the end of the setpoint array
             self.yarr.append(self.follow_object.posy)
@@ -360,12 +370,16 @@ class follow:
 
         # Time is more than [followlag] threshhold, publishing delayed setpoints in normal operation
         else:
+
             self.xarr.append(self.follow_object.posx) #Append the current position to the end of the list
             self.yarr.append(self.follow_object.posy)
             self.zarr.append(self.follow_object.posz)
             self.targettemp.position.x = self.xarr[0]
             self.targettemp.position.y = self.yarr[0]
             self.targettemp.position.z = self.zarr[0]
+            self.posetemp.pose.position.x = self.xarr[0]
+            self.posetemp.pose.position.y = self.yarr[0]
+            self.posetemp.pose.position.z = self.zarr[0]
             self.targettemp.velocity.x = self.velocity_setpoint
             self.targettemp.velocity.y = self.velocity_setpoint
             self.targettemp.velocity.z = self.velocity_setpoint
@@ -402,8 +416,9 @@ class follow:
                                     self.xvelerror, self.yvelerror, self.zvelerror, self.velerror, self.velocity_setpoint])
 
         # Publish setpoints
+        self.follower_setpts.publish(self.posetemp)
         self.targettemp.coordinate_frame = 1
-        self.follower_vel_pub.publish(self.targettemp)
+        #self.follower_vel_pub.publish(self.targettemp)
 
         # Update previous location(independent of setpoint)
         self.prevx=self.follower_position.pose.pose.position.x

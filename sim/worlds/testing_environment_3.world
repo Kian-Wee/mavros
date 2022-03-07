@@ -55,18 +55,18 @@
       <direction>-0.5 0.1 -0.9</direction>
     </light>
 
-    <!--<plugin name='wind_plugin' filename='libgazebo_wind_plugin.so'>
+    <plugin name='wind_plugin' filename='libgazebo_wind_plugin.so'>
       <frameId>wind_base_link</frameId>
       <robotNamespace/>
       <xyzOffset>1 0 0</xyzOffset>
       <windDirectionMean>0 1 0</windDirectionMean>
-      <windVelocityMean>4.0</windVelocityMean>
+      <windVelocityMean>2.0</windVelocityMean>
       <windGustDirection>0 0 0</windGustDirection>
       <windGustDuration>0</windGustDuration>
       <windGustStart>0</windGustStart>
       <windGustVelocityMean>0</windGustVelocityMean>
       <windPubTopic>world_wind</windPubTopic>
-    </plugin>-->	
+    </plugin>-->
 
     <include>
       <uri>model://ground_plane</uri>
