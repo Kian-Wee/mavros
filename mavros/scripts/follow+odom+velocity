@@ -48,6 +48,8 @@ rate=15
 lap_topic="/uav0/lap" #lap counter, everytime it increments by 1 the lap error is computed
 velocity_topic="uav0/velocity" #checks for velocity or position control where 0 is position and any other value is the set
 
+recalc_freq=45 #every recalc_freq waypoints, the rmse is caculated and printed (in addition to lap error)
+
 class follow:
     """
     This class sends position targets to FCU's position controller
@@ -135,6 +137,10 @@ class follow:
         # Start from 1 to avoid header line
         self.prevlaparr =1
 
+        # Recaculate error counter
+        self.recalc_counter =0
+        self.preverrarr =1
+
         # Either one set of these setpoints are used for position or velocity
 
         # The position that will be sent to the following drone
@@ -166,7 +172,15 @@ class follow:
 
             # Check if lap has completed and append spacer and errors
             if self.prevlap != self.lap_count.data:
-                self.tracklap() 
+                print
+                self.tracklap()
+
+            # Recatulate error
+            if self.recalc_counter>=recalc_freq:
+                self.trackerror()
+                self.recalc_counter=0
+            else:
+                self.recalc_counter+=1
 
             # To republish the setpoints
             self.topicbroadcaster()
@@ -234,6 +248,62 @@ class follow:
         rospy.loginfo("No of setpoints: %s", self.lapdatacount)
         rospy.loginfo("Average Lap Error: %s, X-Error: %s, Y-Error: %s, Z-Error: %s",self.error,self.xerror,self.yerror,self.zerror)
         rospy.loginfo("Average Lap Velocity Error: %s, X-Error: %s, Y-Error: %s, Z-Error: %s",self.velerror,self.xvelerror,self.yvelerror,self.zvelerror)
+
+    def trackerror(self):
+
+        self.xerror=0
+        self.yerror=0
+        self.zerror=0
+        self.error=0
+
+        self.xvelerror=0
+        self.yvelerror=0
+        self.zvelerror=0
+        self.velerror=0
+
+        self.errdatacount = 0 # temp counter to keep track of number of data points/entries per lap
+
+        # Calculate current lap errors
+        for x in range(self.preverrarr,len(self.totalarr)): #omit first column of headers
+            self.xerror += abs(self.totalarr[x][7]) #convert to only positive numbers so the negative and positive dont cancel out each other
+            self.yerror += abs(self.totalarr[x][8])
+            self.zerror += abs(self.totalarr[x][9])
+            self.xvelerror += abs(self.totalarr[x][-5]) #convert to only positive numbers so the negative and positive dont cancel out each other
+            self.yvelerror += abs(self.totalarr[x][-4])
+            self.zvelerror += abs(self.totalarr[x][-3])
+            # self.error += self.totalarr[x][-1] # caculate based on x,y,z error
+            self.errdatacount+=1
+
+        # If the follow drone has not been initalised yet or is not moving, prevent modulo by zero error
+        if (self.errdatacount==0):
+            self.xerror =0
+            self.yerror =0
+            self.zerror =0
+            self.error =0
+            self.xvelerror =0
+            self.yvelerror =0
+            self.zvelerror =0
+            self.velerror =0
+        else:
+            self.xerror=self.xerror/self.errdatacount
+            self.yerror=self.yerror/self.errdatacount
+            self.zerror=self.zerror/self.errdatacount
+            # self.error=self.error/self.lapdatacount
+            self.error=sqrt(self.xerror**2 + self.yerror**2 + self.zerror**2)
+
+            self.xvelerror= self.xvelerror/self.errdatacount
+            self.yvelerror= self.yvelerror/self.errdatacount
+            self.zvelerror= self.zvelerror/self.errdatacount
+            self.velerror=sqrt(self.xvelerror**2 + self.yvelerror**2 + self.zvelerror**2)
+
+        # Update pointer
+        self.preverrarr=len(self.totalarr)+1 # Update pointer to count the errors from next lap at the row after this
+
+        # Print to terminal
+        rospy.loginfo("Error Recaculated")
+        rospy.loginfo("No of setpoints: %s", self.errdatacount)
+        rospy.loginfo("Average Error: %s, X-Error: %s, Y-Error: %s, Z-Error: %s",self.error,self.xerror,self.yerror,self.zerror)
+        rospy.loginfo("Average Velocity Error: %s, X-Error: %s, Y-Error: %s, Z-Error: %s",self.velerror,self.xvelerror,self.yvelerror,self.zvelerror)
         
 
     # Uses a FIFO(first in first out) queue to store waypoints/breadcrumbs, the array size is determined by the rate and time to follow behind

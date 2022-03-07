@@ -22,7 +22,7 @@ lap_topic="/uav0/lap"
 velocity_topic="uav0/velocity"
 
 velocity = 1.0 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
-shape = "Circle" # Square, Circle, Inclined Square
+shape = "Square" # Square, Circle, Inclined Square
 radius = 5
 altitude = 2.5 # default altitude to hover at
 altitude2 = 2 # secondary altitude for inclined square
@@ -93,6 +93,8 @@ class drone:
                 radius=total_time_taken*velocity/(2*math.pi)
                 rospy.loginfo("New radius is. %s", radius)
 
+                rospy.loginfo("Total number of waypoints: %s", no_of_waypoints)
+
                 #Generate Trajectory
                 return [(math.cos(2*math.pi/no_of_waypoints*x)*radius,math.sin(2*math.pi/no_of_waypoints*x)*radius,altitude) for x in range(0,no_of_waypoints+1)]
             
@@ -106,6 +108,8 @@ class drone:
                 time_taken=no_of_waypoints/float(rate)
                 radius=time_taken*velocity
                 rospy.loginfo("New radius is. %s", radius)
+
+                rospy.loginfo("Total number of waypoints: %s", no_of_waypoints)
             
                 temparr=[]
                 for i in np.arange(0, radius, radius/no_of_waypoints):
@@ -137,6 +141,8 @@ class drone:
 
                 z_scaling=radius/no_of_waypoints*(altitude2-altitude)
 
+                rospy.loginfo("Total number of waypoints: %s", no_of_waypoints)
+
                 temparr=[]
                 for i in np.arange(0, radius, radius/no_of_waypoints):
                     temparr.append([i+x_offset, y_offset, altitude])
@@ -150,6 +156,7 @@ class drone:
                 for i in np.arange(0, radius, radius/no_of_waypoints):
                     temparr.append([x_offset, radius-i+y_offset, altitude2-z_scaling*i])
                 return temparr
+                
 
 
             # WIP This method 
@@ -162,6 +169,8 @@ class drone:
             else:
                 print("Invalid Shape")
                 rospy.signal_shutdown("Invalid Shape")
+
+            
 
         else:
             # Position based trajectories
@@ -188,6 +197,8 @@ class drone:
             else:
                 print("Invalid Shape")
                 rospy.signal_shutdown("Invalid Shape")
+
+    
 
     # Go to position, supports velocity setpoints too
     def gotopos(self, x, y, z, velocity=0):
