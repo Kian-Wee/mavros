@@ -1,3 +1,63 @@
+# BOREALIS SPECIFIC MAVROS SETUP
+======
+Follow inital mavros installation and change branch to pull changes
+
+Initalise this fork from master branch
+
+	1. run through normal ros and mavros setup
+	
+	2. git remote set-url origin https://github.com/Kian-Wee/mavros.git
+	
+	3. git branch borealis
+	
+	4. git checkout borealis
+	
+	5. git pull origin borealis
+
+If any prior changes were made, drop the changes first with, ```git stash```, ```git stash drop stash@{0}```. Enter name and email if prompted.
+
+More instructions avaliable at [Github & Syntax & Bash](Github & Syntax & Bash/Github Updating Instructions)
+
+
+
+### **Vehicle and position setup** 
+Run the setup file to initalise aliases and udev rules
+``` . ~/catkin_ws/src/mavros/borealis_setup/setup.bash ```
+
+#### PX4 Params configuration
+EKF2_HGT_Mode -> Vision
+EKF2_RNG_AID -> Enabled
+EKF_2_AID_MASK -> Vision position fusion, Vision yaw fusion (uncheck everything else)
+[Developer blogpost on params](https://hubs.la/Q0168CVX0)
+
+#### QGC Setup
+Do remember to change the MAV_SYS_ID on different vehicles, subsequently, change the gcs url port in the mavros launch file
+The first drone using port 14555 and the subsequent starting from 14556(or any port your prefer), Remember to add the port in QGC when monitoring
+
+[Other reference](https://github.com/PX4/PX4-Devguide/blob/master/en/companion_computer/pixhawk_companion)
+
+To run the ouster, ensure the ethernet link is set to link-local only under ipv4 settings
+
+
+
+### **Scripts**
+
+**basic_position** - send positions and generate trajectories
+
+**pos_265** - node for Intel Realsense 265, visual positioning is given to mavros (pos_265_old shows all output)
+
+**follow+odom+velocity** - follows and republishes odom and velocity, counts error per lap
+
+### **Old Scripts**
+
+**follow** - basic follow script to follow a topic
+
+**follow+** - saves additional datapoints
+
+**follow+odom** - uses odometry instead of posestamped and implements a lapcounter(for use with basic_position)
+
+
+
 MAVROS
 ======
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/mavlink/mavros)](https://github.com/mavlink/mavros/releases)  [![Gitter](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/mavlink/mavros?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)  [![CI](https://github.com/mavlink/mavros/actions/workflows/main.yml/badge.svg)](https://github.com/mavlink/mavros/actions/workflows/main.yml)
@@ -18,6 +78,27 @@ MAVLink extendable communication node for ROS.
 - 2020-01-01 version 1.0.0 released, please see [#1369][iss1369] for reasons and its purpose.
 - 2021-05-28 version 2.0.0 released, it's the first alpha release for ROS2.
 
+
+Instructions on launching the files for navigation for the Shadow Drone:
+----------------------
+
+ - cd into workspace
+
+ - RUN source devel/setup.bash
+
+ - RUN sudo chmod 666 /dev/ttyPixhawk to enable serial read from Pixhawk 2.1 FCU
+
+ - RUN roslaunch mavros shadow.launch to establish connection with Pixhawk 2.1 FCU
+
+ - RUN rosrun mavros shadow.final (trajectory within the room) for navigation, takeoff in stabilise mode and switch to Offboard 
+
+OR 
+
+ - RUN rosrun mavros shadow.corner (fly forward along the corner of the room and then back but with greater altitude) for navigation, takeoff in stabilise mode and switch to Offboard
+
+Scripts can be found under src/mavros/mavros/scripts
+
+ADVISED TO RUN ON PYTHON 2.7.12
 
 mavros package
 --------------

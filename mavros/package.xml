@@ -29,6 +29,8 @@
   <build_export_depend>geographiclib</build_export_depend>
   <build_depend>geographiclib-tools</build_depend>
   <build_export_depend>geographiclib-tools</build_export_depend>
+  <build_depend>message_generation</build_depend>
+  <build_export_depend>message_generation</build_export_depend>
   <!-- pymavlink dependency
   <exec_depend>mavlink</exec_depend>
   -->
@@ -57,6 +59,7 @@
   <depend>trajectory_msgs</depend>
   <depend>std_msgs</depend>
   <depend>std_srvs</depend>
+  <depend>borealis_msgs</depend>
 
   <test_depend>rosunit</test_depend>
   <test_depend>gtest</test_depend>

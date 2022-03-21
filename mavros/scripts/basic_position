@@ -1,0 +1,240 @@
+#!/usr/bin/env python
+
+# Basic position control, rewritten from past scripts to properly use classes
+
+from zipfile import ZIP_MAX_COMMENT
+import rospy
+import mavros
+import math
+from geometry_msgs.msg import PoseStamped
+from mavros_msgs.msg import State , PositionTarget
+from mavros_msgs.srv import CommandBool, SetMode
+from nav_msgs.msg import Odometry
+from std_msgs.msg import Int32, Float32 # Lap counter
+import numpy as np
+import time
+
+local_pos_topic='/uav0/mavros/setpoint_position/local'
+local_vel_topic='/uav0/mavros/setpoint_raw/local'
+drone_pos_topic= '/uav0/mavros/local_position/odom'
+
+lap_topic="/uav0/lap"
+velocity_topic="uav0/velocity"
+
+velocity = 1.0 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
+shape = "Square" # Square, Circle, Inclined Square
+radius = 5
+altitude = 2.5 # default altitude to hover at
+altitude2 = 2 # secondary altitude for inclined square
+
+z_vel=0.2 # m/s
+
+rate=15 #hz
+
+mavros.set_namespace()
+
+class drone:
+
+    def __init__(self):
+
+        self.rate = rospy.Rate(rate) # 10hz
+
+        self.drone_position = Odometry() #callback data is saved here
+        rospy.Subscriber(drone_pos_topic, Odometry , self.positioncallback)
+
+        self.local_pos_pub = rospy.Publisher(local_pos_topic, PoseStamped, queue_size=10) # Position Publisher
+        self.local_vel_pub = rospy.Publisher(local_vel_topic, PositionTarget, queue_size=10) # Position and Velocity Publisher
+
+        self.lap = rospy.Publisher(lap_topic, Int32, queue_size=10)
+        self.lapcounter = 0
+
+        self.velocity_pub = rospy.Publisher(velocity_topic, Float32, queue_size=10)
+        self.velocity_pub.publish(velocity)
+
+        self.traj_arr = self.generatetrajectory(shape,radius,velocity,altitude=altitude,altitude2=altitude2)
+
+        while not rospy.is_shutdown():
+            #print ("traj_arr..", self.traj_arr)
+            # Send trajectory and sleep
+            for pos in self.traj_arr:
+                print(pos, self.lapcounter)
+                self.gotopos(pos[0],pos[1],pos[2]) #,velocity
+                self.velocity_pub.publish(velocity)
+                self.rate.sleep()
+
+            # After the trajectory has finished sending, increment lap count by 1
+            self.lapcounter+=1
+            self.lap.publish(self.lapcounter)
+
+            
+
+    # Generate trajectory for circle and square
+    def generatetrajectory(self, shape, radius, velocity=0, x_offset=-radius/2, y_offset=-radius/2, altitude=1,altitude2=1, resolution=0.1):
+
+        # Assume current position is the center, plan trajectory around center
+        x=self.drone_position.pose.pose.position.x
+        y=self.drone_position.pose.pose.position.y
+        z=self.drone_position.pose.pose.position.z
+
+        # Velocity and position based controls
+        if velocity != 0:
+        # Theres are a variety of of ways to create velocity based trajectories
+        # These trajectories need to account for the publishing rate of the node and the current speed
+
+            # This method creates a circle of constant eucalidean velocity by varying the radius given the desired velocity, the polling rate, and the baseline radius
+            if shape=="Circle":
+                print("Velocity Circle")
+                total_time_taken=2*math.pi*radius/velocity # find the time taken each lap
+                no_of_waypoints=int(round(total_time_taken*rate)) # find the number of waypoints per loop and round it to the nearest whole number
+
+                # After getting the total number of waypoints, recompute the new radius by inverting the formula
+                # This helps the drone to complete the trajectory in a discrete number of rate steps
+                total_time_taken=no_of_waypoints/float(rate)
+                radius=total_time_taken*velocity/(2*math.pi)
+                rospy.loginfo("New radius is. %s", radius)
+
+                rospy.loginfo("Total number of waypoints: %s", no_of_waypoints)
+
+                #Generate Trajectory
+                return [(math.cos(2*math.pi/no_of_waypoints*x)*radius,math.sin(2*math.pi/no_of_waypoints*x)*radius,altitude) for x in range(0,no_of_waypoints+1)]
+            
+            # This method creates a square with radius rounded to the nearest multiple of rate to ensure corners are sharp
+            # Still gives alot of resolution, ie 10hz allows up to 0.1m accuracy
+            elif shape=="Square":
+                print("Velocity Square")
+                time_taken=float(radius)/float(velocity) # dont caculate for total perimeter(all 4 sides), caculate each side independently to ensure corner waypoints are sharp
+                no_of_waypoints=round(time_taken*rate) # no of waypoints per side
+
+                time_taken=no_of_waypoints/float(rate)
+                radius=time_taken*velocity
+                rospy.loginfo("New radius is. %s", radius)
+
+                rospy.loginfo("Total number of waypoints: %s", no_of_waypoints)
+            
+                temparr=[]
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([i+x_offset, y_offset, altitude])
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([radius+x_offset, i+y_offset, altitude])
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([radius-i+x_offset, radius+y_offset, altitude])
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([x_offset, radius-i+y_offset, altitude])
+                return temparr
+
+            # Square with 2 different altitudes
+            # the z velocity is not controlled but spread evenly based on the number of waypoints, where a2 and a1 are the different altitudes
+            #  *    x     (A1)     (A2)
+            #  *    ^     2-------3       
+            #  *    |    /       /      
+            #  *    |   /       /         
+            #  *    |  1-------4          
+            #  *    +-------------->y
+            elif shape=="Inclined Square":
+                print("Inclined Velocity Square")
+                time_taken=float(radius)/float(velocity) # dont caculate for total perimeter(all 4 sides), caculate each side independently to ensure corner waypoints are sharp
+                no_of_waypoints=round(time_taken*rate) # no of waypoints per side
+
+                time_taken=no_of_waypoints/float(rate)
+                radius=time_taken*velocity
+                rospy.loginfo("New radius is. %s", radius)
+
+                z_scaling=radius/no_of_waypoints*(altitude2-altitude)
+
+                rospy.loginfo("Total number of waypoints: %s", no_of_waypoints)
+
+                temparr=[]
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([i+x_offset, y_offset, altitude])
+
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([radius+x_offset, i+y_offset, altitude+z_scaling*i])
+
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([radius-i+x_offset, radius+y_offset, altitude2])
+
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([x_offset, radius-i+y_offset, altitude2-z_scaling*i])
+                return temparr
+                
+
+
+            # WIP This method 
+            elif shape=="Circle-hz":
+                pass
+                # circumfrence /speed = time
+                # no of waypoints/time = step discretisation time
+                # 2*math.pi*radius * 
+
+            else:
+                print("Invalid Shape")
+                rospy.signal_shutdown("Invalid Shape")
+
+            
+
+        else:
+            # Position based trajectories
+
+            # Draw a circle, where n is the resolution and also controls the speed
+            if shape=="Circle":
+                print("Position Circle")
+                n=50
+                return [(math.cos(2*math.pi/n*x)*radius,math.sin(2*math.pi/n*x)*radius,altitude) for x in range(0,n+1)]
+
+            # Draw a square of radius,radius assuming it is currently at 0,0
+            elif shape=="Square":
+                temparr=[]
+                for i in np.arange(0, radius, resolution):
+                    temparr.append([i+x_offset, y_offset, altitude])
+                for i in np.arange(0, radius, resolution):
+                    temparr.append([radius+x_offset, i+y_offset, altitude])
+                for i in np.arange(0, radius, resolution):
+                    temparr.append([radius-i+x_offset, radius+y_offset, altitude])
+                for i in np.arange(0, radius, resolution):
+                    temparr.append([x_offset, radius-i+y_offset, altitude])
+                return temparr
+
+            else:
+                print("Invalid Shape")
+                rospy.signal_shutdown("Invalid Shape")
+
+    
+
+    # Go to position, supports velocity setpoints too
+    def gotopos(self, x, y, z, velocity=0):
+
+        # No velocity defined, defaulting to position control
+        if(velocity==0):
+            # print("PUBLISHING POSE")
+            posetemp = PoseStamped()
+            posetemp.pose.position.x = x # offboard mode requires existing position setpoints to boot into
+            posetemp.pose.position.y = y
+            posetemp.pose.position.z = z
+            self.local_pos_pub.publish(posetemp)
+
+        # Send velocity and position
+        else:
+            msg0 = PositionTarget()
+            msg0.type_mask = 64;
+            msg0.position.x = x
+            msg0.position.y = y
+            msg0.position.z = z
+            msg0.velocity.x= velocity
+            msg0.velocity.y= velocity
+            msg0.velocity.z= z_vel
+            msg0.coordinate_frame = 1
+            self.local_vel_pub.publish(msg0)
+            self.velocity_pub.publish(velocity)
+
+    # Check if drone is at position before sending new position
+
+    def positioncallback(self,data): # callback invoked with the message as the first arg
+        self.drone_position = data
+        # print "Velocity: ", math.sqrt(data.twist.twist.linear.x**2+data.twist.twist.linear.y**2)
+
+        
+
+if __name__ == '__main__':
+    rospy.init_node('drone', anonymous=True)
+    node = drone()
+    rospy.spin()
