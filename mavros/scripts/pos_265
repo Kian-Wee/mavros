@@ -78,6 +78,8 @@ class vision:
         self.z_list = []
         i = 0.0
       
+        rospy.on_shutdown(self.quit)
+
         while not rospy.is_shutdown(): #subsequent functions below are automatically run using this while loop (inert functions)  
             #self.arm() 
 
@@ -159,6 +161,9 @@ class vision:
         pos.header.stamp = rospy.Time.now() # Update timestamp for each published SP
         self.pub_vis.publish(pos)
 
+    def quit(self):
+        print('POS_265 IS SHUTTING DOWN')
+        rospy.signal_shutdown("POS_265 SHUTTING DOWN")
 
 if __name__ == '__main__':
     rospy.init_node(drone_name + '_vision', anonymous=True)

@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Setup script for borealis, adds aliases and copies parallel commands script for simultaneous launching
+# Not stable at the moment, copy paste
 
 # Prompt user for drone name
 echo Enter Drone Name[eg, uav0]
@@ -29,17 +30,18 @@ export ROS_HOSTNAME=127.0.0.1 #always set as own ip
 export ROS_IP=127.0.0.1 #always set as own ip
 
 # Realsense aliases
-alias launch_d435i='roslaunch realsense2_camera rs_camera.launch camera:=$DRONE_NAME/d435i serial_no:=$D435_ID color_width:=848 color_height:=480 color_fps:=30 depth_width:=848 depth_height:=480 depth_fps:=30 align_depth:=true'
+alias launch_d435i='roslaunch realsense2_camera rs_camera.launch camera:=$DRONE_NAME/d435i serial_no:=$D435_ID color_width:=848 color_height:=480 color_fps:=30 depth_width:=848 depth_height:=480 depth_fps:=30 align_depth:=true initial_reset:=true enable_sync:=true'
 alias launch_t265='roslaunch realsense2_camera rs_t265.launch serial_no:=$T265_ID camera:=$DRONE_NAME/t265'
 
 alias launch_drone_data_feeder='roslaunch drone_data_feeder_node drone_data_feeder.launch'
 alias drone_data_feeder='rosrun drone_data_feeder_node drone_data_feeder.py'
 
 # Syncronise time and launch mavros, 2 realsenses, the positioning node and the LEDs
-alias launch_borealis='. ~/parallel_comments.bash "sudo ntpdate -s time.nist.gov" "roslaunch mavros px4_swarm.launch" "roslaunch realsense2_camera rs_t265.launch camera:=$DRONE_NAME/t265 serial_no:=$T265_ID" "rosrun mavros pos_265" "roslaunch realsense2_camera rs_camera.launch camera:=$DRONE_NAME/d435i serial_no:=$D435_ID color_width:=848 color_height:=480 color_fps:=30 depth_width:=848 depth_height:=480 depth_fps:=30 align_depth:=true" "python ~/catkin_ws/src/PX4-Lights/buzzer_ros.py'
+alias launch_borealis='. ~/parallel_comments.bash "sudo ntpdate -s time.nist.gov" "roslaunch mavros px4_swarm.launch" "roslaunch realsense2_camera rs_t265.launch camera:=$DRONE_NAME/t265 serial_no:=$T265_ID --wait" "rosrun mavros pos_265" "roslaunch realsense2_camera rs_camera.launch camera:=$DRONE_NAME/d435i serial_no:=$D435_ID color_width:=848 color_height:=480 color_fps:=30 depth_width:=848 depth_height:=480 depth_fps:=30 align_depth:=true initial_reset:=true enable_sync:=true --wait" "python ~/catkin_ws/src/PX4-Lights/buzzer_ros.py"'
 EOF
 
 # Add in udev rules
+sudo chmod 777 ~/catkin_ws/src/mavros/borealis_setup/setup.bash
 sudo touch "/etc/udev/rules.d/99-pixhawk.rules"
 sudo bash -c 'cat << EOF > /etc/udev/rules.d/99-pixhawk.rules
 # Pixhawk 4
