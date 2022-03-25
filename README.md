@@ -1,5 +1,20 @@
 # BOREALIS SPECIFIC MAVROS SETUP
-======
+
+## **Migrating From existing Borealis drone**
+change the DRONE_NAME variable in bashrc to a new drone id
+### Change hostname
+sudo nano /etc/hostname , delete and change to a new name
+sudo nano /etc/hosts , replace all existing computer name with new one
+sudo reboot
+
+### Rebuild workspaces
+
+You might need to catkin clean and catkin build the workspaces again
+
+
+## **New Borealis Setup**
+
+### Installation
 Follow inital mavros installation and change branch to pull changes
 
 Initalise this fork from master branch
@@ -16,7 +31,7 @@ Initalise this fork from master branch
 
 If any prior changes were made, drop the changes first with, ```git stash```, ```git stash drop stash@{0}```. Enter name and email if prompted.
 
-More instructions avaliable at [Github & Syntax & Bash](Github & Syntax & Bash/Github Updating Instructions)
+More instructions(on git) available at [Github & Syntax & Bash](Github & Syntax & Bash/Github Updating Instructions)
 
 
 
