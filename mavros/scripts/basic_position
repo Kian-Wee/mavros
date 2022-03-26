@@ -21,9 +21,9 @@ drone_pos_topic= '/uav0/mavros/local_position/odom'
 lap_topic="/uav0/lap"
 velocity_topic="uav0/velocity"
 
-velocity = 1.0 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
-shape = "Square" # Square, Circle, Inclined Square
-radius = 5
+velocity =  1.0 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
+shape = "Inclined Square" # Square, Circle, Inclined Square
+radius = 3.0
 altitude = 2.5 # default altitude to hover at
 altitude2 = 2 # secondary altitude for inclined square
 
