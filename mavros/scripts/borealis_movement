@@ -1,0 +1,358 @@
+#!/usr/bin/env python
+# vim:set ts=4 sw=4 et:
+#
+# Copyright 2015 UAVenture AG.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+# for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+# Updated: Tarek Taha : tarek.taha@kustar.ac.ae, Vladimir Ermakov
+#    - Changed topic names after re-factoring : https://github.com/mavlink/mavros/issues/233
+#    - Use mavros.setpoint module for topics
+
+import rospy
+import thread
+import threading
+import time
+import mavros
+
+import numpy as np
+#import sys, select, termios, tty
+from select import select
+
+from math import *
+from mavros.utils import *
+from mavros import setpoint as SP
+from std_msgs.msg import Header, String, Bool #type 
+from std_msgs.msg import Float64, Float32 #type from msg generation
+from geometry_msgs.msg import PoseStamped, Pose, Quaternion, TwistStamped, Twist #geometry
+#from tf.transformations import quaternion_from_euler #transformation
+from mavros_msgs.srv import CommandLong #service_class
+from mavros_msgs.msg import PositionTarget,ActuatorControl
+from sensor_msgs.msg import NavSatFix,Range,LaserScan #type
+from rlss_ros.msg import dyn_params, PiecewiseTrajectory, Bezier 
+#from teraranger_array.msg import RangeArray
+
+
+class borealis_movement:
+    """
+    This class sends position targets to FCU's position controller
+    """
+    def __init__(self):
+        self.z = 1.5  
+        self.armed = False  
+        #self.collective = RangeArray()
+        self.rate = rospy.Rate(10) # 10hz is the original 
+        self.sensor_2 = 0.0
+        self.sensor_6 = 0.0
+        self.timeout = 180
+        self.local_position = PoseStamped()
+        self.local_position_1 = PoseStamped()
+        self.count = 0
+        self.counter = 0
+        self.actuator_control_message = ActuatorControl() 
+        self.seq = 1
+        self.getkeys = String()
+        self.rotation = 0.0
+        self.speed = 0.45
+        self.final_traj = PiecewiseTrajectory()
+        self.final_traj_0 = Pose()
+        self.final_traj_1 = Pose()
+        self.planner_activation = Bool()
+        self.pos_x_0 = Float64()
+        self.pos_y_0 = Float64()
+        self.pos_z_0 = Float64()
+        self.pos_x_1 = Float64()
+        self.pos_y_1 = Float64()
+        self.pos_z_1 = Float64()
+        self.traj_0 = Bezier()
+        self.traj_1 = Bezier()
+        self.Bezier_List = [self.traj_0,self.traj_1 ]
+    
+
+        # rospy.wait_for_service('mavros/cmd/arming', 30) # wait for arming, queue for 30s  # this bitch statement gives alot of problem
+
+        # rospy.Subscriber("subscribed topic",topic type,callback invoked with the message as the first arg)  
+
+        #rospy.Subscriber("hub_1/ranges_raw", RangeArray, self.hub_callback)
+        #rospy.Subscriber("mavros/local_position/pose", PoseStamped, self.position_callback)
+        #self.pub_pos = rospy.Publisher('mavros/setpoint_raw/local', PositionTarget, queue_size=10)
+        #self.pub_spt = rospy.Publisher('mavros/setpoint_position/local', PoseStamped, queue_size=10)
+        #self.pub_vel = rospy.Publisher('mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
+        #self.message_pub = rospy.Publisher("/mavros/actuator_control", ActuatorControl, queue_size=10)
+
+        rospy.Subscriber("/uav1/mavros/local_position/pose", PoseStamped, self.position_callback)
+        rospy.Subscriber("/uav2/mavros/local_position/pose", PoseStamped, self.position_1_callback)
+        
+        rospy.Subscriber("/final_trajectory_pose_0", PoseStamped, self.traj_0_callback)
+        rospy.Subscriber("/final_trajectory_pose_1", PoseStamped, self.traj_1_callback)
+        rospy.Subscriber("/final_trajectory", PiecewiseTrajectory, self.traj_callback)
+        rospy.Subscriber("/planner_activation", Bool, self.activation_callback)
+
+        self.pub_pos = rospy.Publisher('/uav1/mavros/setpoint_raw/target_local', PositionTarget, queue_size=10)
+        self.pub_spt = rospy.Publisher('/uav1/mavros/setpoint_position/local', PoseStamped, queue_size=10)
+        self.pub_vel = rospy.Publisher('/uav1/mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
+
+        self.pub_pos_1 = rospy.Publisher('/uav2/mavros/setpoint_raw/target_local', PositionTarget, queue_size=10)
+        self.pub_spt_1 = rospy.Publisher('/uav2/mavros/setpoint_position/local', PoseStamped, queue_size=10)
+        self.pub_vel_1 = rospy.Publisher('/uav2/mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
+        #self.message_pub = rospy.Publisher("mavros/actuator_control", ActuatorControl, queue_size=10)
+
+        #rospy.wait_for_service('/mavros/cmd/command', 30)
+        #self._srv_cmd_long = rospy.ServiceProxy('mavros/cmd/command', CommandLong, persistent=True)
+       
+
+        while not rospy.is_shutdown():
+
+            
+            print "drone 1 moving...", self.pos_x_0, self.pos_y_0, self.pos_y_0
+            print "drone 2 moving...", self.pos_x_1, self.pos_y_0, self.pos_y_0
+            
+            #print len(self.Bezier_List)
+            #print self.planner_activation.data
+            if self.planner_activation.data:
+                self.Moving_1()
+                self.Moving()
+                print "Moving"
+            else:
+                self.Hovering_1()
+                self.Hovering()
+                print "Hovering"
+                        
+            self.rate.sleep()
+
+
+    def position_callback(self, data): # callback invoked with the message as the first arg
+        self.local_position = data 
+
+
+    def position_1_callback(self, data): # callback invoked with the message as the first arg
+        self.local_position_1 = data 
+
+
+    def activation_callback(self, data): # callback invoked with the message as the first arg
+        self.planner_activation = data 
+
+
+    def traj_0_callback(self, data): # callback invoked with the message as the first arg
+        self.final_traj_0 = data
+        self.pos_x_0 = self.final_traj_0.pose.position.x
+        self.pos_y_0 = self.final_traj_0.pose.position.y
+        self.pos_z_0 = self.final_traj_0.pose.position.z
+
+
+    def traj_1_callback(self, data): # callback invoked with the message as the first arg
+        self.final_traj_1 = data
+        self.pos_x_1 = self.final_traj_1.pose.position.x
+        self.pos_y_1 = self.final_traj_1.pose.position.y
+        self.pos_z_1 = self.final_traj_1.pose.position.z
+    
+
+    def traj_callback(self, data): # callback invoked with the message as the first arg
+        self.final_traj = data 
+        
+        # if self.planner_activation.data:
+        
+        #     self.pos_x_0 = self.final_traj.pieces[0].end[0]
+        #     self.pos_y_0 = self.final_traj.pieces[0].end[1]
+        #     self.pos_z_0 = self.final_traj.pieces[0].end[2]
+
+        #     self.pos_x_1 = self.final_traj.pieces[1].end[0]
+        #     self.pos_y_1 = self.final_traj.pieces[1].end[1]
+        #     self.pos_z_1 = self.final_traj.pieces[1].end[2]
+            
+    
+    def arm(self):
+        if self.count < self.timeout:
+            # FIXME: arm and switch to offboard
+            # (need to wait the first few rounds until PX4 has the offboard stream)
+            if not self.armed and self.count > 5:
+                self._srv_cmd_long(False, 176, False,
+                                   1, 6, 0, 0, 0, 0, 0)
+                # make sure the first command doesn't get lost
+                time.sleep(1)
+
+                self._srv_cmd_long(False, 400, False,
+                                   # arm
+                                   1, 0, 0, 0, 0, 0, 0)
+
+                self.armed = True
+            self.count = self.count + 1
+            self.rate.sleep() # The loop calls rate.sleep(), which sleeps just long enough to maintain the desired rate through the loop.
+
+
+
+
+    def Hovering(self): 
+       # Initialise necessary headers
+        pos = PoseStamped()
+        pos.header = Header() # initialising a new header for a new PoseStamped()
+        pos.header.frame_id = "Hovering"
+
+        # Establish desired setpoints
+        pos.pose.position.x = self.local_position.pose.position.x # North
+        pos.pose.position.y = self.local_position.pose.position.y 
+        pos.pose.position.z = self.z 
+
+        # Establish desired setpoints
+        # pos.pose.position.x = self.pos_x_0  # North
+        # pos.pose.position.y = self.pos_y_0
+        # pos.pose.position.z = self.z
+        # pos.pose.position.z = self.pos_z_0
+
+        # Establish desired orientation at setpoint
+        roll_degrees = 0.0 
+        roll = radians(roll_degrees)
+        pitch_degrees = 0.0 
+        pitch = radians(pitch_degrees)
+        yaw_degrees = 0.0  
+        yaw = radians(yaw_degrees)
+
+        # Execute desired orientation
+        # quaternion = quaternion_from_euler(roll, pitch, yaw) #roll,pitch,yaw
+        # pos.pose.orientation = Quaternion(*quaternion)
+
+        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+        quaternion = [qx,qy,qz,qw]  # drone only takes in quarternion values, therefore have to do euler to quarternion conversion
+        pos.pose.orientation = Quaternion(*quaternion)
+        
+        #pos.header.stamp = rospy.Time.now() # Update timestamp for each published SP
+
+        # Publishing to rostopic   
+        self.pub_spt.publish(pos) # updated pose from pos.pose.orientation
+    
+
+    def Moving(self): 
+        # Initialise necessary headers
+        pos = PoseStamped()
+        pos.header = Header() # initialising a new header for a new PoseStamped()
+        pos.header.frame_id = "Moving"
+
+        # Establish desired setpoints
+        pos.pose.position.x = self.pos_x_0  # North
+        pos.pose.position.y = self.pos_y_0
+        pos.pose.position.z = self.pos_z_0
+
+        # Establish desired orientation at setpoint
+        roll_degrees = 0.0 
+        roll = radians(roll_degrees)
+        pitch_degrees = 0.0 
+        pitch = radians(pitch_degrees)
+        yaw_degrees = 0.0  
+        yaw = radians(yaw_degrees)
+
+        # Execute desired orientation
+        # quaternion = quaternion_from_euler(roll, pitch, yaw) #roll,pitch,yaw
+        # pos.pose.orientation = Quaternion(*quaternion)
+
+        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+        quaternion = [qx,qy,qz,qw]  # drone only takes in quarternion values, therefore have to do euler to quarternion conversion
+        pos.pose.orientation = Quaternion(*quaternion)
+        
+        pos.header.stamp = self.final_traj_0.header.stamp # Update timestamp for each published SP
+
+        # Publishing to rostopic   
+        self.pub_spt.publish(pos) # updated pose from pos.pose.orientation
+
+
+    def Moving_1(self): 
+        # Initialise necessary headers
+        pos = PoseStamped()
+        pos.header = Header() # initialising a new header for a new PoseStamped()
+        pos.header.frame_id = "Moving_1"
+
+        # Establish desired setpoints
+        pos.pose.position.x = self.pos_x_1  # North
+        pos.pose.position.y = self.pos_y_1
+        pos.pose.position.z = self.pos_z_1
+
+        # Establish desired orientation at setpoint
+        roll_degrees = 0.0 
+        roll = radians(roll_degrees)
+        pitch_degrees = 0.0 
+        pitch = radians(pitch_degrees)
+        yaw_degrees = 0.0  
+        yaw = radians(yaw_degrees)
+
+        # Execute desired orientation
+        # quaternion = quaternion_from_euler(roll, pitch, yaw) #roll,pitch,yaw
+        # pos.pose.orientation = Quaternion(*quaternion)
+
+        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+        quaternion = [qx,qy,qz,qw]  # drone only takes in quarternion values, therefore have to do euler to quarternion conversion
+        pos.pose.orientation = Quaternion(*quaternion)
+        
+        pos.header.stamp = rospy.Time.now() # Update timestamp for each published SP
+
+        # Publishing to rostopic   
+        self.pub_spt_1.publish(pos) # updated pose from pos.pose.orientation
+
+
+    def Hovering_1(self): 
+       # Initialise necessary headers
+        pos = PoseStamped()
+        pos.header = Header() # initialising a new header for a new PoseStamped()
+        pos.header.frame_id = "Hovering_1"
+
+        # Establish desired setpoints
+        pos.pose.position.x = self.local_position_1.pose.position.x # North
+        pos.pose.position.y = self.local_position_1.pose.position.y 
+        pos.pose.position.z = self.z 
+
+        # Establish desired orientation at setpoint
+        roll_degrees = 0.0 
+        roll = radians(roll_degrees)
+        pitch_degrees = 0.0 
+        pitch = radians(pitch_degrees)
+        yaw_degrees = 0.0  
+        yaw = radians(yaw_degrees)
+
+        # Execute desired orientation
+        # quaternion = quaternion_from_euler(roll, pitch, yaw) #roll,pitch,yaw
+        # pos.pose.orientation = Quaternion(*quaternion)
+
+        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+        quaternion = [qx,qy,qz,qw]  # drone only takes in quarternion values, therefore have to do euler to quarternion conversion
+        pos.pose.orientation = Quaternion(*quaternion)
+        
+        pos.header.stamp = rospy.Time.now() # Update timestamp for each published SP
+
+        # Publishing to rostopic   
+        self.pub_spt_1.publish(pos) # updated pose from pos.pose.orientation
+    
+
+    
+    
+if __name__ == '__main__':
+    rospy.init_node('borealis_movement', anonymous=True)
+
+    node = borealis_movement()
+
+    rospy.spin()  # spin() simply keeps python from exiting until this node is stopped
+
