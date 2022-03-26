@@ -1,5 +1,20 @@
 # BOREALIS SPECIFIC MAVROS SETUP
-======
+
+## **Migrating From existing Borealis drone**
+change the DRONE_NAME variable in bashrc to a new drone id
+### Change hostname
+sudo nano /etc/hostname , delete and change to a new name
+sudo nano /etc/hosts , replace all existing computer name with new one
+sudo reboot
+
+### Rebuild workspaces
+
+You might need to catkin clean and catkin build the workspaces again
+
+
+## **New Borealis Setup**
+
+### Installation
 Follow inital mavros installation and change branch to pull changes
 
 Initalise this fork from master branch
@@ -16,17 +31,28 @@ Initalise this fork from master branch
 
 If any prior changes were made, drop the changes first with, ```git stash```, ```git stash drop stash@{0}```. Enter name and email if prompted.
 
-More instructions avaliable at [Github & Syntax & Bash](Github & Syntax & Bash/Github Updating Instructions)
+More instructions(on git) available at [Github & Syntax & Bash](Github & Syntax & Bash/Github Updating Instructions)
 
 
 
 ### **Vehicle and position setup** 
 Run the setup file to initalise aliases and udev rules
 ``` . ~/catkin_ws/src/mavros/borealis_setup/setup.bash ```
-Enable vision fusion on EKF_2_AID_MASK
-Do remember to change the MAV_SYS_ID on different vehicles
+
+#### PX4 Params configuration
+EKF2_HGT_Mode -> Vision
+EKF2_RNG_AID -> Enabled
+EKF_2_AID_MASK -> Vision position fusion, Vision yaw fusion (uncheck everything else)
+[Developer blogpost on params](https://hubs.la/Q0168CVX0)
+
+#### QGC Setup
+Do remember to change the MAV_SYS_ID on different vehicles, subsequently, change the gcs url port in the mavros launch file
+The first drone using port 14555 and the subsequent starting from 14556(or any port your prefer), Remember to add the port in QGC when monitoring
 
 [Other reference](https://github.com/PX4/PX4-Devguide/blob/master/en/companion_computer/pixhawk_companion)
+
+To run the ouster, ensure the ethernet link is set to link-local only under ipv4 settings
+
 
 
 ### **Scripts**

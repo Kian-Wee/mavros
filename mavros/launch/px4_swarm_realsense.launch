@@ -5,8 +5,8 @@
 	<!-- vim: set ft=xml noet : -->
 	<!-- example launch script for PX4 based FCU's -->
 	
-	<!-- <arg name="fcu_url" default="udp://:14540@localhost:14557" /> same as the bottom  -->
-	<arg name="fcu_url" default="/dev/ttyPixhawk:921600" />
+	<!-- <arg name="fcu_url" default="udp://:14540@localhost:14557" /> same as the bottom --> 
+	<arg name="fcu_url" default="/dev/ttyPixhawk:921600" /> 
 	<arg name="gcs_url" default="udp://:14555@"  />
 	<arg name="tgt_system" default="1" />
 	<arg name="tgt_component" default="1" />
@@ -27,11 +27,20 @@
 		<arg name="respawn_mavros" default="$(arg respawn_mavros)" />
 	</include>
 
-	<arg name="global_origin" default="odom" />
+    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
+	<arg name="camera" value="d435"/>
+        <arg name="tf_prefix" value="d435"/>
+    </include>
 
-	<arg name="uav1_origin" default="uav1/t265_odom_frame" />
+    <include file="$(find realsense2_camera)/launch/rs_t265.launch">
+	<arg name="camera" value="t265"/>
+        <arg name="tf_prefix" value="t265"/>
+    </include>
 
-	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_$(env DRONE_NAME)" args="$(env UAV_X)  $(env UAV_Y) $(env UAV_Z) 0 0 0 1 $(arg global_origin) $(arg uav1_origin) 100" />
+<!--
+    <node pkg="tf" type="static_transform_publisher" name="d455_to_t265_link" args="0.0111 0 -0.05 0 0 0 t265_link d455_link 50" />
+    <node pkg="tf" type="static_transform_publisher" name="ouster_to_t265_link" args="-0.0622 0 0.0246 0 0 0 t265_link os_sensor 50" />
+   --> 
 
     </group>
 </launch>
