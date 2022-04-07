@@ -1,1 +1,2 @@
 ceres -non linear solver, state estimation packages
+git clone https://github.com/Kian-Wee/ouster_example
