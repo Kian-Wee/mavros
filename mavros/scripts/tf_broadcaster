@@ -8,7 +8,6 @@ import math
 import os
 from geometry_msgs.msg import PoseStamped
 import tf
-        
 
 drone_name = os.getenv('DRONE_NAME') #environment variable set in bashrc(or exported in terminal)
 publish_topic = drone_name + "/global_position/pose"
