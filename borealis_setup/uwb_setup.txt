@@ -1,0 +1,11 @@
+cd ~/uwb_ws/src
+sudo apt-get install ros-melodic-serial
+git clone git clone https://github.com/nooploop-dev/serial.git
+# Follow instructions
+cd serial
+make
+make test
+sudo make install
+cd ..
+git clone https://github.com/nooploop-dev/nlink_parser
+catkin build

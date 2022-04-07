@@ -55,7 +55,7 @@
       <direction>-0.5 0.1 -0.9</direction>
     </light>
 
-    <plugin name='wind_plugin' filename='libgazebo_wind_plugin.so'>
+    <!--<plugin name='wind_plugin' filename='libgazebo_wind_plugin.so'>
       <frameId>wind_base_link</frameId>
       <robotNamespace/>
       <xyzOffset>1 0 0</xyzOffset>

@@ -31,18 +31,6 @@
 		<arg name="respawn_mavros" default="$(arg respawn_mavros)" />
 	</include>
 
-	<include file="$(find realsense2_camera)/launch/rs_t265.launch">
-		<arg name="camera" value="t265" />
-		<arg name="tf_prefix" value="t265" />
-	</include>
-
-	<include file="$(find realsense2_camera)/launch/rs_camera.launch">
-		<arg name="camera" value="d435" />
-		<arg name="tf_prefix" value="d435" />
-	</include>
-
-	<node name="pos_265" pkg="mavros" type="pos_265" />
-
     <!-- Launch mavros_extras visualization.cpp to show in rviz, DOESNT SEEM TO PUBLISH-->
     <node name="drone_rviz" pkg="mavros_extras" type="visualization" />
 

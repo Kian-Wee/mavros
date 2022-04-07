@@ -41,14 +41,14 @@ follower_setpts= follower_namespace + "/setpoints" #object following
 follower_set_raw= follower_namespace + '/mavros/setpoint_raw/local' #object following with velocity
 # Take note that odom topic has an additional pose for self.follower_pose.pose.pose
 follower_pos= follower_namespace + "/mavros/local_position/odom" #/uav1/mavros/local_position/odom
-followlag=1 #seconds behind followed object
+followlag=2 #seconds behind followed object 1 for circle, 2 for square
 barrier=1 #meters, if drone is this distance from followed object, it stops
 rate=15
 
 lap_topic="/uav0/lap" #lap counter, everytime it increments by 1 the lap error is computed
 velocity_topic="uav0/velocity" #checks for velocity or position control where 0 is position and any other value is the set
 
-recalc_freq=45 #every recalc_freq waypoints, the rmse is caculated and printed (in addition to lap error)
+recalc_freq=225 #every recalc_freq waypoints, the rmse is caculated and printed (in addition to lap error)
 
 class follow:
     """
@@ -162,7 +162,7 @@ class follow:
         while not rospy.is_shutdown(): #subsequent functions below are automatically run using this while loop (inert functions)  
             # print(self.velocity_setpoint)
             if self.velocity_setpoint == 0:
-                # self.positioncontrol() 
+                #self.positioncontrol() 
                 self.velocitycontrol()
             elif self.velocity_setpoint != 0:
                 #self.positioncontrol()
@@ -374,7 +374,7 @@ class follow:
                                     self.xvelerror, self.yvelerror, self.zvelerror, self.velerror, self.velocity_setpoint])
 
         # Publish setpoints
-        #self.follower_pub.publish(self.posetemp)
+        self.follower_pub.publish(self.posetemp)
         self.follower_setpts.publish(self.posetemp)
 
         # Update previous location(independent of setpoint)
