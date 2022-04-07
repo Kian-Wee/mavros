@@ -22,7 +22,7 @@ lap_topic="/uav0/lap"
 velocity_topic="uav0/velocity"
 
 velocity =  1.0 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
-shape = "Inclined Square" # Square, Circle, Inclined Square
+shape = "Inclined Square" # Square, Circle, Inclined Square, Line
 radius = 3.0
 altitude = 2.5 # default altitude to hover at
 altitude2 = 2 # secondary altitude for inclined square
@@ -165,6 +165,24 @@ class drone:
                 # circumfrence /speed = time
                 # no of waypoints/time = step discretisation time
                 # 2*math.pi*radius * 
+
+            elif shape=="Line":
+                print("Line")
+                time_taken=float(radius)/float(velocity) # dont caculate for total perimeter(all 4 sides), caculate each side independently to ensure corner waypoints are sharp
+                no_of_waypoints=round(time_taken*rate) # no of waypoints per side
+
+                time_taken=no_of_waypoints/float(rate)
+                radius=time_taken*velocity
+                rospy.loginfo("New radius is. %s", radius)
+
+                rospy.loginfo("Total number of waypoints: %s", no_of_waypoints)
+            
+                temparr=[]
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([0, i+y_offset, altitude])
+                for i in np.arange(0, radius, radius/no_of_waypoints):
+                    temparr.append([0, radius-i+y_offset, altitude])
+                return temparr
 
             else:
                 print("Invalid Shape")
