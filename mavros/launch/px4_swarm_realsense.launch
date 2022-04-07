@@ -51,10 +51,7 @@
 	<node name="pos_265" pkg="mavros" type="pos_265" />
 
 	<arg name="global_origin" default="odom" />
-
-	<arg name="$(env DRONE_NAME)_origin" default="$(env DRONE_NAME)/t265_odom_frame" />
-
-	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_$(env DRONE_NAME)" args="$(env UAV_X)  $(env UAV_Y) $(env UAV_Z) 0 0 0 1 $(arg global_origin) $(arg $(env DRONE_NAME)_origin) 100" />
+	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_$(env DRONE_NAME)" args="$(env UAV_X)  $(env UAV_Y) $(env UAV_Z) 0 0 0 1 $(arg global_origin) $(env DRONE_NAME)/t265_odom_frame 100" />
 
 <!--
     <node pkg="tf" type="static_transform_publisher" name="d455_to_t265_link" args="0.0111 0 -0.05 0 0 0 t265_link d455_link 50" />

@@ -28,10 +28,7 @@
 	</include>
 
 	<arg name="global_origin" default="odom" />
-
-	<arg name="$(env DRONE_NAME)_origin" default="$(env DRONE_NAME)/t265_odom_frame" />
-
-	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_$(env DRONE_NAME)" args="$(env UAV_X)  $(env UAV_Y) $(env UAV_Z) 0 0 0 1 $(arg global_origin) $(arg $(env DRONE_NAME)_origin) 100" />
+	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_$(env DRONE_NAME)" args="$(env UAV_X)  $(env UAV_Y) $(env UAV_Z) 0 0 0 1 $(arg global_origin) $(env DRONE_NAME)/t265_odom_frame 100" />
 
     </group>
 </launch>
