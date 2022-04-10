@@ -19,6 +19,7 @@ sudo apt-get install geographiclib-tools
 # Install buzzer package
 cd ~/catkn_ws/src/
 git clone https://github.com/Kian-Wee/PX4-Lights
+git clone 
 
 # Copy bash script for running multiple commands into home folder
 cp ~/catkin_ws/src/mavros/borealis_setup/parallel_comments.bash ~
@@ -35,9 +36,9 @@ export GCS_PORT=14555 #Remember to change the gcs_url port in the  launch file t
 export T265_ID="948422110423"
 export D435_ID="134222075005"
 
-export UAV_X=0
-export UAV_Y=0
-export UAV_Z=0
+export UAV_X="0"
+export UAV_Y="0"
+export UAV_Z="0"
 
 export ROS_MASTER_URI=http://127.0.0.1:11311/ #set to host
 export ROS_HOSTNAME=127.0.0.1 #always set as own ip
