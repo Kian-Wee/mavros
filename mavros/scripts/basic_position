@@ -33,7 +33,7 @@ z_vel=0.2 # m/s
 wait_for_start = 1 # Waits for drone to get into first position before continuing
 rate=15 #hz
 
-pattern_array = [[0,0,1],[1,0,1],[1,1,1],[0,1,1],]
+pattern_array = [[0,0,1],[2,0,1],[2,2,1],[0,1,1],[0,0,1]]
 
 wait=0 # Set to 1 if the drone should hit the setpoint first before moving
 tolerance=0.1 # Drone is considered to have hit setpoint if within this distance of setpoint
