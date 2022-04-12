@@ -5,8 +5,6 @@
     <!-- Launch script for multidrone/swarm with prefix-->
     <!--<group ns="uav0">-->
     <group ns="$(env DRONE_NAME)">
-	<!-- vim: set ft=xml noet : -->
-	<!-- example launch script for PX4 based FCU's -->
 	
 	<!-- <arg name="fcu_url" default="udp://:14540@localhost:14557" /> -->
 	<arg name="fcu_url" default="/dev/ttyPixhawk:921600" />
@@ -35,4 +33,7 @@
     <node name="drone_rviz" pkg="mavros_extras" type="visualization" />
 
     </group>
+
+	<node pkg="tf_publisher" type="tf_broadcaster" name="tf_broadcaster_$(env DRONE_NAME)" output="screen"/>
+	
 </launch>

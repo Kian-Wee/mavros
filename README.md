@@ -71,6 +71,8 @@ To run the ouster, ensure the ethernet link is set to link-local only under ipv4
 
 **follow+odom** - uses odometry instead of posestamped and implements a lapcounter(for use with basic_position)
 
+### Multi-Drone Setup
+Run ``` sudo ntpdate -s time.nist.gov ``` on all devices
 
 
 MAVROS

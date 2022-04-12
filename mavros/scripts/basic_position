@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
-# Basic position control, rewritten from past scripts to properly use classes
+# Basic position control
+# Velocity may be controlled by sequencing the setpoints at a fixed position based on the rosrate
+# Currently, velocity mode does not check if the the drone reaches the set position but contionusly sends the following waypoint to get the drone to try to accelerate to the desired velocity
 
-from zipfile import ZIP_MAX_COMMENT
+# from zipfile import ZIP_MAX_COMMENT
 import rospy
 import mavros
 import math
@@ -22,20 +24,27 @@ lap_topic="/uav0/lap"
 velocity_topic="uav0/velocity"
 
 velocity =  1.0 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
-shape = "Inclined Square" # Square, Circle, Inclined Square, Line
+shape = "Waypoints" # Square, Circle, Inclined Square, Line, Pattern(Velocity Dependent), Waypoints(Velocity Independent, has to wait for waypoint to reach) 
 radius = 3.0
 altitude = 2.5 # default altitude to hover at
 altitude2 = 2 # secondary altitude for inclined square
 
 z_vel=0.2 # m/s
-
+wait_for_start = 1 # Waits for drone to get into first position before continuing
 rate=15 #hz
+
+pattern_array = [[0,0,1],[2,0,1],[2,2,1],[0,1,1],[0,0,1]]
+
+wait=0 # Set to 1 if the drone should hit the setpoint first before moving
+tolerance=0.1 # Drone is considered to have hit setpoint if within this distance of setpoint
 
 mavros.set_namespace()
 
 class drone:
 
     def __init__(self):
+
+        global wait_for_start, wait
 
         self.rate = rospy.Rate(rate) # 10hz
 
@@ -51,35 +60,49 @@ class drone:
         self.velocity_pub = rospy.Publisher(velocity_topic, Float32, queue_size=10)
         self.velocity_pub.publish(velocity)
 
-        self.traj_arr = self.generatetrajectory(shape,radius,velocity,altitude=altitude,altitude2=altitude2)
+        if shape != "Waypoints":
+            self.traj_arr = self.generatetrajectory(shape,radius,velocity,altitude=altitude,altitude2=altitude2)
+        else:
+            self.traj_arr = pattern_array
+            wait = 1
 
         while not rospy.is_shutdown():
-            #print ("traj_arr..", self.traj_arr)
-            # Send trajectory and sleep
-            for pos in self.traj_arr:
-                print(pos, self.lapcounter)
-                self.gotopos(pos[0],pos[1],pos[2]) #,velocity
-                self.velocity_pub.publish(velocity)
-                self.rate.sleep()
 
-            # After the trajectory has finished sending, increment lap count by 1
-            self.lapcounter+=1
-            self.lap.publish(self.lapcounter)
+            if wait_for_start == 1:
+                while(self.isatpos(self.traj_arr[0][0],self.traj_arr[0][1],self.traj_arr[0][2],tolerance) != 1):
+                    print("Waiting for drone to go to", [self.traj_arr[0][0],self.traj_arr[0][1],self.traj_arr[0][2]])
+                    self.gotopos(self.traj_arr[0][0],self.traj_arr[0][1],self.traj_arr[0][2])
+                    self.rate.sleep()
+                wait_for_start = 0
+
+            # Send trajectory and sleep
+            if(wait==0):
+                for pos in self.traj_arr:
+                    print(pos, self.lapcounter)
+                    self.gotopos(pos[0],pos[1],pos[2])
+                    self.velocity_pub.publish(velocity)
+                    self.rate.sleep()
+            else:
+                for pos in self.traj_arr:
+                    print(pos, self.lapcounter)
+                    # Interrupts sending of new waypoints in for loop by publishing the same point until reached
+                    while(self.isatpos(pos[0],pos[1],pos[2],tolerance) != 1):
+                        self.gotopos(pos[0],pos[1],pos[2])
+                        self.rate.sleep()
 
             
 
-    # Generate trajectory for circle and square
+    # Generate trajectories
     def generatetrajectory(self, shape, radius, velocity=0, x_offset=-radius/2, y_offset=-radius/2, altitude=1,altitude2=1, resolution=0.1):
 
-        # Assume current position is the center, plan trajectory around center
+        # Assume current position is the center, plan trajectory around center(NOT YET IMPLEMENTED, ASSUME VIO INITALISATION AT ORIGIN)
         x=self.drone_position.pose.pose.position.x
         y=self.drone_position.pose.pose.position.y
         z=self.drone_position.pose.pose.position.z
 
         # Velocity and position based controls
         if velocity != 0:
-        # Theres are a variety of of ways to create velocity based trajectories
-        # These trajectories need to account for the publishing rate of the node and the current speed
+        # These trajectories "forces a velocity" by account for the publishing rate of the node and the current speed (quite jank)
 
             # This method creates a circle of constant eucalidean velocity by varying the radius given the desired velocity, the polling rate, and the baseline radius
             if shape=="Circle":
@@ -156,15 +179,6 @@ class drone:
                 for i in np.arange(0, radius, radius/no_of_waypoints):
                     temparr.append([x_offset, radius-i+y_offset, altitude2-z_scaling*i])
                 return temparr
-                
-
-
-            # WIP This method 
-            elif shape=="Circle-hz":
-                pass
-                # circumfrence /speed = time
-                # no of waypoints/time = step discretisation time
-                # 2*math.pi*radius * 
 
             elif shape=="Line":
                 print("Line")
@@ -183,6 +197,32 @@ class drone:
                 for i in np.arange(0, radius, radius/no_of_waypoints):
                     temparr.append([0, radius-i+y_offset, altitude])
                 return temparr
+
+            # Caculate the speed via the time needed to reach each setpoint
+            elif shape=="Pattern":
+                print("Pattern")
+
+                # # Remake the array to ensure each waypoint is rounded to the velocity
+                # new_arr=[]
+                # for i in range(1, len(pattern_array)):
+                #     x=pattern_array[i]-pattern_array[i-1]/
+                #     new_arr.append([pattern_array[i]])
+                #     print(pattern_array[i]-)
+
+                
+
+                # # Express interpolation between points to generate intermediate points in a parametric formula
+                # x = x1 + (x2-x1) * timestep
+                # y = y1 + (y2-y1) * timestep    
+                
+                # # Breakup waypoints into shorter waypoints
+                # path_array=[]
+                # # Run through every point to the next point
+                # for i in range(0,len(pattern_array)):
+                #     distance = len(pattern_array)
+                #     no_of_waypoints=round(float(distance)/float(velocity)*rate) # no of waypoints per side
+                #     # Caculate all the subwaypoints between the main waypoints
+                #     for wp in range(0,len):
 
             else:
                 print("Invalid Shape")
@@ -233,7 +273,7 @@ class drone:
         # Send velocity and position
         else:
             msg0 = PositionTarget()
-            msg0.type_mask = 64;
+            msg0.type_mask = 64
             msg0.position.x = x
             msg0.position.y = y
             msg0.position.z = z
@@ -242,17 +282,21 @@ class drone:
             msg0.velocity.z= z_vel
             msg0.coordinate_frame = 1
             self.local_vel_pub.publish(msg0)
-            self.velocity_pub.publish(velocity)
+            self.velocity_pub.publish(velocity) # Additional publisher for just the velocity for research purposes
 
-    # Check if drone is at position before sending new position
+    # Check if drone is at position before sending new position for position mode
+    def isatpos(self, x, y, z, tolerance=0.1):
+        if(math.sqrt((self.drone_position.pose.pose.position.x-x)**2+(self.drone_position.pose.pose.position.y-y)**2+(self.drone_position.pose.pose.position.z-z)**2)<tolerance):
+            return 1
+        else:
+            return 0
 
     def positioncallback(self,data): # callback invoked with the message as the first arg
         self.drone_position = data
-        # print "Velocity: ", math.sqrt(data.twist.twist.linear.x**2+data.twist.twist.linear.y**2)
 
         
 
 if __name__ == '__main__':
-    rospy.init_node('drone', anonymous=True)
+    rospy.init_node('drone_basic_position', anonymous=True)
     node = drone()
     rospy.spin()
