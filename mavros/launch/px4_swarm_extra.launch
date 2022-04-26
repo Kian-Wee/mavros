@@ -5,8 +5,6 @@
     <!-- Launch script for multidrone/swarm with prefix-->
     <!--<group ns="uav0">-->
     <group ns="$(env DRONE_NAME)">
-	<!-- vim: set ft=xml noet : -->
-	<!-- example launch script for PX4 based FCU's -->
 	
 	<!-- <arg name="fcu_url" default="udp://:14540@localhost:14557" /> -->
 	<arg name="fcu_url" default="/dev/ttyPixhawk:921600" />
@@ -31,31 +29,11 @@
 		<arg name="respawn_mavros" default="$(arg respawn_mavros)" />
 	</include>
 
-	<include file="$(find realsense2_camera)/launch/rs_t265.launch">
-		<arg name="camera" value="t265" />
-		<arg name="tf_prefix" value="t265" />
-		<arg name="serial_no" value="$(env T265_ID)" />
-	</include>
-
-	<include file="$(find realsense2_camera)/launch/rs_camera.launch">
-		<arg name="camera" value="d435" />
-		<arg name="tf_prefix" value="d435" />
-		<arg name="serial_no" value="$(env D435_ID)" />
-		<arg name="color_width" value="848" />
-		<arg name="color_height" value="480" />
-		<arg name="color_fps" value="30" />
-		<arg name="depth_width" value="848" /> 
-		<arg name="depth_height" value="480" /> 
-		<arg name="depth_fps" value="30" /> 
-		<arg name="align_depth" value="true" /> 
-		<arg name="initial_reset" value="true" /> 
-		<arg name="enable_sync" value="true" /> 
-	</include>
-
-	<node name="pos_265" pkg="mavros" type="pos_265" />
-
     <!-- Launch mavros_extras visualization.cpp to show in rviz, DOESNT SEEM TO PUBLISH-->
     <node name="drone_rviz" pkg="mavros_extras" type="visualization" />
 
     </group>
+
+	<node pkg="tf_publisher" type="tf_broadcaster" name="tf_broadcaster_$(env DRONE_NAME)" output="screen"/>
+	
 </launch>

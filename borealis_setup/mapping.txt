@@ -1,1 +1,29 @@
-ceres -non linear solver, state estimation packages
+#!/bin/bash
+
+# Setup script for borealis mapping
+
+# Install ceres -non linear solver, state estimation packages
+
+cd ~
+mkdir mapping_ws/src
+cd mapping_ws
+catkin init
+cd mapping_ws/src
+
+git clone https://ceres-solver.googlesource.com/ceres-solver.git
+# CMake
+sudo apt-get install cmake -y
+# google-glog + gflags
+sudo apt-get install libgoogle-glog-dev libgflags-dev -y
+# Use ATLAS for BLAS & LAPACK
+sudo apt-get install libatlas-base-dev -y
+# Eigen3
+sudo apt-get install libeigen3-dev -y
+# SuiteSparse and CXSparse (optional)
+sudo apt-get install libsuitesparse-dev -y
+
+
+git clone https://github.com/Kian-Wee/A-LOAM.git
+git clone https://github.com/Kian-Wee/ouster_example.git
+
+

@@ -2,12 +2,10 @@
 
     <!-- Launch script for multidrone/swarm with prefix-->
     <group ns="$(env DRONE_NAME)">
-	<!-- vim: set ft=xml noet : -->
-	<!-- example launch script for PX4 based FCU's -->
 	
 	<!-- <arg name="fcu_url" default="udp://:14540@localhost:14557" /> same as the bottom --> 
 	<arg name="fcu_url" default="/dev/ttyPixhawk:921600" /> 
-	<arg name="gcs_url" default="udp://:14555@"  />
+	<arg name="gcs_url" default="udp://:$(env GCS_PORT)@"  />
 	<arg name="tgt_system" default="1" />
 	<arg name="tgt_component" default="1" />
 	<arg name="log_output" default="screen" />
@@ -27,15 +25,31 @@
 		<arg name="respawn_mavros" default="$(arg respawn_mavros)" />
 	</include>
 
-    <include file="$(find realsense2_camera)/launch/rs_camera.launch">
-	<arg name="camera" value="d435"/>
-        <arg name="tf_prefix" value="d435"/>
-    </include>
+	<include file="$(find realsense2_camera)/launch/rs_t265.launch">
+		<arg name="camera" value="t265" />
+		<arg name="tf_prefix" value="t265" />
+		<arg name="serial_no" value="$(env T265_ID)" />
+	</include>
 
-    <include file="$(find realsense2_camera)/launch/rs_t265.launch">
-	<arg name="camera" value="t265"/>
-        <arg name="tf_prefix" value="t265"/>
-    </include>
+	<include file="$(find realsense2_camera)/launch/rs_camera.launch">
+		<arg name="camera" value="d435" />
+		<arg name="tf_prefix" value="d435" />
+		<arg name="serial_no" value="$(env D435_ID)" />
+		<arg name="color_width" value="848" />
+		<arg name="color_height" value="480" />
+		<arg name="color_fps" value="30" />
+		<arg name="depth_width" value="848" /> 
+		<arg name="depth_height" value="480" /> 
+		<arg name="depth_fps" value="30" /> 
+		<arg name="align_depth" value="true" /> 
+		<arg name="initial_reset" value="true" /> 
+		<arg name="enable_sync" value="true" /> 
+	</include>
+
+	<node name="pos_265" pkg="mavros" type="pos_265" />
+
+	<arg name="global_origin" default="odom" />
+	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_$(env DRONE_NAME)" args="$(env UAV_X)  $(env UAV_Y) $(env UAV_Z) 0 0 0 1 $(arg global_origin) $(env DRONE_NAME)/t265_odom_frame 5" />
 
 <!--
     <node pkg="tf" type="static_transform_publisher" name="d455_to_t265_link" args="0.0111 0 -0.05 0 0 0 t265_link d455_link 50" />
@@ -43,4 +57,7 @@
    --> 
 
     </group>
+
+	<node pkg="tf_publisher" type="tf_broadcaster" name="tf_broadcaster_$(env DRONE_NAME)" output="screen"/>
+
 </launch>

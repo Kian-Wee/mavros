@@ -2,12 +2,10 @@
 
     <!-- Launch script for multidrone/swarm with prefix-->
     <group ns="$(env DRONE_NAME)">
-	<!-- vim: set ft=xml noet : -->
-	<!-- example launch script for PX4 based FCU's -->
 	
 	<!-- <arg name="fcu_url" default="udp://:14540@localhost:14557" /> same as the bottom  -->
 	<arg name="fcu_url" default="/dev/ttyPixhawk:921600" />
-	<arg name="gcs_url" default="udp://:14555@"  />
+	<arg name="gcs_url" default="udp://:$(env GCS_PORT)@"  />
 	<arg name="tgt_system" default="1" />
 	<arg name="tgt_component" default="1" />
 	<arg name="log_output" default="screen" />
@@ -28,10 +26,10 @@
 	</include>
 
 	<arg name="global_origin" default="odom" />
-
-	<arg name="uav1_origin" default="uav1/t265_odom_frame" />
-
-	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_$(env DRONE_NAME)" args="$(env UAV_X)  $(env UAV_Y) $(env UAV_Z) 0 0 0 1 $(arg global_origin) $(arg uav1_origin) 100" />
+	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_$(env DRONE_NAME)" args="$(env UAV_X)  $(env UAV_Y) $(env UAV_Z) 0 0 0 1 $(arg global_origin) $(env DRONE_NAME)/t265_odom_frame 5" />
 
     </group>
+
+	<node pkg="tf_publisher" type="tf_broadcaster" name="tf_broadcaster_$(env DRONE_NAME)" output="screen"/>
+
 </launch>
