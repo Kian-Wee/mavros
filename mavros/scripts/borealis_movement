@@ -91,21 +91,21 @@ class borealis_movement:
         #self.pub_vel = rospy.Publisher('mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
         #self.message_pub = rospy.Publisher("/mavros/actuator_control", ActuatorControl, queue_size=10)
 
-        rospy.Subscriber("/uav1/mavros/local_position/pose", PoseStamped, self.position_callback)
-        rospy.Subscriber("/uav2/mavros/local_position/pose", PoseStamped, self.position_1_callback)
+        rospy.Subscriber("sim/uav1/mavros/local_position/pose", PoseStamped, self.position_callback)
+        rospy.Subscriber("sim/uav2/mavros/local_position/pose", PoseStamped, self.position_1_callback)
         
         rospy.Subscriber("/final_trajectory_pose_0", PoseStamped, self.traj_0_callback)
         rospy.Subscriber("/final_trajectory_pose_1", PoseStamped, self.traj_1_callback)
         rospy.Subscriber("/final_trajectory", PiecewiseTrajectory, self.traj_callback)
         rospy.Subscriber("/planner_activation", Bool, self.activation_callback)
 
-        self.pub_pos = rospy.Publisher('/uav1/mavros/setpoint_raw/target_local', PositionTarget, queue_size=10)
-        self.pub_spt = rospy.Publisher('/uav1/mavros/setpoint_position/local', PoseStamped, queue_size=10)
-        self.pub_vel = rospy.Publisher('/uav1/mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
+        self.pub_pos = rospy.Publisher('sim/uav1/mavros/setpoint_raw/target_local', PositionTarget, queue_size=10)
+        self.pub_spt = rospy.Publisher('sim/uav1/mavros/setpoint_position/local', PoseStamped, queue_size=10)
+        self.pub_vel = rospy.Publisher('sim/uav1/mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
 
-        self.pub_pos_1 = rospy.Publisher('/uav2/mavros/setpoint_raw/target_local', PositionTarget, queue_size=10)
-        self.pub_spt_1 = rospy.Publisher('/uav2/mavros/setpoint_position/local', PoseStamped, queue_size=10)
-        self.pub_vel_1 = rospy.Publisher('/uav2/mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
+        self.pub_pos_1 = rospy.Publisher('sim/uav2/mavros/setpoint_raw/target_local', PositionTarget, queue_size=10)
+        self.pub_spt_1 = rospy.Publisher('sim/uav2/mavros/setpoint_position/local', PoseStamped, queue_size=10)
+        self.pub_vel_1 = rospy.Publisher('sim/uav2/mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
         #self.message_pub = rospy.Publisher("mavros/actuator_control", ActuatorControl, queue_size=10)
 
         #rospy.wait_for_service('/mavros/cmd/command', 30)
