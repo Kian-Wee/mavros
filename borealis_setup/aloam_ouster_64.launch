@@ -1,0 +1,27 @@
+<launch>
+    
+    <param name="scan_line" type="int" value="64" />
+
+    <!-- if 1, do mapping 10 Hz, if 2, do mapping 5 Hz. Suggest to use 1, it will adjust frequence automaticlly -->
+    <param name="mapping_skip_frame" type="int" value="1" />
+
+    <!-- remove too closed points -->
+    <param name="minimum_range" type="double" value="1"/>
+
+
+    <param name="mapping_line_resolution" type="double" value="0.4"/>
+    <param name="mapping_plane_resolution" type="double" value="0.8"/>
+
+    <node pkg="aloam_velodyne" type="ascanRegistration" name="$(env DRONE_NAME)_ascanRegistration" output="screen" />
+
+    <node pkg="aloam_velodyne" type="alaserOdometry" name="$(env DRONE_NAME)_alaserOdometry" output="screen" />
+
+    <node pkg="aloam_velodyne" type="alaserMapping" name="$(env DRONE_NAME)_alaserMapping" output="screen" />
+
+    <arg name="global_origin" default="odom" />
+
+<group ns="$(env DRONE_NAME)">
+    <node pkg="tf" type="static_transform_publisher" name="aloam_transform_publisher" args="0 0 0 0 0 0 1 $(env DRONE_NAME)/os_sensor $(env DRONE_NAME)/camera_init 100" />
+</group>
+
+</launch>
