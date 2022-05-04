@@ -25,6 +25,7 @@ import thread
 import threading
 import time
 import mavros
+import os
 
 import numpy as np
 #import sys, select, termios, tty
@@ -43,6 +44,7 @@ from sensor_msgs.msg import NavSatFix,Range,LaserScan #type
 from rlss_ros.msg import dyn_params, PiecewiseTrajectory, Bezier 
 #from teraranger_array.msg import RangeArray
 
+id = os.getenv('DRONE_NUMBER') #environment variable set in bashrc(or exported in terminal)
 
 class borealis_movement:
     """
@@ -103,7 +105,7 @@ class borealis_movement:
         #self.pub_vel = rospy.Publisher('mavros/setpoint_velocity/cmd_vel', TwistStamped, queue_size=10)
         #self.message_pub = rospy.Publisher("/mavros/actuator_control", ActuatorControl, queue_size=10)
 
-        rospy.Subscriber("/uav" + id+ "/mavros/local_position/pose", PoseStamped, self.position_callback) # need to change to env variables for id
+        rospy.Subscriber("/uav" + id + "/mavros/local_position/pose", PoseStamped, self.position_callback) # need to change to env variables for id
         
         rospy.Subscriber("/uav" + id + "/final_trajectory_pose", PoseStamped, self.traj_0_callback) # edit this tmr to include the env var for id
         rospy.Subscriber("/final_trajectory_pose_1", PoseStamped, self.traj_1_callback)
@@ -112,9 +114,9 @@ class borealis_movement:
         # rospy.Subscriber("/yaw3dk", Float64, self.yaw_callback)
         
         # sweep motion towards dummy        
-        rospy.Subscriber("/uav1/command/yaw", Float64, self.yaw_callback)
-        rospy.Subscriber("/sweep", Bool, self.sweep_callback)
-        rospy.Subscriber("/target_position", Point, self.dummy_pose_callback)
+        rospy.Subscriber("/uav" + id + "/command/yaw", Float64, self.yaw_callback)
+        rospy.Subscriber("/uav" + id + "/sweep", Bool, self.sweep_callback)
+        rospy.Subscriber("/uav" + id + "/target_position", Point, self.dummy_pose_callback)
         # rospy.Subscriber("/target_yaw", Float64, self.dummy_yaw_callback)
 
 
@@ -468,7 +470,7 @@ class borealis_movement:
    
     
 if __name__ == '__main__':
-    rospy.init_node('borealis_movement', anonymous=True)
+    rospy.init_node("/uav" + id + '_borealis_movement', anonymous=True)
 
     node = borealis_movement()
 
