@@ -49,6 +49,7 @@ from tf2_msgs.msg import TFMessage
 
 # drone_name="uav0"
 drone_name = os.getenv('DRONE_NAME') #environment variable set in bashrc(or exported in terminal)
+drone_number = os.getenv('DRONE_NUMBER') #environment variable set in bashrc(or exported in terminal)
 odom_frame_id=drone_name+"/t265_odom_frame"
 
 class vision:
@@ -72,6 +73,7 @@ class vision:
 
         rospy.Subscriber('/tf', TFMessage, self.callback_tf)
         rospy.Subscriber(drone_name + "/vins_estimator/camera_pose", PoseWithCovarianceStamped, self.pose_callback)
+        rospy.Subscriber("UAV" + drone_number+ "Pose", PoseWithCovarianceStamped, self.pose_callback)
         rospy.Subscriber(drone_name + "/mavros/local_position/pose", PoseStamped, self.position_callback)
         rospy.Subscriber(drone_name + "/mavros/vision_pose/pose", PoseStamped, self.vision_callback)
         self.pub_vis = rospy.Publisher(drone_name + '/mavros/vision_pose/pose', PoseStamped, queue_size=10)
