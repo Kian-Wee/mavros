@@ -26,10 +26,11 @@
 	</include>
 
 	<arg name="global_origin" default="odom" />
-	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_$(env DRONE_NAME)" args="$(env UAV_X)  $(env UAV_Y) $(env UAV_Z) 0 0 0 1 $(arg global_origin) $(env DRONE_NAME)/t265_odom_frame 5" />
-
+	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher" args="$(env UAV_X) $(env UAV_Y) $(env UAV_Z) 0 0 0 1 $(arg global_origin) $(env DRONE_NAME) 5" />
+	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_t265" args="0 0 0 0 0 0 1 $(env DRONE_NAME) $(env DRONE_NAME)/t265_odom_frame 5" />
+	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_d435i" args="0 0 0 0 0 0 1 $(env DRONE_NAME) $(env DRONE_NAME)/d435i_link 5" />
     </group>
 
-	<node pkg="tf_publisher" type="tf_broadcaster" name="tf_broadcaster_$(env DRONE_NAME)" output="screen"/>
+	<!-- <node pkg="tf_publisher" type="tf_broadcaster" name="tf_broadcaster_$(env DRONE_NAME)" output="screen"/> -->
 
 </launch>

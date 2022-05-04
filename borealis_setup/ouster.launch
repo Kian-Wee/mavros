@@ -35,5 +35,8 @@
     <param name="~/tf_prefix" value="$(arg tf_prefix)"/>
   </node>
 
-  <node pkg="tf" type="static_transform_publisher" name="ouster_static_transform_publisher_$(env DRONE_NAME)" args="0 0 0 0 0 0 1 $(env DRONE_NAME)/t265_pose_frame $(env DRONE_NAME)/os_sensor 100" />
+<group ns="$(env DRONE_NAME)">
+  <node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_ouster" args="0 0 0 0 0 0 1 $(env DRONE_NAME) $(env DRONE_NAME)/os_sensor 100" />
+</group>
+
 </launch>
