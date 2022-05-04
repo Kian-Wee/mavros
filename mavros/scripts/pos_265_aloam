@@ -72,7 +72,7 @@ class vision:
         # rospy.Subscriber("subscribed topic",topic type,callback invoked with the message as the first arg)  
 
         rospy.Subscriber('/tf', TFMessage, self.callback_tf)
-        rospy.Subscriber("/aft_mapped_to_init", Odometry, self.pose_callback)
+        rospy.Subscriber(drone_name + "/aft_mapped_to_init", Odometry, self.pose_callback)
         rospy.Subscriber(drone_name + "/mavros/local_position/pose", PoseStamped, self.position_callback)
         rospy.Subscriber(drone_name + "/mavros/vision_pose/pose", PoseStamped, self.vision_callback)
         self.pub_vis = rospy.Publisher(drone_name + '/mavros/vision_pose/pose', PoseStamped, queue_size=10)
