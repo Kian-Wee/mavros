@@ -60,6 +60,7 @@ alias launch_borealis='. ~/parallel_comments.bash "sudo ntpdate -s time.nist.gov
 alias launch_borealis2='. ~/parallel_comments.bash "sudo ntpdate -s time.nist.gov" "roslaunch mavros px4_swarm_realsense.launch" "python ~/catkin_ws/src/PX4-Lights/buzzer_ros.py"'
 # Launch Borealis with Ouster tracking, also launches Ouster
 alias launch_borealis_ouster='. ~/parallel_comments.bash "sudo ntpdate -s time.nist.gov" "roslaunch mavros px4_swarm.launch" "roslaunch realsense2_camera rs_t265.launch camera:=$DRONE_NAME/t265 serial_no:=$T265_ID --wait" "rosrun mavros pos_265_ouster" "roslaunch realsense2_camera rs_camera.launch camera:=$DRONE_NAME/d435i serial_no:=$D435_ID color_width:=848 color_height:=480 color_fps:=30 depth_width:=848 depth_height:=480 depth_fps:=30 align_depth:=true initial_reset:=true enable_sync:=true --wait" "python ~/catkin_ws/src/PX4-Lights/buzzer_ros.py" "roslaunch ouster_ros ouster.launch sensor_hostname:="os1-991942000601.local"  metadata:="/home/borealis/ouster/ouster_example/ouster_meta.json" --wait" "roslaunch aloam_velodyne aloam_ouster_32_test.launch --wait"'
+alias launch_buzzer='python ~/catkin_ws/src/PX4-Lights/buzzer_ros.py'
 
 sudo ntpdate -s time.nist.gov
 EOF
