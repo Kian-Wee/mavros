@@ -152,7 +152,7 @@ class borealis_movement:
                             self.count = 1
                     else:
                         print "distract_0"
-	            	self.distract_x = self.pos_x_0
+	            	    self.distract_x = self.pos_x_0
                         self.distract_y = self.pos_y_0
                         self.distract_z = self.pos_z_0 
                         if abs(self.distract_x - self.local_position.pose.position.x) < self.tolerance and abs(self.distract_y - self.local_position.pose.position.y) < self.tolerance:
