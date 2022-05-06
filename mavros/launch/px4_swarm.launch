@@ -31,6 +31,6 @@
 	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_d435i" args="0 0 0 0 0 0 1 $(env DRONE_NAME) $(env DRONE_NAME)/d435i_link 5" />
     </group>
 
-	<!-- <node pkg="tf_publisher" type="tf_broadcaster" name="tf_broadcaster_$(env DRONE_NAME)" output="screen"/> -->
+	<node pkg="tf_publisher" type="tf_broadcaster" name="tf_broadcaster_$(env DRONE_NAME)" output="screen"/>
 
 </launch>

@@ -106,10 +106,10 @@ class vision:
                 self.filtered_estimator()
                 # print i, self.vision_position.pose.orientation.z, self.local_position.pose.position.z
                 if (self.vision_position.pose.orientation.z == None and self.local_position.pose.position.z == None) or (self.vision_position.pose.orientation.z == 0 and self.local_position.pose.position.z == 0):
-                    print("%s T265 and Mavros are offline" % (drone_name))
+                    print("%s Fused Estimate and Mavros are offline" % (drone_name))
                     time.sleep(1)
                 elif self.vision_position.pose.orientation.z == None or self.vision_position.pose.orientation.z == 0:
-                    print("%s T265 is offline" % (drone_name))
+                    print("%s Fused Estimate is offline" % (drone_name))
                 elif self.local_position.pose.position.z == None or self.local_position.pose.position.z == 0:
                     print("%s Mavros is offline" % (drone_name))
 

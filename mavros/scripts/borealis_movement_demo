@@ -90,7 +90,7 @@ class borealis_movement:
         self.distract_x = 0.0
         self.distract_y = 0.0
         self.distract_z = 0.0
-        self.offset_y = -0.7
+        self.offset_y = 0.9
         self.tolerance = 0.3
     
 
@@ -108,6 +108,7 @@ class borealis_movement:
         rospy.Subscriber("/uav" + id + "/mavros/local_position/pose", PoseStamped, self.position_callback) # need to change to env variables for id
         
         rospy.Subscriber("/uav" + id + "/final_trajectory_pose", PoseStamped, self.traj_0_callback) # edit this tmr to include the env var for id
+        # rospy.Subscriber("pose3dk", PoseStamped, self.traj_0_callback)
         rospy.Subscriber("/final_trajectory_pose_1", PoseStamped, self.traj_1_callback)
         rospy.Subscriber("/uav" + id + "/final_trajectory", PiecewiseTrajectory, self.traj_callback)
         rospy.Subscriber("/uav" + id + "/planner_activation", Bool, self.activation_callback)
@@ -154,7 +155,7 @@ class borealis_movement:
                             self.count = 1
                     else:
                         print "distract_0"
-	            	    self.distract_x = self.pos_x_0
+            	        self.distract_x = self.pos_x_0
                         self.distract_y = self.pos_y_0
                         self.distract_z = self.pos_z_0 
                         if abs(self.distract_x - self.local_position.pose.position.x) < self.tolerance and abs(self.distract_y - self.local_position.pose.position.y) < self.tolerance:
@@ -470,7 +471,7 @@ class borealis_movement:
    
     
 if __name__ == '__main__':
-    rospy.init_node("/uav" + id + '_borealis_movement', anonymous=True)
+    rospy.init_node("uav" + id + '_borealis_movement', anonymous=True)
 
     node = borealis_movement()
 
