@@ -11,7 +11,7 @@
 	<arg name="ID" value="1"/>
 	<!-- <arg name="gcs_url" default="udp://:14557@"/> -->
 	<arg name="gcs_url" default="udp://@"  />
-	<arg name="tgt_system" default="1" />
+	<arg name="tgt_system" default="$(env DRONE_NUMBER)" />
 	<arg name="tgt_component" default="1" />
 	<arg name="log_output" default="screen" />
 	<arg name="fcu_protocol" default="v2.0" />
