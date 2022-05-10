@@ -70,12 +70,12 @@ class borealis_movement:
         self.final_traj_0 = Pose()
         self.final_traj_1 = Pose()
         self.planner_activation = Bool()
-        self.pos_x_0 = Float64()
-        self.pos_y_0 = Float64()
-        self.pos_z_0 = Float64()
-        self.pos_x_1 = Float64()
-        self.pos_y_1 = Float64()
-        self.pos_z_1 = Float64()
+        self.pos_x_0 = 0.0
+        self.pos_y_0 = 0.0
+        self.pos_z_0 = 0.0
+        self.pos_x_1 = 0.0
+        self.pos_y_1 = 0.0
+        self.pos_z_1 = 0.0
         self.traj_0 = Bezier()
         self.traj_1 = Bezier()
         self.yaw = Float64()
@@ -343,7 +343,7 @@ class borealis_movement:
         quaternion = [qx,qy,qz,qw]  # drone only takes in quarternion values, therefore have to do euler to quarternion conversion
         pos.pose.orientation = Quaternion(*quaternion)
         
-        pos.header.stamp = self.final_traj_0.header.stamp # Update timestamp for each published SP
+        # pos.header.stamp = self.final_traj_0.header.stamp # Update timestamp for each published SP
 
         # Publishing to rostopic   
         self.pub_spt.publish(pos) # updated pose from pos.pose.orientation
@@ -471,7 +471,7 @@ class borealis_movement:
    
     
 if __name__ == '__main__':
-    rospy.init_node("uav" + id + '_borealis_movement', anonymous=True)
+    rospy.init_node("UAV" + id + '_borealis_movement', anonymous=True)
 
     node = borealis_movement()
 
