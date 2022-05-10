@@ -12,7 +12,7 @@ def blast3dk(xx, yy, zz, yaw):
     while not rospy.is_shutdown():
         #ros_3dk = PoseStamped()
         #ros_3dk.header = Header()
-        #ros_3dk.header.stamp = rospy.Time.now()
+        #ros_3dk.header.stamp = rospyQ.Time.now()
         ros_3dk = Vector3()
         yaw_3dk = Float64()
         yaw_3dk.data = yaw
