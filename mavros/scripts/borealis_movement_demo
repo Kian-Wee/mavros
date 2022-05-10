@@ -471,7 +471,7 @@ class borealis_movement:
    
     
 if __name__ == '__main__':
-    rospy.init_node("uav" + id + '_borealis_movement', anonymous=True)
+    rospy.init_node("UAV" + id + '_borealis_movement', anonymous=True)
 
     node = borealis_movement()
 
