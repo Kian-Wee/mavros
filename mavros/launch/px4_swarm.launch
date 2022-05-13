@@ -6,7 +6,9 @@
 	<!-- <arg name="fcu_url" default="udp://:14540@localhost:14557" /> same as the bottom  -->
 	<arg name="fcu_url" default="/dev/ttyPixhawk:921600" />
 	<arg name="gcs_url" default="udp://:$(env GCS_PORT)@"  />
-	<arg name="tgt_system" default="1" />
+	<!-- CURRENTLY DOES NOT WORK -->
+	<!-- <arg name="system_id" default="3"/> -->
+	<arg name="tgt_system" default="$(env DRONE_NUMBER)" />
 	<arg name="tgt_component" default="1" />
 	<arg name="log_output" default="screen" />
 	<arg name="fcu_protocol" default="v2.0" />
@@ -18,6 +20,7 @@
 
 		<arg name="fcu_url" value="$(arg fcu_url)" />
 		<arg name="gcs_url" value="$(arg gcs_url)" />
+		<arg name="system_id" value="$(arg system_id)" />
 		<arg name="tgt_system" value="$(arg tgt_system)" />
 		<arg name="tgt_component" value="$(arg tgt_component)" />
 		<arg name="log_output" value="$(arg log_output)" />
