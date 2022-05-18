@@ -23,6 +23,9 @@
 # Ensure that EKF2_AID_MASK has vision set to on if the local_position is not publishing
 
 # TODO, check for case whereby t265 or mavros disconnects
+# https://docs.px4.io/v1.12/en/ros/external_position_estimation.html
+
+# Reference
 
 from curses import A_ALTCHARSET
 import os
@@ -40,6 +43,8 @@ from geometry_msgs.msg import PoseStamped, Quaternion, TransformStamped, PoseWit
 from nav_msgs.msg import Odometry
 from tf2_msgs.msg import TFMessage
 
+import pyrealsense2 as rs #pip install pyrealsense2
+
 # drone_name="uav0"
 drone_name = os.getenv('DRONE_NAME') #environment variable set in bashrc(or exported in terminal)
 odom_frame_id=drone_name+"/t265_odom_frame"
@@ -53,6 +58,9 @@ global_z=os.getenv('UAV_Z')
 # Median Filter
 median_filter=False
 median_array_len=15
+
+# Clear T265(Beta)
+
 
 class vision:
     """
@@ -90,6 +98,8 @@ class vision:
         self.y_list = []
         self.z_list = []
         self.median_init = False
+
+        self.reset_t265()
       
         rospy.on_shutdown(self.quit)
 
@@ -219,6 +229,14 @@ class vision:
     def quit(self):
         print('POS_265 IS SHUTTING DOWN')
         rospy.signal_shutdown("POS_265 SHUTTING DOWN")
+
+    def reset_t265(self):
+        ctx = rs.context()
+        devices = ctx.query_devices()
+        for dev in devices:
+            dev.hardware_reset()
+            time.sleep(1)
+
 
 if __name__ == '__main__':
     rospy.init_node(drone_name + '_vision', anonymous=True)
