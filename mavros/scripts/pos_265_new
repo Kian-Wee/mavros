@@ -29,7 +29,6 @@
 
 from curses import A_ALTCHARSET
 import os
-from re import A
 
 import rospy
 import thread
@@ -43,7 +42,7 @@ from geometry_msgs.msg import PoseStamped, Quaternion, TransformStamped, PoseWit
 from nav_msgs.msg import Odometry
 from tf2_msgs.msg import TFMessage
 
-import pyrealsense2 as rs #pip install pyrealsense2
+# import pyrealsense2 as rs #pip install pyrealsense2
 
 # drone_name="uav0"
 drone_name = os.getenv('DRONE_NAME') #environment variable set in bashrc(or exported in terminal)
@@ -71,8 +70,8 @@ class vision:
         '''
         CHANGE THIS BASED ON THE POSITIONING SOURCE TO BE FUSED
         '''
-        # rospy.Subscriber('/tf', TFMessage, self.vision_callback) # Fuse from TF
-        rospy.Subscriber(drone_name + "/aft_mapped_to_init", Odometry, self.vision_callback)
+        rospy.Subscriber('/tf', TFMessage, self.vision_callback) # Fuse from TF
+        # rospy.Subscriber(drone_name + "/aft_mapped_to_init", Odometry, self.vision_callback)
         # rospy.Subscriber(drone_name + "/vins_estimator/camera_pose", PoseWithCovarianceStamped, self.vision_callback)
 
         # Temporary variables to store the incoming vision position and orientation data topics
@@ -119,57 +118,50 @@ class vision:
 
     # Callback for position from position source, if this topic if offline, the position source is not publishing
     def vision_callback(self, data):
-        
-        # Check for different data types
-        if data._type== "nav_msgs/Odometry" or data._type== "geometry_msgs/PoseWithCovarianceStamped":
-            self.x=data.pose.pose.position.x
-            self.y=data.pose.pose.position.y
-            self.z=data.pose.pose.position.z
-            self.qx=data.pose.pose.orientation.x
-            self.qy=data.pose.pose.orientation.y
-            self.qz=data.pose.pose.orientation.z
 
         # If TF is used as the as the position
-        elif data._type=="tf/tfMessage" and data.transforms[0].header.frame_id == odom_frame_id:
-            self.x = data.transforms[0].transform.translation.x
-            self.y = data.transforms[0].transform.translation.y
-            self.z = data.transforms[0].transform.translation.z
-            self.rx = data.transforms[0].transform.rotation.x
-            self.ry = data.transforms[0].transform.rotation.y
-            self.rz = data.transforms[0].transform.rotation.z
-            self.rw = data.transforms[0].transform.rotation.w
-
-        elif data._type== "geometry_msgs/PoseStamped":
-            self.x=data.pose.position.x
-            self.y=data.pose.position.y
-            self.z=data.pose.position.z
-            self.qx=data.pose.orientation.x
-            self.qy=data.pose.orientation.y
-            self.qz=data.pose.orientation.z    
+        if data._type=="tf2_msgs/TFMessage":
+            if data.transforms[0].header.frame_id == odom_frame_id:
+                self.x = data.transforms[0].transform.translation.x
+                self.y = data.transforms[0].transform.translation.y
+                self.z = data.transforms[0].transform.translation.z
+                self.rx = data.transforms[0].transform.rotation.x
+                self.ry = data.transforms[0].transform.rotation.y
+                self.rz = data.transforms[0].transform.rotation.z
+                self.rw = data.transforms[0].transform.rotation.w
 
         else:
-            print("Unsupported vision message type")
+            # Check for different data types
+            if data._type== "nav_msgs/Odometry" or data._type== "geometry_msgs/PoseWithCovarianceStamped":
+                self.x=data.pose.pose.position.x
+                self.y=data.pose.pose.position.y
+                self.z=data.pose.pose.position.z
+                self.qx=data.pose.pose.orientation.x
+                self.qy=data.pose.pose.orientation.y
+                self.qz=data.pose.pose.orientation.z
+
+
+
+            elif data._type== "geometry_msgs/PoseStamped":
+                self.x=data.pose.position.x
+                self.y=data.pose.position.y
+                self.z=data.pose.position.z
+                self.qx=data.pose.orientation.x
+                self.qy=data.pose.orientation.y
+                self.qz=data.pose.orientation.z    
+
+            else:
+                print("Unsupported vision message type")
         
 
         # Change to global/system coordiantes if prompted
         if global_positioning==True:
             self.global_positioning()
 
-    # # If TF is used as the as the position
-    # def callback_tf(self,data):
-    #     if data.transforms[0].header.frame_id == odom_frame_id:
-    #         self.x = data.transforms[0].transform.translation.x
-    #         self.y = data.transforms[0].transform.translation.y
-    #         self.z = data.transforms[0].transform.translation.z
-    #         self.rx = data.transforms[0].transform.rotation.x
-    #         self.ry = data.transforms[0].transform.rotation.y
-    #         self.rz = data.transforms[0].transform.rotation.z
-    #         self.rw = data.transforms[0].transform.rotation.w
-
     def global_positioning(self):
-        self.x += global_x
-        self.y += global_y
-        self.z += global_z
+        self.x += float(global_x)
+        self.y += float(global_y)
+        self.z += float(global_z)
     
     def filtered_estimator(self):
         
@@ -205,6 +197,7 @@ class vision:
             time.sleep(1)
         elif self.z == None or self.z == 0:
             print("%s Position Source is offline" % (drone_name))
+            time.sleep(1)
         elif self.local_position.pose.position.z == None or self.local_position.pose.position.z == 0:
             print("%s Mavros is offline" % (drone_name))
             time.sleep(1)
@@ -231,11 +224,12 @@ class vision:
         rospy.signal_shutdown("POS_265 SHUTTING DOWN")
 
     def reset_t265(self):
-        ctx = rs.context()
-        devices = ctx.query_devices()
-        for dev in devices:
-            dev.hardware_reset()
-            time.sleep(1)
+        pass
+    #     ctx = rs.context()
+    #     devices = ctx.query_devices()
+    #     for dev in devices:
+    #         dev.hardware_reset()
+    #         time.sleep(1)
 
 
 if __name__ == '__main__':

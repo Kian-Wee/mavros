@@ -29,13 +29,13 @@
 	</include>
 
 	<include file="$(find realsense2_camera)/launch/rs_t265.launch">
-		<arg name="camera" value="$(env DRONE_NAME)/t265" />
+		<arg name="camera" value="t265" />
 		<arg name="tf_prefix" value="$(env DRONE_NAME)/t265" />
 		<arg name="serial_no" value="$(env T265_ID)" />
 	</include>
 
 	<include file="$(find realsense2_camera)/launch/rs_camera.launch">
-		<arg name="camera" value="$(env DRONE_NAME)/d435i" />
+		<arg name="camera" value="d435i" />
 		<arg name="tf_prefix" value="$(env DRONE_NAME)/d435i" />
 		<arg name="serial_no" value="$(env D435_ID)" />
 		<arg name="color_width" value="848" />
@@ -49,8 +49,6 @@
 		<arg name="enable_sync" value="true" /> 
 	</include>
 
-	<node name="pos_265" pkg="mavros" type="pos_265" />
-
 	<arg name="global_origin" default="odom" />
 	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher" args="$(env UAV_X) $(env UAV_Y) $(env UAV_Z) 0 0 0 1 $(arg global_origin) $(env DRONE_NAME) 5" />
 	<node pkg="tf" type="static_transform_publisher" name="static_transform_publisher_t265" args="0 0 0 0 0 0 1 $(env DRONE_NAME) $(env DRONE_NAME)/t265_odom_frame 5" />
@@ -62,6 +60,8 @@
    --> 
 
     </group>
+
+	<node name="pos_265_new" pkg="mavros" type="pos_265_new" />
 
 	<!-- <node pkg="tf_publisher" type="tf_broadcaster" name="tf_broadcaster_$(env DRONE_NAME)" output="screen"/> -->
 
