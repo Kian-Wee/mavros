@@ -136,19 +136,19 @@ class vision:
                 self.x=data.pose.pose.position.x
                 self.y=data.pose.pose.position.y
                 self.z=data.pose.pose.position.z
-                self.qx=data.pose.pose.orientation.x
-                self.qy=data.pose.pose.orientation.y
-                self.qz=data.pose.pose.orientation.z
-
-
+                self.rx=data.pose.pose.orientation.x
+                self.ry=data.pose.pose.orientation.y
+                self.rz=data.pose.pose.orientation.z
+                self.rw=data.pose.pose.orientation.w
 
             elif data._type== "geometry_msgs/PoseStamped":
                 self.x=data.pose.position.x
                 self.y=data.pose.position.y
                 self.z=data.pose.position.z
-                self.qx=data.pose.orientation.x
-                self.qy=data.pose.orientation.y
-                self.qz=data.pose.orientation.z    
+                self.rx=data.pose.orientation.x
+                self.ry=data.pose.orientation.y
+                self.rz=data.pose.orientation.z 
+                self.rw=data.pose.orientation.w   
 
             else:
                 print("Unsupported vision message type")
