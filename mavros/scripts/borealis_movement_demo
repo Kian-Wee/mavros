@@ -115,7 +115,7 @@ class borealis_movement:
         # rospy.Subscriber("/yaw3dk", Float64, self.yaw_callback)
         
         # sweep motion towards dummy        
-        rospy.Subscriber("/uav" + id + "/command/yaw", Float64, self.yaw_callback)
+        rospy.Subscriber("/uav" + id + "/command/yaw/out", Float64, self.yaw_callback)
         rospy.Subscriber("/uav" + id + "/sweep", Bool, self.sweep_callback)
         rospy.Subscriber("/uav" + id + "/target_position", Point, self.dummy_pose_callback)
         # rospy.Subscriber("/target_yaw", Float64, self.dummy_yaw_callback)

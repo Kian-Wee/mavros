@@ -1,0 +1,5 @@
+<launch>
+    <machine name="uav1" address="192.168.1.62">
+	<include file="$(find mavros)/launch/px4_swarm_realsense.launch">
+	</machine>
+</launch>
