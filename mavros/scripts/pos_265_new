@@ -122,9 +122,9 @@ class vision:
         # If TF is used as the as the position
         if data._type=="tf2_msgs/TFMessage":
             if data.transforms[0].header.frame_id == odom_frame_id:
-                self.x = data.transforms[0].transform.translation.x
-                self.y = data.transforms[0].transform.translation.y
-                self.z = data.transforms[0].transform.translation.z
+                self.x = data.transforms[0].transform.translation.x + float(global_x)
+                self.y = data.transforms[0].transform.translation.y + float(global_y)
+                self.z = data.transforms[0].transform.translation.z + float(global_z)
                 self.rx = data.transforms[0].transform.rotation.x
                 self.ry = data.transforms[0].transform.rotation.y
                 self.rz = data.transforms[0].transform.rotation.z
@@ -133,18 +133,18 @@ class vision:
         else:
             # Check for different data types
             if data._type== "nav_msgs/Odometry" or data._type== "geometry_msgs/PoseWithCovarianceStamped":
-                self.x=data.pose.pose.position.x
-                self.y=data.pose.pose.position.y
-                self.z=data.pose.pose.position.z
+                self.x=data.pose.pose.position.x + float(global_x)
+                self.y=data.pose.pose.position.y + float(global_y)
+                self.z=data.pose.pose.position.z + float(global_z)
                 self.rx=data.pose.pose.orientation.x
                 self.ry=data.pose.pose.orientation.y
                 self.rz=data.pose.pose.orientation.z
                 self.rw=data.pose.pose.orientation.w
 
             elif data._type== "geometry_msgs/PoseStamped":
-                self.x=data.pose.position.x
-                self.y=data.pose.position.y
-                self.z=data.pose.position.z
+                self.x=data.pose.position.x + float(global_x)
+                self.y=data.pose.position.y + float(global_y)
+                self.z=data.pose.position.z + float(global_z)
                 self.rx=data.pose.orientation.x
                 self.ry=data.pose.orientation.y
                 self.rz=data.pose.orientation.z 
@@ -154,14 +154,14 @@ class vision:
                 print("Unsupported vision message type")
         
 
-        # Change to global/system coordiantes if prompted
-        if global_positioning==True:
-            self.global_positioning()
+        # # Change to global/system coordiantes if prompted
+        # if global_positioning==True:
+        #     self.global_positioning()
 
-    def global_positioning(self):
-        self.x += float(global_x)
-        self.y += float(global_y)
-        self.z += float(global_z)
+    # def global_positioning(self):
+    #     self.x += float(global_x)
+    #     self.y += float(global_y)
+    #     self.z += float(global_z)
     
     def filtered_estimator(self):
         
