@@ -39,6 +39,7 @@ from std_msgs.msg import Float64, Float32, Int32 #type from msg generation
 from geometry_msgs.msg import PoseStamped, Pose, Quaternion, TwistStamped, Twist, Point #geometry
 #from tf.transformations import quaternion_from_euler #transformation
 from mavros_msgs.srv import CommandLong #service_class
+from nav_msgs.msg import Path
 from mavros_msgs.msg import PositionTarget,ActuatorControl
 from sensor_msgs.msg import NavSatFix,Range,LaserScan #type
 from rlss_ros.msg import dyn_params, PiecewiseTrajectory, Bezier 
@@ -92,6 +93,7 @@ class borealis_movement:
         self.distract_z = 0.0
         self.offset_y = 0.9
         self.tolerance = 0.3
+        self.whole = Path()
     
 
         # rospy.wait_for_service('mavros/cmd/arming', 30) # wait for arming, queue for 30s  # this bitch statement gives alot of problem
@@ -110,6 +112,7 @@ class borealis_movement:
         rospy.Subscriber("/uav" + id + "/final_trajectory_pose", PoseStamped, self.traj_0_callback) # edit this tmr to include the env var for id
         # rospy.Subscriber("pose3dk", PoseStamped, self.traj_0_callback)
         rospy.Subscriber("/final_trajectory_pose_1", PoseStamped, self.traj_1_callback)
+        rospy.Subscriber("/uav" + id + "/whole_trajectory_pose", Path, self.whole_traj_callback)
         rospy.Subscriber("/uav" + id + "/final_trajectory", PiecewiseTrajectory, self.traj_callback)
         rospy.Subscriber("/uav" + id + "/planner_activation", Bool, self.activation_callback)
         # rospy.Subscriber("/yaw3dk", Float64, self.yaw_callback)
@@ -123,6 +126,7 @@ class borealis_movement:
 
         # need to change to env variables
         self.pub_pos = rospy.Publisher("/uav" + id + "/mavros/setpoint_raw/local", PositionTarget, queue_size=10)
+        self.pub_traj = rospy.Publisher("/uav" + id + "/edited_whole_trajectory_pose", Path, queue_size=10)
         self.pub_spt = rospy.Publisher("/uav" + id + "/mavros/setpoint_position/local", PoseStamped, queue_size=10)
         self.pub_vel = rospy.Publisher("/uav" + id + "/mavros/setpoint_velocity/cmd_vel", TwistStamped, queue_size=10)
         #self.message_pub = rospy.Publisher("mavros/actuator_control", ActuatorControl, queue_size=10)
@@ -172,6 +176,14 @@ class borealis_movement:
                 self.count = 0
             
             self.rate.sleep()
+
+
+    def whole_traj_callback(self, data):
+        temp = Path()
+        temp = data
+        self.whole.header.frame_id = "odom"
+        self.whole.poses = temp.poses
+        self.pub_traj.publish(self.whole)
 
 
     def position_callback(self, data): # callback invoked with the message as the first arg
