@@ -23,140 +23,199 @@
 # Ensure that EKF2_AID_MASK has vision set to on if the local_position is not publishing
 
 # TODO, check for case whereby t265 or mavros disconnects
+# https://docs.px4.io/v1.12/en/ros/external_position_estimation.html
+# TODO FIX RW
 
+# Reference
+
+from curses import A_ALTCHARSET
 import os
 
 import rospy
 import thread
 import threading
 import time
-import mavros
 
-from numpy import linalg #linear algebra, can be used to find things like eigenvectors etc.
 import numpy as np
 
-from math import *
-from mavros.utils import *
-from mavros import setpoint as SP
 from std_msgs.msg import Header #type 
-from std_msgs.msg import Float64, Float32 #type from msg generation
-from geometry_msgs.msg import PoseStamped, Quaternion, TwistStamped, TransformStamped #geometry
-# from tf.transformations import quaternion_from_euler #transformation
-from mavros_msgs.srv import CommandLong #service_class
-from mavros_msgs.msg import PositionTarget,Thrust,AttitudeTarget
-from sensor_msgs.msg import NavSatFix,Range #type
+from geometry_msgs.msg import PoseStamped, Quaternion, TransformStamped, PoseWithCovarianceStamped #geometry
+from nav_msgs.msg import Odometry
 from tf2_msgs.msg import TFMessage
+
+# import pyrealsense2 as rs #pip install pyrealsense2
 
 # drone_name="uav0"
 drone_name = os.getenv('DRONE_NAME') #environment variable set in bashrc(or exported in terminal)
 odom_frame_id=drone_name+"/t265_odom_frame"
 
+# Global Positioning, when set to true, the data is transformed to the global/system frame as defined in the system variables, currently assumes fixed and same orientation during initalisation
+global_positioning=True
+global_x=os.getenv('UAV_X')
+global_y=os.getenv('UAV_Y')
+global_z=os.getenv('UAV_Z')
+
+# Median Filter
+median_filter=False
+median_array_len=15
+
+# Clear T265(Beta)
+
+
 class vision:
     """
-    This class sends position targets to FCU's position controller
+    This class sends positioning information to the mavros node via the vision_pose/pose topic, allowing for position mode hold
     """
     def __init__(self):
-        self.y = 0.0
+
+        '''
+        CHANGE THIS BASED ON THE POSITIONING SOURCE TO BE FUSED
+        '''
+        # rospy.Subscriber('/tf', TFMessage, self.vision_callback) # Fuse from TF
+        rospy.Subscriber(drone_name + "/aft_mapped_to_init", Odometry, self.vision_callback)
+        # rospy.Subscriber(drone_name + "/vins_estimator/camera_pose", PoseWithCovarianceStamped, self.vision_callback)
+
+        # Temporary variables to store the incoming vision position and orientation data topics
         self.x = 0.0
+        self.y = 0.0
         self.z = 0.0
         self.rx = 0.0
         self.ry = 0.0
-        self.rz = 0.0  
-        self.rate = rospy.Rate(50) # 10hz is the original 
-        self.local_position = PoseStamped() 
-        self.vision_position = PoseStamped() 
-        self.camera_pose = TransformStamped() 
+        self.rz = 0.0
+        self.rw = 0.0  
 
-        # rospy.Subscriber("subscribed topic",topic type,callback invoked with the message as the first arg)  
+        self.rate = rospy.Rate(50) # Rate of position source, mavros requires posestamped message at minimum 50hz and posestampedwithcovariance at 30hz
 
-        rospy.Subscriber('/tf', TFMessage, self.callback_tf)
+        # Callback for local mavros position
+        self.local_position = PoseStamped()
         rospy.Subscriber(drone_name + "/mavros/local_position/pose", PoseStamped, self.position_callback)
-        rospy.Subscriber(drone_name + "/mavros/vision_pose/pose", PoseStamped, self.vision_callback)
+
+        # Publisher for vision_pose/pose topic
         self.pub_vis = rospy.Publisher(drone_name + '/mavros/vision_pose/pose', PoseStamped, queue_size=10)
+
+        # For median filter
         self.x_list = []
         self.y_list = []
         self.z_list = []
-        i = 0.0
+        self.median_init = False
+
+        self.reset_t265()
       
         rospy.on_shutdown(self.quit)
 
-        while not rospy.is_shutdown(): #subsequent functions below are automatically run using this while loop (inert functions)  
-            #self.arm() 
+        while not rospy.is_shutdown():
 
-            if i < 15:
-                #self.x_list.append(self.local_position.pose.position.x) 
-                self.y_list.append(self.y) 
-                self.x_list.append(self.x) 
-                self.z_list.append(self.z) 
-                i += 1
+            if median_filter==True:
+                x,y,z = self.median_fn()
+                self.position_publisher(x,y,z,self.rx,self.ry,self.rz,self.rw)
             else:
-                self.filtered_y = np.median(self.y_list)
-                self.filtered_x = np.median(self.x_list)
-                self.filtered_z = np.median(self.z_list)
-                self.y_list.pop(0)
-                self.x_list.pop(0)
-                self.z_list.pop(0)
-                self.y_list.append(self.y) 
-                self.x_list.append(self.x) 
-                self.z_list.append(self.z) 
-                self.filtered_estimator()
-                # print i, self.vision_position.pose.orientation.z, self.local_position.pose.position.z
-                if (self.vision_position.pose.orientation.z == None and self.local_position.pose.position.z == None) or (self.vision_position.pose.orientation.z == 0 and self.local_position.pose.position.z == 0):
-                    print("%s T265 and Mavros are offline" % (drone_name))
-                    time.sleep(1)
-                elif self.vision_position.pose.orientation.z == None or self.vision_position.pose.orientation.z == 0:
-                    print("%s T265 is offline" % (drone_name))
-                elif self.local_position.pose.position.z == None or self.local_position.pose.position.z == 0:
-                    print("%s Mavros is offline" % (drone_name))
+                self.position_publisher(self.x,self.y,self.z,self.rx,self.ry,self.rz,self.rw)
 
             self.rate.sleep()
 
-    def position_callback(self, data): # callback invoked with the message as the first arg
+    # Callback for position from mavros, if this topic is offline, mavros is not yet initalisedelf.
+    def position_callback(self, data):
         self.local_position = data
 
-    def vision_callback(self, data): # callback invoked with the message as the first arg
-        self.vision_position = data
+    # Callback for position from position source, if this topic if offline, the position source is not publishing
+    def vision_callback(self, data):
 
-        
-    def callback_tf(self,data):
-        if data.transforms[0].header.frame_id == odom_frame_id:
-            self.y = data.transforms[0].transform.translation.y
-            self.x = data.transforms[0].transform.translation.x
-            self.z = data.transforms[0].transform.translation.z
-            self.rx = data.transforms[0].transform.rotation.x
-            self.ry = data.transforms[0].transform.rotation.y
-            self.rz = data.transforms[0].transform.rotation.z
+        # If TF is used as the as the position
+        if data._type=="tf2_msgs/TFMessage":
+            if data.transforms[0].header.frame_id == odom_frame_id:
+                self.x = data.transforms[0].transform.translation.x + float(global_x)
+                self.y = data.transforms[0].transform.translation.y + float(global_y)
+                self.z = data.transforms[0].transform.translation.z + float(global_z)
+                self.rx = data.transforms[0].transform.rotation.x
+                self.ry = data.transforms[0].transform.rotation.y
+                self.rz = data.transforms[0].transform.rotation.z
+                self.rw = data.transforms[0].transform.rotation.w
+
         else:
-            self.y = self.y
-            self.x = self.x
-            self.z = self.z
-            self.rx = self.rx
-            self.ry = self.ry
-            self.rz = self.rz
+            # Check for different data types
+            if data._type== "nav_msgs/Odometry" or data._type== "geometry_msgs/PoseWithCovarianceStamped":
+                self.x=data.pose.pose.position.x + float(global_x)
+                self.y=data.pose.pose.position.y + float(global_y)
+                self.z=data.pose.pose.position.z + float(global_z)
+                self.rx=data.pose.pose.orientation.x
+                self.ry=data.pose.pose.orientation.y
+                self.rz=data.pose.pose.orientation.z
+                self.rw=data.pose.pose.orientation.w
 
+            elif data._type== "geometry_msgs/PoseStamped":
+                self.x=data.pose.position.x + float(global_x)
+                self.y=data.pose.position.y + float(global_y)
+                self.z=data.pose.position.z + float(global_z)
+                self.rx=data.pose.orientation.x
+                self.ry=data.pose.orientation.y
+                self.rz=data.pose.orientation.z 
+                self.rw=data.pose.orientation.w   
 
+            else:
+                print("Unsupported vision message type")
+        
+
+        # # Change to global/system coordiantes if prompted
+        # if global_positioning==True:
+        #     self.global_positioning()
+
+    # def global_positioning(self):
+    #     self.x += float(global_x)
+    #     self.y += float(global_y)
+    #     self.z += float(global_z)
+    
     def filtered_estimator(self):
+        
+        if self.median_init==False:
+            for i in range(1,median_array_len):
+                self.x_list.append(self.x) 
+                self.y_list.append(self.y) 
+                self.z_list.append(self.z) 
+                self.rate.sleep()
+            self.median_init=True
+            self.filtered_x = np.median(self.x_list)
+            self.filtered_y = np.median(self.y_list)
+            self.filtered_z = np.median(self.z_list)
+        else:
+            self.filtered_x = np.median(self.x_list)
+            self.filtered_y = np.median(self.y_list)
+            self.filtered_z = np.median(self.z_list)
+            self.x_list.pop(0)
+            self.y_list.pop(0)
+            self.z_list.pop(0)
+            self.x_list.append(self.x) 
+            self.y_list.append(self.y) 
+            self.z_list.append(self.z) 
+        return self.filtered_x, self.filtered_y, self.filtered_z
+
+
+    def position_publisher(self, x, y, z, rx, ry, rz, rw):
+
+        # ERROR CHECKING
+        # print i, self.vision_position.pose.orientation.z, self.local_position.pose.position.z
+        if (self.z == None and self.local_position.pose.position.z == None) or (self.z == 0 and self.local_position.pose.position.z == 0):
+            print("%s Position Source and Mavros are offline" % (drone_name))
+            time.sleep(1)
+        elif self.z == None or self.z == 0:
+            print("%s Position Source is offline" % (drone_name))
+            time.sleep(1)
+        elif self.local_position.pose.position.z == None or self.local_position.pose.position.z == 0:
+            print("%s Mavros is offline" % (drone_name))
+            time.sleep(1)
 
         # Initialise necessary headers
         pos = PoseStamped()
         pos.header = Header()
         pos.header.frame_id = "filtered_vision"
 
-        pos.pose.position.x = self.filtered_x
-        pos.pose.position.y = self.filtered_y
-        pos.pose.position.z = self.filtered_z
+        pos.pose.position.x = x
+        pos.pose.position.y = y
+        pos.pose.position.z = z
 
-        roll = self.rx 
-        pitch = self.ry
-        yaw = self.rz
-
-        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
-        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
-        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
-        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
-
-        quaternion = [qx,qy,qz,qw]
-        pos.pose.orientation = Quaternion(*quaternion)
+        pos.pose.orientation.x = rx
+        pos.pose.orientation.y = ry
+        pos.pose.orientation.z = rz
+        pos.pose.orientation.w = rw
             
         pos.header.stamp = rospy.Time.now() # Update timestamp for each published SP
         self.pub_vis.publish(pos)
@@ -164,6 +223,15 @@ class vision:
     def quit(self):
         print('POS_265 IS SHUTTING DOWN')
         rospy.signal_shutdown("POS_265 SHUTTING DOWN")
+
+    def reset_t265(self):
+        pass
+    #     ctx = rs.context()
+    #     devices = ctx.query_devices()
+    #     for dev in devices:
+    #         dev.hardware_reset()
+    #         time.sleep(1)
+
 
 if __name__ == '__main__':
     rospy.init_node(drone_name + '_vision', anonymous=True)

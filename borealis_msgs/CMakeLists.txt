@@ -10,6 +10,7 @@ add_message_files(
   FILES
   Breadcrumb.msg
   xyz.msg
+  Borealis_HRI_Output.msg
 )
 
 

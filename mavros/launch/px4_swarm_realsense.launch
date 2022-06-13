@@ -61,8 +61,11 @@
 
     </group>
 
-	<node name="pos_265_new" pkg="mavros" type="pos_265_new" />
+	<node name="pos_265_new" pkg="mavros" type="pos_265" />
 
 	<!-- <node pkg="tf_publisher" type="tf_broadcaster" name="tf_broadcaster_$(env DRONE_NAME)" output="screen"/> -->
+
+	<node pkg="px4_lights" type="buzzer_ros.py" name="$(env DRONE_NAME)_lights" output="screen"/>
+	<node pkg="ros_helper_functions" type="uwb_human_broadcaster" name="tf_broadcaster_$(env DRONE_NAME)" output="screen"/>
 
 </launch>

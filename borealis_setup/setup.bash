@@ -76,6 +76,7 @@ SUBSYSTEM=="tty", ATTRS{idVendor}=="26ac", ATTRS{idProduct}=="0032", SYMLINK+="t
 #SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="ttyPixhawk"
 EOF'
 
+sudo udevadm control --reload-rules && udevadm trigger
 sudo usermod -a -G tty borealis
 sudo usermod -a -G dialout borealis
 

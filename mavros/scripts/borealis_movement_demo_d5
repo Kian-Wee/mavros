@@ -84,7 +84,7 @@ class borealis_movement:
         self.dummy_yaw = Float64()
         self.dummy = Point()
         self.Bezier_List = [self.traj_0,self.traj_1 ]
-        self.sweep = Bool()
+        self.mode = String()
         self.roll_x = 0.0
         self.pitch_y = 0.0
         self.yaw_z = 0.0
@@ -119,8 +119,10 @@ class borealis_movement:
         
         # sweep motion towards dummy        
         rospy.Subscriber("/uav" + id + "/command/yaw", Float64, self.yaw_callback)
-        rospy.Subscriber("/uav" + id + "/sweep", Bool, self.sweep_callback)
-        rospy.Subscriber("/uav" + id + "/target_position", Point, self.dummy_pose_callback)
+        rospy.Subscriber("/uav" + id + "/hri_mode", String, self.mode_callback)
+        rospy.Subscriber("/uav" + id + "/command/pose", PoseStamped, self.dummy_pose_callback)
+        # self.dummy.x=0
+        # self.dummy.y=0
         # rospy.Subscriber("/target_yaw", Float64, self.dummy_yaw_callback)
 
 
@@ -142,37 +144,38 @@ class borealis_movement:
             print self.pos_z_0
             #print len(self.Bezier_List)
             #print self.planner_activation.data
-            if self.sweep.data:
-                print "Sweeping" 
-                print self.sweep.data
-
-                if self.dummy.x == 0.0: # might need another trigger
-                    print "sweep but target not detected"
-                    self.Hovering()
-                else:
-                    if self.count == 0:
-                        print "distract_1"
-                        self.distract_x = self.dummy.x 
-                        self.distract_y = self.dummy.y + self.offset_y 
-                        self.distract_z = self.pos_z_0 
-                        if abs(self.distract_x - self.local_position.pose.position.x) < self.tolerance and abs(self.distract_y - self.local_position.pose.position.y) < self.tolerance:
-                            self.count = 1
-                    else:
-                        print "distract_0"
-            	        self.distract_x = self.pos_x_0
-                        self.distract_y = self.pos_y_0
-                        self.distract_z = self.pos_z_0 
-                        if abs(self.distract_x - self.local_position.pose.position.x) < self.tolerance and abs(self.distract_y - self.local_position.pose.position.y) < self.tolerance:
-                            self.count = 0
-                    self.Distract()
+            if self.mode=="Sweep":
+                print "Sweeping"
+                self.Hovering()
                     
+            elif self.mode == "Distract" and self.dummy.x != 0.0:
+                if self.count == 0:
+                    print "distract_1"
+                    self.distract_x = self.dummy.x 
+                    self.distract_y = self.dummy.y + self.offset_y 
+                    self.distract_z = self.pos_z_0 
+                    if abs(self.distract_x - self.local_position.pose.position.x) < self.tolerance and abs(self.distract_y - self.local_position.pose.position.y) < self.tolerance:
+                        self.count = 1
+                else:
+                    print "distract_0"
+                    self.distract_x = self.pos_x_0
+                    self.distract_y = self.pos_y_0
+                    self.distract_z = self.pos_z_0 
+                    if abs(self.distract_x - self.local_position.pose.position.x) < self.tolerance and abs(self.distract_y - self.local_position.pose.position.y) < self.tolerance:
+                        self.count = 0
+                self.Distract()
+                            
+            elif self.mode == "Distract" and self.dummy.x != 0.0:
+                print "trying to distract but target not detected"
+                self.Hovering()
+
             else:
                 if self.planner_activation.data:
                     self.Moving()
                     print "Moving w planner"
                 else:
                     self.Hovering()
-                    print "Hovering w planner"    
+                    print "Hovering w planner"
                 self.count = 0
             
             self.rate.sleep()
@@ -213,17 +216,18 @@ class borealis_movement:
         self.yaw_z = (abs(atan2(t3, t4))) 
 
 
-    def sweep_callback(self, data):
-        self.sweep = data 
+    def mode_callback(self, data):
+        self.mode = data.data 
 
 
     def dummy_pose_callback(self, data):
-        self.dummy = data           
+        if self.mode == "Distract":
+            self.dummy.x=data.pose.position.x
+            self.dummy.y=data.pose.position.y          
 
 
     def yaw_callback(self,data):
         self.yaw = data
-
 
     def dummy_yaw_callback(self,data):
         self.dummy_yaw = data
