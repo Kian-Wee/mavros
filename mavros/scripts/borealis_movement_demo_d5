@@ -20,6 +20,8 @@
 #    - Changed topic names after re-factoring : https://github.com/mavlink/mavros/issues/233
 #    - Use mavros.setpoint module for topics
 
+# TODO? moving_vel and hovering_vel needs changing to the current yaw
+
 import rospy
 import thread
 import threading
@@ -81,7 +83,7 @@ class borealis_movement:
         self.traj_1 = Bezier()
         self.yaw = Float64()
         self.yaw_hold = Float64()
-        self.dummy_yaw = Float64()
+        # self.dummy_yaw = Float64()
         self.dummy = Point()
         self.Bezier_List = [self.traj_0,self.traj_1 ]
         self.mode = String()
@@ -95,6 +97,7 @@ class borealis_movement:
         self.tolerance = 0.3
         self.whole = Path()
     
+        self.orientation = PoseStamped()
 
         # rospy.wait_for_service('mavros/cmd/arming', 30) # wait for arming, queue for 30s  # this bitch statement gives alot of problem
 
@@ -118,9 +121,9 @@ class borealis_movement:
         # rospy.Subscriber("/yaw3dk", Float64, self.yaw_callback)
         
         # sweep motion towards dummy        
-        rospy.Subscriber("/uav" + id + "/command/yaw", Float64, self.yaw_callback)
+        # rospy.Subscriber("/uav" + id + "/command/yaw", Float64, self.yaw_callback)
         rospy.Subscriber("/uav" + id + "/hri_mode", String, self.mode_callback)
-        rospy.Subscriber("/uav" + id + "/command/pose", PoseStamped, self.dummy_pose_callback)
+        rospy.Subscriber("/uav" + id + "/setpoint", PoseStamped, self.dummy_pose_callback)
         # self.dummy.x=0
         # self.dummy.y=0
         # rospy.Subscriber("/target_yaw", Float64, self.dummy_yaw_callback)
@@ -223,14 +226,16 @@ class borealis_movement:
     def dummy_pose_callback(self, data):
         if self.mode == "Distract":
             self.dummy.x=data.pose.position.x
-            self.dummy.y=data.pose.position.y          
+            self.dummy.y=data.pose.position.y
+
+        self.data         
 
 
-    def yaw_callback(self,data):
-        self.yaw = data
+    # def yaw_callback(self,data):
+    #     self.yaw = data
 
-    def dummy_yaw_callback(self,data):
-        self.dummy_yaw = data
+    # def dummy_yaw_callback(self,data):
+    #     self.dummy_yaw = data
 
 
     def activation_callback(self, data): # callback invoked with the message as the first arg
@@ -302,25 +307,27 @@ class borealis_movement:
         pos.pose.position.y = self.pos_y_0
         pos.pose.position.z = self.pos_z_0
 
-        # Establish desired orientation at setpoint
-        roll_degrees = 0.0 
-        roll = radians(roll_degrees)
-        pitch_degrees = 0.0 
-        pitch = radians(pitch_degrees)
-        yaw_degrees = 0.0  
-        yaw = radians(self.yaw.data)
+        # # Establish desired orientation at setpoint
+        # roll_degrees = 0.0 
+        # roll = radians(roll_degrees)
+        # pitch_degrees = 0.0 
+        # pitch = radians(pitch_degrees)
+        # yaw_degrees = 0.0  
+        # yaw = radians(self.yaw.data)
 
-        # Execute desired orientation
-        # quaternion = quaternion_from_euler(roll, pitch, yaw) #roll,pitch,yaw
+        # # Execute desired orientation
+        # # quaternion = quaternion_from_euler(roll, pitch, yaw) #roll,pitch,yaw
+        # # pos.pose.orientation = Quaternion(*quaternion)
+
+        # qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        # qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        # qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        # qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+        # quaternion = [qx,qy,qz,qw]  # drone only takes in quarternion values, therefore have to do euler to quarternion conversion
         # pos.pose.orientation = Quaternion(*quaternion)
 
-        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
-        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
-        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
-        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
-
-        quaternion = [qx,qy,qz,qw]  # drone only takes in quarternion values, therefore have to do euler to quarternion conversion
-        pos.pose.orientation = Quaternion(*quaternion)
+        pos.pose.orientation = self.orientation.pose.orientation
         
         #pos.header.stamp = rospy.Time.now() # Update timestamp for each published SP
 
@@ -339,26 +346,28 @@ class borealis_movement:
         pos.pose.position.y = self.pos_y_0
         pos.pose.position.z = self.pos_z_0
 
-        # Establish desired orientation at setpoint
-        roll_degrees = 0.0 
-        roll = radians(roll_degrees)
-        pitch_degrees = 0.0 
-        pitch = radians(pitch_degrees)
-        yaw_degrees = 0.0  
-        yaw = radians(self.yaw.data)
+        # # Establish desired orientation at setpoint
+        # roll_degrees = 0.0 
+        # roll = radians(roll_degrees)
+        # pitch_degrees = 0.0 
+        # pitch = radians(pitch_degrees)
+        # yaw_degrees = 0.0  
+        # yaw = radians(self.yaw.data)
 
-        # Execute desired orientation
-        # quaternion = quaternion_from_euler(roll, pitch, yaw) #roll,pitch,yaw
+        # # Execute desired orientation
+        # # quaternion = quaternion_from_euler(roll, pitch, yaw) #roll,pitch,yaw
+        # # pos.pose.orientation = Quaternion(*quaternion)
+
+        # qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        # qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        # qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        # qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+        # quaternion = [qx,qy,qz,qw]  # drone only takes in quarternion values, therefore have to do euler to quarternion conversion
         # pos.pose.orientation = Quaternion(*quaternion)
-
-        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
-        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
-        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
-        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
-
-        quaternion = [qx,qy,qz,qw]  # drone only takes in quarternion values, therefore have to do euler to quarternion conversion
-        pos.pose.orientation = Quaternion(*quaternion)
         
+        pos.pose.orientation = self.orientation.pose.orientation
+
         # pos.header.stamp = self.final_traj_0.header.stamp # Update timestamp for each published SP
 
         # Publishing to rostopic   
@@ -376,26 +385,28 @@ class borealis_movement:
         pos.pose.position.y = self.distract_y
         pos.pose.position.z = self.distract_z
 
-        # Establish desired orientation at setpoint
-        roll_degrees = 0.0 
-        roll = radians(roll_degrees)
-        pitch_degrees = 0.0 
-        pitch = radians(pitch_degrees)
-        yaw_degrees = 0.0  
-        yaw = radians(self.yaw.data)
+        # # Establish desired orientation at setpoint
+        # roll_degrees = 0.0 
+        # roll = radians(roll_degrees)
+        # pitch_degrees = 0.0 
+        # pitch = radians(pitch_degrees)
+        # yaw_degrees = 0.0  
+        # yaw = radians(self.yaw.data)
 
-        # Execute desired orientation
-        # quaternion = quaternion_from_euler(roll, pitch, yaw) #roll,pitch,yaw
+        # # Execute desired orientation
+        # # quaternion = quaternion_from_euler(roll, pitch, yaw) #roll,pitch,yaw
+        # # pos.pose.orientation = Quaternion(*quaternion)
+
+        # qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+        # qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
+        # qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
+        # qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
+
+        # quaternion = [qx,qy,qz,qw]  # drone only takes in quarternion values, therefore have to do euler to quarternion conversion
         # pos.pose.orientation = Quaternion(*quaternion)
-
-        qx = np.sin(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) - np.cos(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
-        qy = np.cos(roll/2) * np.sin(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.cos(pitch/2) * np.sin(yaw/2)
-        qz = np.cos(roll/2) * np.cos(pitch/2) * np.sin(yaw/2) - np.sin(roll/2) * np.sin(pitch/2) * np.cos(yaw/2)
-        qw = np.cos(roll/2) * np.cos(pitch/2) * np.cos(yaw/2) + np.sin(roll/2) * np.sin(pitch/2) * np.sin(yaw/2)
-
-        quaternion = [qx,qy,qz,qw]  # drone only takes in quarternion values, therefore have to do euler to quarternion conversion
-        pos.pose.orientation = Quaternion(*quaternion)
         
+        pos.pose.orientation = self.orientation.pose.orientation
+
         # pos.header.stamp = self.final_traj_0.header.stamp # Update timestamp for each published SP
 
         # Publishing to rostopic   

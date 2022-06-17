@@ -63,6 +63,8 @@ alias launch_borealis_ouster='. ~/parallel_comments.bash "sudo ntpdate -s time.n
 alias launch_buzzer='python ~/catkin_ws/src/PX4-Lights/buzzer_ros.py'
 alias drop_commit='. ~/parallel_comments.bash "git add -A" "git stash" "git stash drop stash@{0}"'
 
+alias launch_multimaster='~/ros_multimaster/ros_multimaster.bash'
+
 sudo ntpdate -s time.nist.gov
 EOF
 
