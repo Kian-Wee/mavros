@@ -147,30 +147,32 @@ class borealis_movement:
             print self.pos_z_0
             #print len(self.Bezier_List)
             #print self.planner_activation.data
-            if self.mode=="Sweep":
-                print "Sweeping"
-                self.Hovering()
-                    
-            elif self.mode == "Distract" and self.dummy.x != 0.0:
-                if self.count == 0:
-                    print "distract_1"
-                    self.distract_x = self.dummy.x 
-                    self.distract_y = self.dummy.y + self.offset_y 
-                    self.distract_z = self.pos_z_0 
-                    if abs(self.distract_x - self.local_position.pose.position.x) < self.tolerance and abs(self.distract_y - self.local_position.pose.position.y) < self.tolerance:
-                        self.count = 1
-                else:
-                    print "distract_0"
-                    self.distract_x = self.pos_x_0
-                    self.distract_y = self.pos_y_0
-                    self.distract_z = self.pos_z_0 
-                    if abs(self.distract_x - self.local_position.pose.position.x) < self.tolerance and abs(self.distract_y - self.local_position.pose.position.y) < self.tolerance:
-                        self.count = 0
-                self.Distract()
-                            
-            elif self.mode == "Distract" and self.dummy.x != 0.0:
-                print "trying to distract but target not detected"
-                self.Hovering()
+            if self.mode=="Sweep" or self.mode == "Distract":
+
+                if self.mode=="Sweep":
+                    print "Sweeping"
+                    self.Hovering()
+
+                elif self.mode == "Distract" and self.dummy.x == 0.0:
+                    print "trying to distract but target not detected"
+                    self.Hovering()
+                        
+                elif self.mode == "Distract" and self.dummy.x != 0.0:
+                    if self.count == 0:
+                        print "distract_1"
+                        self.distract_x = self.dummy.x 
+                        self.distract_y = self.dummy.y + self.offset_y 
+                        self.distract_z = self.pos_z_0 
+                        if abs(self.distract_x - self.local_position.pose.position.x) < self.tolerance and abs(self.distract_y - self.local_position.pose.position.y) < self.tolerance:
+                            self.count = 1
+                    else:
+                        print "distract_0"
+                        self.distract_x = self.pos_x_0
+                        self.distract_y = self.pos_y_0
+                        self.distract_z = self.pos_z_0 
+                        if abs(self.distract_x - self.local_position.pose.position.x) < self.tolerance and abs(self.distract_y - self.local_position.pose.position.y) < self.tolerance:
+                            self.count = 0
+                    self.Distract()
 
             else:
                 if self.planner_activation.data:
@@ -228,7 +230,10 @@ class borealis_movement:
             self.dummy.x=data.pose.position.x
             self.dummy.y=data.pose.position.y
 
-        self.data         
+            self.orientation.pose.orientation.x = data.pose.orientation.x
+            self.orientation.pose.orientation.y = data.pose.orientation.y
+            self.orientation.pose.orientation.z = data.pose.orientation.z
+            self.orientation.pose.orientation.w = data.pose.orientation.w
 
 
     # def yaw_callback(self,data):

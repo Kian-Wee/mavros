@@ -15,28 +15,30 @@ from nav_msgs.msg import Odometry
 from std_msgs.msg import Int32, Float32 # Lap counter
 import numpy as np
 import time
+import os
 
-local_pos_topic='/uav0/mavros/setpoint_position/local'
-local_vel_topic='/uav0/mavros/setpoint_raw/local'
-drone_pos_topic= '/uav0/mavros/local_position/odom'
+drone_name = os.getenv('DRONE_NAME') #environment variable set in bashrc(or exported in terminal)
 
-lap_topic="/uav0/lap"
-velocity_topic="uav0/velocity"
+local_pos_topic=drone_name+'/mavros/setpoint_position/local'
+local_vel_topic=drone_name+'/mavros/setpoint_raw/local'
+drone_pos_topic= drone_name+'/mavros/local_position/odom'
 
-velocity =  1.0 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
+lap_topic=drone_name+"/lap"
+velocity_topic=drone_name+"/velocity"
+
+velocity = 0 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
 shape = "Waypoints" # Square, Circle, Inclined Square, Line, Pattern(Velocity Dependent), Waypoints(Velocity Independent, has to wait for waypoint to reach) 
 radius = 3.0
 altitude = 2.5 # default altitude to hover at
 altitude2 = 2 # secondary altitude for inclined square
+pattern_array = [[0,0,1],[2,0,1],[2,2,1],[0,1,1],[0,0,1]] # The waypoints to go to
 
 z_vel=0.2 # m/s
 wait_for_start = 1 # Waits for drone to get into first position before continuing
-rate=15 #hz
-
-pattern_array = [[0,0,1],[2,0,1],[2,2,1],[0,1,1],[0,0,1]]
-
 wait=0 # Set to 1 if the drone should hit the setpoint first before moving
 tolerance=0.1 # Drone is considered to have hit setpoint if within this distance of setpoint
+
+rate=15 #hz
 
 mavros.set_namespace()
 
@@ -46,7 +48,7 @@ class drone:
 
         global wait_for_start, wait
 
-        self.rate = rospy.Rate(rate) # 10hz
+        self.rate = rospy.Rate(rate)
 
         self.drone_position = Odometry() #callback data is saved here
         rospy.Subscriber(drone_pos_topic, Odometry , self.positioncallback)
@@ -255,8 +257,6 @@ class drone:
             else:
                 print("Invalid Shape")
                 rospy.signal_shutdown("Invalid Shape")
-
-    
 
     # Go to position, supports velocity setpoints too
     def gotopos(self, x, y, z, velocity=0):
