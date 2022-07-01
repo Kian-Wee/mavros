@@ -1,5 +1,9 @@
 #!/usr/bin/env python
 
+# !!! Ensure the px4 param COM_RCL_EXCEPT is set to 5 in QGC
+# NAV_RCL_ACT is disabled
+# COM_RC_IN_MODE no checks
+
 # Basic position control
 # Velocity may be controlled by sequencing the setpoints at a fixed position based on the rosrate
 # Currently, velocity mode does not check if the the drone reaches the set position but contionusly sends the following waypoint to get the drone to try to accelerate to the desired velocity
@@ -17,7 +21,8 @@ import numpy as np
 import time
 import os
 
-drone_name = os.getenv('DRONE_NAME') #environment variable set in bashrc(or exported in terminal)
+# drone_name = os.getenv('DRONE_NAME') #environment variable set in bashrc(or exported in terminal)
+drone_name = "uav1"
 
 local_pos_topic=drone_name+'/mavros/setpoint_position/local'
 local_vel_topic=drone_name+'/mavros/setpoint_raw/local'
@@ -26,15 +31,15 @@ drone_pos_topic= drone_name+'/mavros/local_position/odom'
 lap_topic=drone_name+"/lap"
 velocity_topic=drone_name+"/velocity"
 
-velocity = 0 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
-shape = "Waypoints" # Square, Circle, Inclined Square, Line, Pattern(Velocity Dependent), Waypoints(Velocity Independent, has to wait for waypoint to reach) 
+velocity = 1 # leave 0 for position mode, position will be automatically determined by px4 based on distance to next setpoint and rate
+shape = "Figure8" # Square, Circle, Inclined Square, Line, Figure8, Pattern(Velocity Dependent), Waypoints(Velocity Independent, has to wait for waypoint to reach) 
 radius = 3.0
 altitude = 2.5 # default altitude to hover at
 altitude2 = 2 # secondary altitude for inclined square
 pattern_array = [[0,0,1],[2,0,1],[2,2,1],[0,1,1],[0,0,1]] # The waypoints to go to
 
 z_vel=0.2 # m/s
-wait_for_start = 1 # Waits for drone to get into first position before continuing
+wait_for_start = 0 # Waits for drone to get into first position before continuing
 wait=0 # Set to 1 if the drone should hit the setpoint first before moving
 tolerance=0.1 # Drone is considered to have hit setpoint if within this distance of setpoint
 
@@ -78,7 +83,7 @@ class drone:
                 wait_for_start = 0
 
             # Send trajectory and sleep
-            if(wait==0):
+            if wait==0:
                 for pos in self.traj_arr:
                     print(pos, self.lapcounter)
                     self.gotopos(pos[0],pos[1],pos[2])
@@ -225,6 +230,27 @@ class drone:
                 #     no_of_waypoints=round(float(distance)/float(velocity)*rate) # no of waypoints per side
                 #     # Caculate all the subwaypoints between the main waypoints
                 #     for wp in range(0,len):
+
+            # This is caculated similiar to the shape of the circle with the formula
+            # x = sin(t), y = sin(t) * cos(t) ; this doesnt generate the nicest figure of 8 but it significantly simplifies the code and allows it to share the circle code
+            # TODO, figure out speed settings
+            # other formulas : x = sin(t), y = -sin(t)
+            elif shape=="Figure8":
+                radius = radius/4
+                print("Figure 8")
+                total_time_taken=4*math.pi*radius/velocity # find the time taken each lap
+                no_of_waypoints=int(round(total_time_taken*rate)) # find the number of waypoints per loop and round it to the nearest whole number
+
+                # After getting the total number of waypoints, recompute the new radius by inverting the formula
+                # This helps the drone to complete the trajectory in a discrete number of rate steps
+                total_time_taken=no_of_waypoints/float(rate)
+                radius=total_time_taken*velocity/(2*math.pi)
+                rospy.loginfo("New radius is. %s", radius)
+
+                rospy.loginfo("Total number of waypoints: %s", no_of_waypoints)
+
+                #Generate Trajectory
+                return [(math.sin(2*math.pi/no_of_waypoints*x)*radius,math.sin(2*math.pi/no_of_waypoints*x)*math.cos(2*math.pi/no_of_waypoints*x)*radius,altitude) for x in range(0,no_of_waypoints+1)]
 
             else:
                 print("Invalid Shape")
