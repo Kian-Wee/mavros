@@ -193,10 +193,10 @@ class vision:
 
         # ERROR CHECKING
         # print i, self.vision_position.pose.orientation.z, self.local_position.pose.position.z
-        if (self.z == None and self.local_position.pose.position.z == None) or (self.z == 0 and self.local_position.pose.position.z == 0):
+        if (self.rw == None and self.local_position.pose.position.z == None) or (self.rw == 0 and self.local_position.pose.position.z == 0):
             print("%s Position Source and Mavros are offline" % (drone_name))
             time.sleep(1)
-        elif self.z == None or self.z == 0:
+        elif self.rw == None or self.rw == 0:
             print("%s Position Source is offline" % (drone_name))
             time.sleep(1)
         elif self.local_position.pose.position.z == None or self.local_position.pose.position.z == 0:
