@@ -40,9 +40,15 @@ Run the setup file to initalise aliases and udev rules
 ``` . ~/catkin_ws/src/mavros/borealis_setup/setup.bash ```
 
 #### PX4 Params configuration
+
 EKF2_HGT_Mode -> Vision
+
 EKF2_RNG_AID -> Enabled
-EKF_2_AID_MASK -> Vision position fusion, Vision yaw fusion (uncheck everything else)
+
+EKF_2_AID_MASK -> Vision position fusion, Vision yaw fusion (uncheck everything else, value should be 24)
+
+SYS_ID -> same as tgt_id on mavros
+
 [Developer blogpost on params](https://hubs.la/Q0168CVX0)
 
 #### QGC Setup
