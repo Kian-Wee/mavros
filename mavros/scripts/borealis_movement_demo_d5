@@ -230,10 +230,10 @@ class borealis_movement:
             self.dummy.x=data.pose.position.x
             self.dummy.y=data.pose.position.y
 
-            self.orientation.pose.orientation.x = data.pose.orientation.x
-            self.orientation.pose.orientation.y = data.pose.orientation.y
-            self.orientation.pose.orientation.z = data.pose.orientation.z
-            self.orientation.pose.orientation.w = data.pose.orientation.w
+        self.orientation.pose.orientation.x = data.pose.orientation.x
+        self.orientation.pose.orientation.y = data.pose.orientation.y
+        self.orientation.pose.orientation.z = data.pose.orientation.z
+        self.orientation.pose.orientation.w = data.pose.orientation.w
 
 
     # def yaw_callback(self,data):
