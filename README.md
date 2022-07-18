@@ -49,6 +49,10 @@ EKF_2_AID_MASK -> Vision position fusion, Vision yaw fusion (uncheck everything 
 
 SYS_ID -> same as tgt_id on mavros
 
+MC_YAWRATE_MAX -> 80 deg/s(prevent localisation drift)
+
+MC_YAWRAUTO_MAX -> 4 deg/s(prevent localisation drift)
+
 [Developer blogpost on params](https://hubs.la/Q0168CVX0)
 
 #### QGC Setup
