@@ -82,7 +82,8 @@ class vision:
         self.rx = 0.0
         self.ry = 0.0
         self.rz = 0.0
-        self.rw = 0.0  
+        self.rw = 0.0
+        self.timer = 0.0
 
         self.rate = rospy.Rate(50) # Rate of position source, mavros requires posestamped message at minimum 50hz and posestampedwithcovariance at 30hz
 
@@ -193,15 +194,15 @@ class vision:
 
         # ERROR CHECKING
         # print i, self.vision_position.pose.orientation.z, self.local_position.pose.position.z
-        if (self.rw == None and self.local_position.pose.position.z == None) or (self.rw == 0 and self.local_position.pose.position.z == 0):
+        if ((self.rw == None and self.local_position.pose.position.z == None) or (self.rw == 0 and self.local_position.pose.position.z == 0)) and self.timer > time.time() + 1:
             print("%s Position Source and Mavros are offline" % (drone_name))
-            time.sleep(1)
-        elif self.rw == None or self.rw == 0:
+            self.timer=time.time()
+        elif (self.rw == None or self.rw == 0) and self.timer > time.time() + 1:
             print("%s Position Source is offline" % (drone_name))
-            time.sleep(1)
-        elif self.local_position.pose.position.z == None or self.local_position.pose.position.z == 0:
+            self.timer=time.time()
+        elif (self.local_position.pose.position.z == None or self.local_position.pose.position.z == 0) and self.timer > time.time() + 1:
             print("%s Mavros is offline" % (drone_name))
-            time.sleep(1)
+            self.timer=time.time()
 
         # Initialise necessary headers
         pos = PoseStamped()
