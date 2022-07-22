@@ -186,13 +186,13 @@ class vision:
         # print i, self.vision_position.pose.orientation.z, self.local_position.pose.position.z
         if ((self.rw == None and self.local_position.pose.position.z == None) or (self.rw == 0 and self.local_position.pose.position.z == 0)) and self.timer + 2 < time.time():
             print("%s Position Source and Mavros are offline" % (drone_name))
-            # self.timer=time.time()
+            self.timer=time.time()
         elif (self.rw == None or self.rw == 0) and self.timer + 2 < time.time():
             print("%s Position Source is offline" % (drone_name))
-            # self.timer=time.time()
+            self.timer=time.time()
         elif (self.local_position.pose.position.z == None or self.local_position.pose.position.z == 0) and self.timer + 2 < time.time():
             print("%s Mavros is offline" % (drone_name))
-            # self.timer=time.time()
+            self.timer=time.time()
 
         # Initialise necessary headers
         pos = PoseStamped()
