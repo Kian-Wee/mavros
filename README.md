@@ -59,7 +59,7 @@ PWM_MAIN_MIN -> 950 (esc calibration often does not give the proper min value)
 
 MPC_THR_HOVER -> 32
 
-MC_ROLLRATE, MP_PITCHRATE, MC_YAWRATE -> ensure pid tuning is done
+MC_ROLLRATE, MC_PITCHRATE, MC_YAWRATE -> ensure pid tuning is done
 
 
 [Developer blogpost on params](https://hubs.la/Q0168CVX0)
