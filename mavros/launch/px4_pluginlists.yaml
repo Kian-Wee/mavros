@@ -1,12 +1,54 @@
+# When launching mavros, the list of plugins that are loaded and blacklisted will be shown, use it as reference
+
 plugin_blacklist:
-# common
+# common http://wiki.ros.org/mavros/Plugins
 - safety_area
-# extras
+- global_position
+- imu_pub
+- param
+- rc_io
+- vfr_hud
+- waypoint
+- 3dr_radio
+- actuator_control
+- adsb
+- camera
+- companion_process_status
+- debug_value
+- esc_status
+- esc_telemetry
+- fake_gps
+- ftp
+- geofence
+- gps_input
+- gps_rtk
+- gps_status
+- hil
+- home_position
+- imu
+- landing_target
+- mount_control
+- nav_controller_output
+- obstacle_distance
+- onboard_computer_status
+- rallypoint
+- terrain
+- trajectory
+- tunnel
+- wind_estimation
+
+
+
+
+# extras http://wiki.ros.org/mavros_extras#Plugins
 - image_pub
 - vibration
 - distance_sensor 
 - rangefinder
 - wheel_odometry
+- px4flow
+- mocap_pose_estimate
+- cam_imu_sync
 
 
 
