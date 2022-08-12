@@ -60,7 +60,7 @@ median_filter=False
 median_array_len=15
 
 # Clear T265(Beta)
-
+# TODO, rosparam set /mavros/target_system_id 1
 
 class vision:
     """
