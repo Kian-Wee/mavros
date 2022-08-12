@@ -25,7 +25,6 @@ plugin_blacklist:
 - gps_status
 - hil
 - home_position
-- imu
 - landing_target
 - mount_control
 - nav_controller_output
