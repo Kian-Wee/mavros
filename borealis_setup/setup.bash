@@ -20,7 +20,6 @@ sudo apt-get install libgeographic-dev ros-melodic-geographic-msgs geographiclib
 # Install buzzer package
 cd ~/catkn_ws/src/
 git clone https://github.com/Kian-Wee/PX4-Lights
-git clone 
 
 # Copy bash script for running multiple commands into home folder
 cp ~/catkin_ws/src/mavros/borealis_setup/parallel_comments.bash ~
@@ -28,6 +27,12 @@ cp ~/catkin_ws/src/mavros/borealis_setup/parallel_comments.bash ~
 # Copy aliases
 cat >> ~/.bashrc << EOF	
 source ~/catkin_ws/devel/setup.bash --extend
+source ~/tenghooi_ws/devel/setup.bash --extend
+source ~/catkin_ws/devel/setup.bash --extend
+source ~/multi_agent_ws/devel/setup.bash --extend
+source ~/uwb_ws/devel/setup.bash --extend
+source ~/rlss_ws/devel/setup.bash --extend
+source ~/trajectory_ws/devel/setup.bash --extend
 
 # Configure these
 #export DRONE_NAME="uav0"
@@ -50,8 +55,8 @@ alias launch_d435i='roslaunch realsense2_camera rs_camera.launch camera:=$DRONE_
 alias launch_t265='roslaunch realsense2_camera rs_t265.launch serial_no:=$T265_ID camera:=$DRONE_NAME/t265'
 
 ## Ouster aliases
-alias launch_ouster='roslaunch ouster_ros ouster.launch sensor_hostname:="os-122121000737.local"  metadata:="/home/borealis/ouster/ouster_example/ouster_meta.json" '
-#alias launch_ouster='roslaunch ouster_ros ouster.launch sensor_hostname:="os1-991942000601.local"  metadata:="/home/borealis/ouster/ouster_example/ouster_meta.json" '
+alias launch_ouster='roslaunch ouster_ros ouster.launch sensor_hostname:="os-serialnumberhere.local"  metadata:="/home/borealis/ouster/ouster_example/ouster_meta.json" '
+alias sync_ouster='sudo ptpd -i enp4s0 -M'
 
 ## Mavros aliases
 # Syncronise time and launch mavros, 2 realsenses, the positioning node and the LEDs
@@ -108,7 +113,6 @@ source ~/.bashrc
 # Python installation, source: https://discourse.acados.org/t/acados-installation-in-pycharm/103/11
 sudo apt-get install virtualenv -y
 sudo apt install python3-pip -y
-pip3 install -e /home/$USER/acados/interfaces/acados_template
 
 echo "Build Acados? [Y,n]"
 read input
@@ -139,6 +143,8 @@ if [[ $input == "Y" || $input == "y" ]]; then
 	echo "Ensure X-11 forwarding is enabled when running over ssh"
 	cd ~/acados/examples/acados_python/getting_started
 	python3 minimal_example_closed_loop.py
+	pip3 install -e /home/$USER/acados/interfaces/acados_template
+	pip3 install future-fstrings
 else
         echo "Not building acados"
 fi
