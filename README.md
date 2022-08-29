@@ -11,7 +11,6 @@ sudo reboot
 
 You might need to catkin clean and catkin build the workspaces again
 
-
 ## **New Borealis Setup**
 
 ### Installation
@@ -68,7 +67,7 @@ MC_ROLLRATE, MC_PITCHRATE, MC_YAWRATE -> ensure pid tuning is done
 Do remember to change the MAV_SYS_ID on different vehicles, subsequently, change the gcs url port in the mavros launch file
 The first drone using port 14555 and the subsequent starting from 14556(or any port your prefer), Remember to add the port in QGC when monitoring
 
-[Other reference](https://github.com/PX4/PX4-Devguide/blob/master/en/companion_computer/pixhawk_companion)
+[Other reference](https://github.com/PX4/PX4-Devguide/blob/master/en/companion_computer/pixhawk_companion.md)
 
 To run the ouster, ensure the ethernet link is set to link-local only under ipv4 settings
 
@@ -78,7 +77,7 @@ To run the ouster, ensure the ethernet link is set to link-local only under ipv4
 
 **basic_position** - send positions and generate trajectories
 
-**pos_265** - node for Intel Realsense 265, visual positioning is given to mavros (pos_265_old shows all output)
+**pos_265** - node to provide vision position for mavros, supports posestamped and odometry types (pos_265_old shows all output)
 
 **follow+odom+velocity** - follows and republishes odom and velocity, counts error per lap
 
