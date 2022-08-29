@@ -143,8 +143,8 @@ if [[ $input == "Y" || $input == "y" ]]; then
 	echo "Ensure X-11 forwarding is enabled when running over ssh"
 	cd ~/acados/examples/acados_python/getting_started
 	python3 minimal_example_closed_loop.py
-	pip3 install -e /home/$USER/acados/interfaces/acados_template
 	pip3 install future-fstrings
+	pip3 install -e /home/$USER/acados/interfaces/acados_template
 else
         echo "Not building acados"
 fi
