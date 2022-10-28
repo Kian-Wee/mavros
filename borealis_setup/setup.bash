@@ -60,7 +60,7 @@ alias sync_ouster='sudo ptpd -i enp4s0 -M'
 
 ## Mavros aliases
 # Syncronise time and launch mavros, 2 realsenses, the positioning node and the LEDs
-alias launch_borealis='. ~/parallel_comments.bash "sudo ntpdate -s time.nist.gov" "roslaunch mavros px4_swarm.launch" "roslaunch realsense2_camera rs_t265.launch camera:=$DRONE_NAME/t265 serial_no:=$T265_ID --wait" "rosrun mavros pos_265" "roslaunch realsense2_camera rs_camera.launch camera:=$DRONE_NAME/d435i serial_no:=$D435_ID color_width:=848 color_height:=480 color_fps:=30 depth_width:=848 depth_height:=480 depth_fps:=30 align_depth:=true initial_reset:=true enable_sync:=true --wait" "python ~/catkin_ws/src/PX4-Lights/buzzer_ros.py"'
+alias launch_borealis='. ~/parallel_comments.bash "sudo ntpdate -s time.nist.gov" "roslaunch mavros px4_swarm.launch" "roslaunch realsense2_camera rs_t265.launch camera:=$DRONE_NAME/t265 serial_no:=$T265_ID --wait" "rosrun mavros pos_265" "roslaunch realsense2_camera rs_camera.launch camera:=$DRONE_NAME/d435i serial_no:=$D435_ID color_width:=848 color_height:=480 color_fps:=30 depth_width:=848 depth_height:=480 depth_fps:=30 align_depth:=true initial_reset:=true enable_sync:=true output:=log --wait" "python ~/catkin_ws/src/PX4-Lights/buzzer_ros.py"'
 # Alternative launch script using combined roslaunch
 alias launch_borealis2='. ~/parallel_comments.bash "sudo ntpdate -s time.nist.gov" "roslaunch mavros px4_swarm_realsense.launch" "python ~/catkin_ws/src/PX4-Lights/buzzer_ros.py"'
 # Launch Borealis with Ouster tracking, also launches Ouster
