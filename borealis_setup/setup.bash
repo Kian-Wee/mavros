@@ -77,12 +77,16 @@ EOF
 sudo chmod 777 ~/catkin_ws/src/mavros/borealis_setup/setup.bash
 sudo touch "/etc/udev/rules.d/99-pixhawk.rules"
 sudo bash -c 'cat << EOF > /etc/udev/rules.d/99-pixhawk.rules
+# lsusb to find out
+
 # Pixhawk 4
-SUBSYSTEM=="tty", ATTRS{idVendor}=="26ac", ATTRS{idProduct}=="0032", SYMLINK+="ttyPixhawk"
+#SUBSYSTEM=="tty", ATTRS{idVendor}=="26ac", ATTRS{idProduct}=="0032", SYMLINK+="ttyPixhawk"
 # Pixhawk 2
 # SUBSYSTEM=="tty", ATTRS{idVendor}=="0403", ATTRS{idProduct}=="6001", SYMLINK+="ttyPixhawk"
 # Pixhawk Cube Orange
-# SUBSYSTEM=="tty", ATTRS{idVendor}=="2dae", ATTRS{idProduct}=="1016", SYMLINK+="ttyPixhawk"
+SUBSYSTEM=="tty", ATTRS{idVendor}=="2dae", ATTRS{idProduct}=="1016", SYMLINK+="ttyPixhawk"
+# Pixhawk 6x
+# SUBSYSTEM=="tty", ATTRS{idVendor}=="3185", ATTRS{idProduct}=="0035", SYMLINK+="ttyPixhawk"
 EOF'
 
 sudo udevadm control --reload-rules && udevadm trigger
