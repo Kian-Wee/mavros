@@ -117,12 +117,12 @@ private:
     const rclcpp::Time & stamp, const Eigen::Affine3d & tr,
     const geometry_msgs::msg::PoseWithCovariance::_covariance_type & cov)
   {
-    if (last_transform_stamp == stamp) {
-      RCLCPP_DEBUG_THROTTLE(
-        get_logger(),
-        *get_clock(), 10, "Vision: Same transform as last one, dropped.");
-      return;
-    }
+    // if (last_transform_stamp == stamp) {
+    //   RCLCPP_DEBUG_THROTTLE(
+    //     get_logger(),
+    //     *get_clock(), 10, "Vision: Same transform as last one, dropped.");
+    //   return;
+    // }
     last_transform_stamp = stamp;
 
     auto position = ftf::transform_frame_enu_ned(Eigen::Vector3d(tr.translation()));
