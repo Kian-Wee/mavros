@@ -92,6 +92,11 @@ To run the ouster, ensure the ethernet link is set to link-local only under ipv4
 ### Multi-Drone Setup
 Run ``` sudo ntpdate -s time.nist.gov ``` on all devices
 
+### Debugging Position Control
+Aside from checking the coordinate frame, check that the uorb topics are being published to by typing listener [[topic]](https://github.com/PX4/PX4-Autopilot/blob/main/src/modules/uxrce_dds_client/dds_topics.yaml).
+/vehicle_visual_odometry should show the position estimate and
+/vehicle_local_position should show the postition estimate post fusion and should not be using dead reckoning.
+
 
 MAVROS
 ======
