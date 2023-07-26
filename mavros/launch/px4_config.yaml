@@ -45,14 +45,14 @@ cmd:
 
 # global_position
 global_position:
-  frame_id: "map"             # origin frame
+  frame_id: "global"             # origin frame
   child_frame_id: "base_link" # body-fixed frame
   rot_covariance: 99999.0   # covariance for attitude?
   gps_uere: 1.0             # User Equivalent Range Error (UERE) of GPS sensor (m)
   use_relative_alt: true    # use relative altitude for local coordinates
   tf:
     send: true              # send TF? set true for rtab, usually its false
-    frame_id: "map"  # TF frame_id
+    frame_id: "global"  # TF frame_id
     global_frame_id: "earth"  # TF earth frame_id
     child_frame_id: "base_link" # TF child_frame_id
 
@@ -67,11 +67,11 @@ imu:
 
 # local_position
 local_position:
-  frame_id: "map"
+  frame_id: "local"
 #  frame_id: "odom"
   tf:
-    send: false  #used to be false
-    frame_id: "map" #used to be map
+    send: true  #used to be false
+    frame_id: "local" #used to be map
     child_frame_id: "base_link" #used to be base_link
     send_fcu: true  # used to be false
 
